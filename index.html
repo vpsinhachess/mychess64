@@ -941,11 +941,27 @@ function handleHostData(conn, data){
     drawOfferBy = conn.role || conn.playerColor;
     hostSync();
   }
-  if(data.type === 'drawAccept' && conn === guestConn && drawOfferBy === myColor && !getGameResult()){
-    drawOfferBy=null; setGameResult('0.5-0.5','Draw agreed'); hostSync();
+  if(data.type === 'drawAccept' && !getGameResult()){
+    // The Host is authoritative. Accept only from the actual playing Guest
+    // whose assigned colour is the opponent of the active Host offer.
+    // Do not require conn === guestConn because a mobile reconnect can leave
+    // a short-lived stale DataConnection object while the action is in flight.
+    const responder = conn.playerColor || conn.role;
+    if(responder && drawOfferBy && responder !== drawOfferBy && responder === ((drawOfferBy === 'w') ? 'b' : 'w')){
+      drawOfferBy=null;
+      setGameResult('0.5-0.5','Draw agreed');
+      hostSync();
+    }
   }
-  if(data.type === 'drawDecline' && conn === guestConn && drawOfferBy === myColor){
-    drawOfferBy=null; hostSync();
+  if(data.type === 'drawDecline'){
+    // Same authoritative validation for Decline: only the opponent of the
+    // active offer may clear it. This prevents stale/duplicate messages from
+    // changing the game state.
+    const responder = conn.playerColor || conn.role;
+    if(responder && drawOfferBy && responder !== drawOfferBy && responder === ((drawOfferBy === 'w') ? 'b' : 'w')){
+      drawOfferBy=null;
+      hostSync();
+    }
   }
   if(data.type === 'resign' && conn === guestConn && !getGameResult()){
     setGameResult(conn.role==='w'?'0-1':'1-0',(conn.role==='w'?'White':'Black')+' resigned'); hostSync();
@@ -1257,9 +1273,9 @@ function respondDraw(accept){
     else drawOfferBy=null;
     hostSync();
   } else {
-    drawOfferBy=null;
-    renderGame();
-    sendGuestCommand({type:accept?'drawAccept':'drawDecline'});
+    // Keep the popup visible until the Host broadcasts the authoritative result.
+    // This prevents the Guest UI from hiding a response that was not yet processed.
+    sendGuestCommand({type:accept?'drawAccept':'drawDecline', fromColor:myColor});
   }
 }
 function resignGame(){
