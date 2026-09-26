@@ -121,7 +121,7 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
 .room-chip{font-size:.78rem;color:var(--muted);padding:6px 9px;border:1px solid var(--border);border-radius:7px;}
 .game-layout{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;padding:8px;}
 .board-zone{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-#board{width:min(100%,calc(100dvh - 70px));height:auto;max-width:100%;max-height:calc(100dvh - 70px);aspect-ratio:1/1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:2px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.28);touch-action:manipulation;flex:0 0 auto;}
+#board{width:min(100%,calc(100dvh - 70px));height:min(100%,calc(100dvh - 70px));max-width:calc(100dvh - 70px);max-height:calc(100dvh - 70px);aspect-ratio:1/1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);border-radius:2px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.28);touch-action:manipulation;flex:0 0 auto;}
 #board{position:relative;}
 #board .arrow-layer{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;overflow:visible;}
 #board .arrow-line{fill:none;stroke-width:.16;stroke-linecap:round;stroke-linejoin:round;}
@@ -197,7 +197,7 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
   .game-app{height:auto;min-height:100dvh;grid-template-rows:52px auto;}
   .game-layout{grid-template-columns:1fr;gap:8px;padding:5px;}
   .board-zone{min-height:auto;overflow:visible;}
-  #board{width:min(calc(100vw - 10px),calc(100dvh - 130px));height:auto;max-width:calc(100vw - 10px);max-height:calc(100dvh - 130px);aspect-ratio:1/1;}
+  #board{width:min(calc(100vw - 10px),calc(100dvh - 130px));height:min(calc(100vw - 10px),calc(100dvh - 130px));max-width:none;max-height:none;}
   .side-panel{min-height:0;height:auto;max-height:none;}
 }
 @media(max-width:520px){
@@ -232,7 +232,7 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
   .game-app{height:100dvh;min-height:0;grid-template-rows:52px minmax(0,1fr);}
   .game-layout{height:100%;min-height:0;grid-template-columns:minmax(0,1fr) 300px;gap:8px;padding:5px;}
   .board-zone{min-width:0;min-height:0;height:100%;overflow:hidden;}
-  #board{width:min(100%,calc(100dvh - 65px));height:auto;max-width:100%;max-height:calc(100dvh - 65px);aspect-ratio:1/1;}
+  #board{width:min(100%,calc(100dvh - 65px));height:min(100%,calc(100dvh - 65px));max-width:calc(100dvh - 65px);max-height:calc(100dvh - 65px);}
   .side-panel{height:100%;max-height:100%;min-height:0;overflow:hidden;}
   .players-panel{padding:7px;gap:5px;}
   .player-row{padding:7px 8px;gap:6px;}
@@ -244,115 +244,6 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
   .controls{padding:7px 8px;}
   .control-grid,.game-actions{gap:5px;}
   .control-grid button,.game-actions button{padding:7px 5px;font-size:.78rem;}
-}
-
-/* =========================================================
-   MyChess64 Responsive Display V2
-   Priority: Chessboard + Player Names + Chess Clocks
-   Layout adapts by width AND orientation.
-   ========================================================= */
-
-/* Desktop / laptop landscape: board and player panel side-by-side. */
-@media (min-width:901px) and (orientation:landscape){
-  html,body{overflow:hidden;}
-  .game-app{height:100dvh;min-height:0;grid-template-rows:52px minmax(0,1fr);}
-  .game-layout{height:100%;min-height:0;grid-template-columns:minmax(0,1fr) clamp(300px,24vw,360px);gap:10px;padding:6px;}
-  .board-zone{height:100%;min-width:0;min-height:0;overflow:hidden;}
-  #board{width:min(100%,calc(100dvh - 64px));height:auto;max-width:100%;max-height:calc(100dvh - 64px);aspect-ratio:1/1;}
-  .side-panel{height:100%;max-height:100%;min-height:0;overflow:hidden;}
-  .players-panel{flex:0 0 auto;}
-  .notation-wrap{min-height:0;flex:1 1 auto;overflow:hidden;}
-  .notation{min-height:0;overflow-y:auto;}
-  .controls{flex:0 0 auto;}
-}
-
-/* Tablet / small laptop landscape: keep the full board beside names + clocks. */
-@media (min-width:721px) and (max-width:900px) and (orientation:landscape){
-  html,body{overflow:hidden;}
-  .game-app{height:100dvh;min-height:0;grid-template-rows:48px minmax(0,1fr);}
-  .game-topbar{padding:0 9px;}
-  .brand-logo{width:36px;height:24px;}
-  .brand-name{font-size:.96rem;}
-  .game-layout{height:100%;min-height:0;grid-template-columns:minmax(0,1fr) 285px;gap:7px;padding:5px;}
-  .board-zone{height:100%;min-width:0;min-height:0;overflow:hidden;}
-  #board{width:min(100%,calc(100dvh - 60px));height:auto;max-width:100%;max-height:calc(100dvh - 60px);aspect-ratio:1/1;}
-  .side-panel{height:100%;max-height:100%;min-height:0;overflow:hidden;}
-  .players-panel{padding:7px;gap:5px;flex:0 0 auto;}
-  .player-row{padding:7px 8px;gap:6px;}
-  .player-name{font-size:.92rem;}
-  .player-meta{font-size:.64rem;}
-  .clock{font-size:1.18rem;min-width:78px;padding:6px 8px;}
-  .notation-wrap{min-height:0;flex:1 1 auto;overflow:hidden;}
-  .notation{min-height:0;overflow-y:auto;}
-  .controls{padding:7px 8px;flex:0 0 auto;}
-}
-
-/* Mobile landscape: preserve the chessboard and BOTH player clocks side-by-side. */
-@media (max-width:720px) and (orientation:landscape){
-  html,body{overflow:hidden;}
-  .game-app{height:100dvh;min-height:0;grid-template-rows:46px minmax(0,1fr);}
-  .game-topbar{padding:0 7px;}
-  .brand-logo{width:32px;height:22px;}
-  .brand-name{font-size:.88rem;}
-  .room-chip{display:none;}
-  .top-actions{gap:4px;}
-  .top-actions button{width:34px;height:34px;}
-  .game-layout{height:100%;min-height:0;grid-template-columns:minmax(0,1fr) clamp(250px,34vw,285px);gap:5px;padding:4px;}
-  .board-zone{height:100%;min-width:0;min-height:0;overflow:hidden;}
-  #board{width:min(100%,calc(100dvh - 56px));height:auto;max-width:100%;max-height:calc(100dvh - 56px);aspect-ratio:1/1;}
-  .side-panel{height:100%;max-height:100%;min-height:0;overflow:hidden;border-radius:8px;}
-  .players-panel{padding:5px;gap:4px;flex:0 0 auto;}
-  .player-row{padding:5px 6px;gap:5px;}
-  .player-name{font-size:.78rem;}
-  .player-meta{font-size:.58rem;}
-  .clock{font-size:1.02rem;min-width:68px;padding:5px 6px;}
-  .notation-wrap{min-height:0;flex:1 1 auto;overflow:hidden;}
-  .notation-columns{padding:3px 5px;font-size:.58rem;}
-  .notation{padding:3px 5px;font-size:.68rem;}
-  .move-row{padding:3px 3px;}
-  .move-nav{gap:4px;margin:4px 5px 5px;}
-  .move-nav button{padding:5px 3px;font-size:.62rem;}
-  .controls{padding:5px;flex:0 0 auto;}
-  .clock-tools{gap:4px;margin-bottom:4px;}
-  .clock-tools select,.clock-tools button{padding:5px;font-size:.65rem;}
-  .control-grid,.game-actions{gap:4px;}
-  .control-grid button,.game-actions button{padding:5px 4px;font-size:.68rem;}
-}
-
-/* Tablet / mobile portrait: the board remains large, with both players + clocks
-   immediately below it. Notation and controls continue below and may scroll. */
-@media (max-width:900px) and (orientation:portrait){
-  html,body{overflow:auto;}
-  .game-app{height:auto;min-height:100dvh;grid-template-rows:48px auto;}
-  .game-topbar{padding:0 8px;}
-  .game-layout{height:auto;min-height:0;display:grid;grid-template-columns:1fr;gap:6px;padding:4px;}
-  .board-zone{height:auto;min-height:0;overflow:visible;}
-  #board{width:min(calc(100vw - 8px),calc(100dvh - 180px));height:auto;max-width:calc(100vw - 8px);max-height:calc(100dvh - 180px);aspect-ratio:1/1;}
-  .side-panel{height:auto;max-height:none;min-height:0;overflow:hidden;border-radius:8px;}
-  .players-panel{padding:7px;gap:5px;flex:0 0 auto;}
-  .player-row{padding:7px 8px;}
-  .clock{font-size:1.18rem;min-width:78px;}
-  .notation-wrap{height:clamp(150px,24vh,260px);min-height:150px;flex:0 0 auto;overflow:hidden;}
-  .notation{min-height:0;overflow-y:auto;}
-  .controls{flex:0 0 auto;}
-}
-
-/* Very small portrait phones: keep the board + player clocks comfortably visible. */
-@media (max-width:520px) and (orientation:portrait){
-  .game-app{grid-template-rows:44px auto;}
-  .game-topbar{padding:0 6px;}
-  .brand-logo{width:32px;height:22px;}
-  .brand-name{font-size:.88rem;}
-  .room-chip{display:none;}
-  .top-actions{gap:4px;}
-  .top-actions button{width:34px;height:34px;}
-  .game-layout{padding:3px;gap:5px;}
-  #board{width:min(calc(100vw - 6px),calc(100dvh - 165px));height:auto;max-width:calc(100vw - 6px);max-height:calc(100dvh - 165px);aspect-ratio:1/1;}
-  .players-panel{padding:6px;gap:4px;}
-  .player-row{padding:6px 7px;gap:6px;}
-  .player-name{font-size:.88rem;}
-  .player-meta{font-size:.62rem;}
-  .clock{font-size:1.12rem;min-width:76px;padding:5px 8px;}
 }
 </style>
 </head>
@@ -445,17 +336,6 @@ let rematchOfferBy = null;
 let connectionState = 'waiting';
 let guestReconnectTimer = null;
 let guestReconnectAttempts = 0;
-// Guest outbound commands are queued briefly during mobile reconnects so moves/actions are not silently lost.
-let guestCommandQueue = [];
-let guestConnectInProgress = false;
-// Host-authoritative synchronization markers. They prevent stale mobile states
-// from overwriting newer positions and let the Guest confirm a move was applied.
-let stateVersion = 0;
-let lastRemoteStateVersion = 0;
-let nextGuestCommandId = 1;
-let pendingGuestMoveCommand = null;
-let lastAppliedMoveCommandId = null;
-let processedMoveCommandIds = new Set();
 // Move-review mode: null = live position, otherwise 0..history.length.
 let viewPly = null;
 
@@ -512,7 +392,7 @@ function tickClock(){
     stopClockTicker();
     setGameResult(winner==='w'?'1-0':'0-1',(winner==='w'?'White':'Black')+' wins on time');
     if(isHost){ hostSync(); }
-    else { sendGuestCommand({type:'timeout',color:timedOut}); renderGame(); }
+    else if(hostConn && hostConn.open){ hostConn.send({type:'timeout',color:timedOut}); renderGame(); }
   }
 }
 function clockMs(color){
@@ -664,9 +544,7 @@ function showMessage(msg, isError){
 
 function cleanup(){
   try{ if(guestReconnectTimer) clearTimeout(guestReconnectTimer); }catch(e){} guestReconnectTimer=null; guestReconnectAttempts=0; try{ if(peer) peer.destroy(); }catch(e){}
-  peer=null; guestConn=null; otherConns=[]; hostConn=null; selected=null; guestCommandQueue=[]; guestConnectInProgress=false;
-  stateVersion=0; lastRemoteStateVersion=0; nextGuestCommandId=1; pendingGuestMoveCommand=null; lastAppliedMoveCommandId=null; processedMoveCommandIds=new Set();
-  window.__names=null;
+  peer=null; guestConn=null; otherConns=[]; hostConn=null; selected=null;
   chess = new Chess(); myColor=null;
   resetGameState();
   resetClock('off');
@@ -682,15 +560,8 @@ function hostGame(){
   });
   peer.on('connection', conn => {
     conn.on('open', () => {
-      // A mobile browser can temporarily lose/recreate its PeerJS DataConnection.
-      // If the incoming connection belongs to the same guest peer, replace the stale
-      // connection instead of classifying the new connection as a spectator.
-      const sameGuestPeer = guestConn && guestConn.peer && conn.peer === guestConn.peer;
-      const guestConnectionUsable = guestConn && guestConn.open;
-      if(!guestConn || !guestConnectionUsable || sameGuestPeer){
-        const oldGuest = guestConn;
+      if(!guestConn){
         guestConn = conn; connectionState='connected'; conn.role = (hostColor === 'w') ? 'b' : 'w'; conn.playerColor = conn.role;
-        if(oldGuest && oldGuest !== conn){ try{ oldGuest.close(); }catch(e){} }
       } else {
         conn.role = 'spectator';
         otherConns.push(conn);
@@ -742,8 +613,7 @@ function sendTo(conn){
   conn.send({
     type:'state', fen: chess.fen(), whiteName, blackName,
     status: guestConn ? 'playing' : 'waiting', yourRole: conn.role, takebackOfferBy, rematchOfferBy,
-    clock: clockPayload(), history: chess.history({verbose:true}), drawOfferBy, result: getGameResult(), resultReason: gameResultReason,
-    stateVersion, lastAppliedMoveCommandId
+    clock: clockPayload(), history: chess.history({verbose:true}), drawOfferBy, result: getGameResult(), resultReason: gameResultReason
   });
 }
 
@@ -763,20 +633,11 @@ function hostSync(){
     stopClockTicker();
   }
   viewPly=null; selected=null;
-  stateVersion++;
   renderGame();
   broadcastState();
 }
 
 function handleHostData(conn, data){
-  if(data.type === 'ping' && conn === guestConn){
-    try{ if(conn.open) conn.send({type:'pong',stateVersion}); }catch(e){}
-    return;
-  }
-  if(data.type === 'syncRequest' && conn === guestConn){
-    sendTo(conn);
-    return;
-  }
   if(data.type === 'name' && conn === guestConn){ guestName = data.name; hostSync(); }
   if(data.type === 'timeout' && conn === guestConn && !getGameResult()){
     const timedOut = (data.color==='w'||data.color==='b') ? data.color : conn.role;
@@ -795,44 +656,12 @@ function handleHostData(conn, data){
       hostSync();
     }
   }
-  if(data.type === 'move' && conn === guestConn){
-    const commandId = data.commandId || null;
-    // A mobile reconnect can resend a move that the Host already applied. Do
-    // not apply it twice; simply confirm the already-authoritative position.
-    if(commandId && processedMoveCommandIds.has(commandId)){
-      try{ if(conn.open) conn.send({type:'moveAck',commandId,accepted:true,stateVersion,lastAppliedMoveCommandId}); }catch(e){}
-      sendTo(conn);
-      return;
-    }
-    if(getGameResult() || chess.turn() !== conn.role){
-      try{ if(conn.open) conn.send({type:'moveAck',commandId,accepted:false,stateVersion,lastAppliedMoveCommandId}); }catch(e){}
-      sendTo(conn);
-      return;
-    }
-    if(clockPreset!=='off' && clockState.running && clockState.active===conn.role && clockMs(conn.role)<=0){
-      try{ if(conn.open) conn.send({type:'moveAck',commandId,accepted:false,stateVersion,lastAppliedMoveCommandId}); }catch(e){}
-      return;
-    }
+  if(data.type === 'move' && conn === guestConn && !getGameResult() && chess.turn() === conn.role){
+    if(clockPreset!=='off' && clockState.running && clockState.active===conn.role && clockMs(conn.role)<=0) return;
     const mover=chess.turn();
+    saveMoveSnapshot();
     const res=chess.move({from:data.from,to:data.to,promotion:'q'});
-    if(res){
-      if(commandId){
-        processedMoveCommandIds.add(commandId);
-        // Keep the dedupe cache bounded during a long game/session.
-        if(processedMoveCommandIds.size>100){
-          const first=processedMoveCommandIds.values().next().value;
-          processedMoveCommandIds.delete(first);
-        }
-        lastAppliedMoveCommandId=commandId;
-      }
-      pendingGuestMove=null;
-      startClockAfterMove(mover);
-      try{ if(conn.open) conn.send({type:'moveAck',commandId,accepted:true,stateVersion:stateVersion+1,lastAppliedMoveCommandId:commandId}); }catch(e){}
-      hostSync();
-    } else {
-      try{ if(conn.open) conn.send({type:'moveAck',commandId,accepted:false,stateVersion,lastAppliedMoveCommandId}); }catch(e){}
-      sendTo(conn);
-    }
+    if(res){ pendingGuestMove=null; startClockAfterMove(mover); hostSync(); }
   }
   if(data.type === 'takebackOffer' && conn === guestConn && chess.history().length){
     const requester = (data.fromColor==='w'||data.fromColor==='b') ? data.fromColor : conn.playerColor || conn.role;
@@ -874,45 +703,14 @@ function scheduleGuestReconnect(){
   connectionState='reconnecting'; renderGame();
   guestReconnectTimer=setTimeout(()=>{ guestReconnectTimer=null; connectGuestToHost(); }, Math.min(8000,1500+guestReconnectAttempts*750));
 }
-function flushGuestCommands(){
-  if(!hostConn || !hostConn.open) return;
-  const queued = guestCommandQueue.splice(0);
-  queued.forEach(msg=>{ try{ if(hostConn && hostConn.open) hostConn.send(msg); else guestCommandQueue.push(msg); }catch(e){ guestCommandQueue.push(msg); } });
-}
-function sendGuestCommand(msg){
-  if(!msg) return false;
-  if(msg.type==='move' && !msg.commandId){
-    msg = Object.assign({},msg,{commandId:'m'+Date.now().toString(36)+'-'+(nextGuestCommandId++)});
-    pendingGuestMoveCommand=msg;
-  }
-  if(hostConn && hostConn.open){
-    try{ hostConn.send(msg); return true; }catch(e){}
-  }
-  // Do not silently discard Guest actions while a mobile connection is reconnecting.
-  // A move is retained separately so it can be retried after reconnect.
-  if(!(msg.type==='move' && pendingGuestMoveCommand===msg)) guestCommandQueue.push(msg);
-  scheduleGuestReconnect();
-  return false;
-}
 function connectGuestToHost(){
-  if(!peer || !roomCode || guestConnectInProgress) return;
-  guestConnectInProgress=true;
+  if(!peer || !roomCode) return;
   guestReconnectAttempts++;
   const conn=peer.connect('chess-'+roomCode,{reliable:true}); hostConn=conn;
-  conn.on('open',()=>{
-    guestReconnectAttempts=0; guestConnectInProgress=false; connectionState='connected'; renderGame();
-    try{ conn.send({type:'name',name:myName}); }catch(e){}
-    // Always ask the Host for the latest authoritative position after a
-    // reconnect. This also heals a mobile page that was briefly suspended.
-    try{ conn.send({type:'syncRequest',knownVersion:lastRemoteStateVersion}); }catch(e){}
-    if(pendingGuestMoveCommand){
-      try{ conn.send(pendingGuestMoveCommand); }catch(e){}
-    }
-    flushGuestCommands();
-  });
+  conn.on('open',()=>{ guestReconnectAttempts=0; connectionState='connected'; conn.send({type:'name',name:myName}); });
   conn.on('data',data=>handleGuestData(data));
-  conn.on('close',()=>{ guestConnectInProgress=false; if(hostConn===conn) scheduleGuestReconnect(); });
-  conn.on('error',()=>{ guestConnectInProgress=false; if(hostConn===conn) scheduleGuestReconnect(); });
+  conn.on('close',()=>scheduleGuestReconnect());
+  conn.on('error',()=>scheduleGuestReconnect());
 }
 
 function joinGame(code){
@@ -921,51 +719,18 @@ function joinGame(code){
   peer.on('open', () => {
     isHost = false; connectionState='reconnecting';
     content.innerHTML = '<div class="card lobby-card waiting-card"><div class="waiting-title">Connecting to game…</div><p class="waiting-subtitle">Room <b>' + esc(code) + '</b></p><div class="connection-card"><span class="connection-dot reconnecting"></span><span>Connecting to opponent…</span></div></div>';
-    startGuestHeartbeat();
     connectGuestToHost();
   });
   peer.on('error', err => { connectionState='reconnecting'; if(err.type!=='peer-unavailable') scheduleGuestReconnect(); else showMessage('Could not reach room "' + code + '" (' + err.type + '). Check the code and make sure the host is online.', true); });
 }
 
 function handleGuestData(data){
-  if(data.type === 'moveAck'){
-    if(data.commandId && pendingGuestMoveCommand && data.commandId===pendingGuestMoveCommand.commandId){
-      if(data.accepted){
-        pendingGuestMoveCommand=null;
-        pendingGuestMove=null;
-      } else {
-        // The Host rejected the optimistic move. The following authoritative
-        // state (sent immediately below) restores the correct position.
-        pendingGuestMoveCommand=null;
-        pendingGuestMove=null;
-      }
-      renderGame();
-    }
-    return;
-  }
-  if(data.type === 'pong'){
-    connectionState='connected';
-    return;
-  }
   if(data.type === 'state'){
-    const incomingVersion = Number(data.stateVersion||0);
-    // Ignore an older state that arrives after a newer mobile state.
-    if(incomingVersion < lastRemoteStateVersion) return;
-    lastRemoteStateVersion=incomingVersion;
     chess.load(data.fen);
     myColor = data.yourRole === 'b' ? 'b' : (data.yourRole === 'w' ? 'w' : null);
     window.__names = { white: data.whiteName, black: data.blackName, status: data.status };
     remoteHistory = data.history || [];
-    if(pendingGuestMoveCommand && data.lastAppliedMoveCommandId===pendingGuestMoveCommand.commandId){
-      pendingGuestMoveCommand=null;
-      pendingGuestMove=null;
-    } else if(data.lastAppliedMoveCommandId && pendingGuestMoveCommand && data.lastAppliedMoveCommandId!==pendingGuestMoveCommand.commandId){
-      // Host has advanced past this Guest command; authoritative history wins.
-      pendingGuestMoveCommand=null;
-      pendingGuestMove=null;
-    } else {
-      pendingGuestMove=null;
-    }
+    pendingGuestMove = null;
     viewPly = null;
     drawOfferBy = data.drawOfferBy || null;
     takebackOfferBy = data.takebackOfferBy || null;
@@ -998,7 +763,7 @@ function resetGameState(){
 function renderGame(){
   const names = isHost
     ? { white: hostColor==='w'?myName:guestName, black: hostColor==='w'?guestName:myName, status: connectionState }
-    : Object.assign({ white:'', black:'' }, (window.__names || {}), { status: connectionState });
+    : (window.__names || { white:'', black:'', status:connectionState });
   const turn=chess.turn();
   const result=getGameResult();
   let statusText;
@@ -1122,32 +887,32 @@ function offerTakeback(){
     takebackOfferBy=myColor;
     hostSync();
   } else if(hostConn && hostConn.open){
-    sendGuestCommand({type:'takebackOffer', fromColor:myColor});
+    hostConn.send({type:'takebackOffer', fromColor:myColor});
   }
 }
 function respondTakeback(accept){
   if(isHost){
     if(!takebackOfferBy || takebackOfferBy===myColor) return;
     if(accept){ if(restoreLastMove()){ takebackOfferBy=null; hostSync(); } } else { takebackOfferBy=null; hostSync(); }
-  } else sendGuestCommand({type:accept?'takebackAccept':'takebackDecline', fromColor:myColor});
+  } else if(hostConn && hostConn.open) hostConn.send({type:accept?'takebackAccept':'takebackDecline', fromColor:myColor});
 }
 function offerRematch(){
   if(!getGameResult()) return;
   if(isHost){ rematchOfferBy=myColor; hostSync(); }
-  else sendGuestCommand({type:'rematchOffer'});
+  else if(hostConn && hostConn.open) hostConn.send({type:'rematchOffer'});
 }
 function respondRematch(accept){
   if(isHost){
     if(rematchOfferBy!=='b') return;
     if(accept){ chess=new Chess(); resetGameState(); resetClock(clockPreset); connectionState='connected'; hostSync(); }
     else { rematchOfferBy=null; hostSync(); }
-  } else sendGuestCommand({type:accept?'rematchAccept':'rematchDecline'});
+  } else if(hostConn && hostConn.open) hostConn.send({type:accept?'rematchAccept':'rematchDecline'});
 }
 
 function offerDraw(){
   if(getGameResult() || drawOfferBy) return;
   if(isHost){ drawOfferBy=myColor; hostSync(); }
-  else sendGuestCommand({type:'drawOffer'});
+  else if(hostConn && hostConn.open){ hostConn.send({type:'drawOffer'}); }
 }
 function respondDraw(accept){
   if(isHost){
@@ -1155,8 +920,8 @@ function respondDraw(accept){
     if(accept){ drawOfferBy=null; setGameResult('0.5-0.5','Draw agreed'); }
     else drawOfferBy=null;
     hostSync();
-  } else {
-    sendGuestCommand({type:accept?'drawAccept':'drawDecline'});
+  } else if(hostConn && hostConn.open){
+    hostConn.send({type:accept?'drawAccept':'drawDecline'});
   }
 }
 function resignGame(){
@@ -1164,8 +929,8 @@ function resignGame(){
   if(isHost){
     setGameResult(myColor==='w'?'0-1':'1-0',(myColor==='w'?'White':'Black')+' resigned');
     hostSync();
-  } else {
-    sendGuestCommand({type:'resign'});
+  } else if(hostConn && hostConn.open){
+    hostConn.send({type:'resign'});
   }
 }
 
@@ -1547,7 +1312,7 @@ function onSquareClick(sq){
         const moveResult=chess.move({from:fromSq,to:toSq,promotion:'q'});
         pendingGuestMove=moveResult;
         viewPly=null; selected=null; renderGame();
-        sendGuestCommand({type:'move',from:fromSq,to:toSq});
+        hostConn.send({type:'move',from:fromSq,to:toSq});
       }
       return;
     }
@@ -1557,32 +1322,6 @@ function onSquareClick(sq){
     if(piece && piece.color===myColor){ selected=sq; drawBoard(); }
   }
 }
-
-// Mobile browser lifecycle recovery. PeerJS can be paused while a tab is
-// backgrounded; on return, verify the data channel and request a fresh state.
-let guestHeartbeatTimer = null;
-function ensureGuestConnection(){
-  if(isHost || !peer || !roomCode) return;
-  if(hostConn && hostConn.open){
-    try{ hostConn.send({type:'syncRequest',knownVersion:lastRemoteStateVersion}); }catch(e){ scheduleGuestReconnect(); }
-  } else {
-    scheduleGuestReconnect();
-  }
-}
-function startGuestHeartbeat(){
-  if(guestHeartbeatTimer || isHost) return;
-  guestHeartbeatTimer=setInterval(()=>{
-    if(document.visibilityState==='hidden') return;
-    if(hostConn && hostConn.open){
-      try{ hostConn.send({type:'ping',at:Date.now()}); }catch(e){ scheduleGuestReconnect(); }
-    } else ensureGuestConnection();
-  },8000);
-}
-window.addEventListener('online',ensureGuestConnection);
-window.addEventListener('offline',()=>{ if(!isHost){ connectionState='reconnecting'; renderGame(); } });
-window.addEventListener('pageshow',ensureGuestConnection);
-window.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') ensureGuestConnection(); });
-window.addEventListener('beforeunload',()=>{ if(guestHeartbeatTimer) clearInterval(guestHeartbeatTimer); });
 
 loadTheme();
 renderLobby();
