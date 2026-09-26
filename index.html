@@ -191,7 +191,7 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
 .player-row.active .clock{box-shadow:0 0 0 2px rgba(47,126,234,.28);transform:scale(1.015);}.clock.low{animation:clockPulse 1s infinite;}.clock.urgent{animation:clockPulse .55s infinite;}
 @keyframes clockPulse{50%{filter:brightness(1.15);}}
 .connection-dot.reconnecting{background:#d17b19;box-shadow:0 0 0 4px rgba(209,123,25,.12);}
-.offer-card{padding:8px 9px;border:1px solid var(--accent2);background:var(--panel2);border-radius:8px;font-size:.74rem;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:7px}.offer-card .offer-buttons{display:flex;gap:5px}.offer-card button{margin:0;padding:5px 8px;font-size:.72rem}
+.offer-card{padding:8px 9px;border:1px solid var(--accent2);background:var(--panel2);border-radius:8px;font-size:.74rem;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:7px}.offer-card .offer-buttons{display:flex;gap:5px}.offer-card button{margin:0;padding:5px 8px;font-size:.72rem}.mobile-offer-slot{display:none}.mobile-offer-card{padding:10px 10px;border:1px solid var(--accent2);background:var(--panel);border-radius:9px;font-size:.78rem;display:flex;justify-content:space-between;align-items:center;gap:9px;margin-top:5px;box-shadow:0 2px 8px rgba(12,39,66,.06)}.mobile-offer-card .offer-buttons{display:flex;gap:6px;flex:0 0 auto}.mobile-offer-card button{margin:0;padding:7px 10px;font-size:.76rem;white-space:nowrap}
 @media(max-width:900px){
   html,body{overflow:auto;}
   .game-app{height:auto;min-height:100dvh;grid-template-rows:52px auto;}
@@ -199,6 +199,14 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
   .board-zone{min-height:auto;overflow:visible;}
   #board{width:min(calc(100vw - 10px),calc(100dvh - 130px));height:auto;max-width:calc(100vw - 10px);max-height:calc(100dvh - 130px);aspect-ratio:1/1;}
   .side-panel{min-height:0;height:auto;max-height:none;}
+}
+@media(max-width:900px) and (orientation:portrait){
+  .mobile-offer-slot{display:block;width:100%;}
+  .desktop-offers .draw-offer,.desktop-offers .takeback-offer{display:none;}
+  .mobile-offer-card{width:100%;box-sizing:border-box;}
+}
+@media(max-width:900px) and (orientation:landscape){
+  .mobile-offer-slot{display:none;}
 }
 @media(max-width:520px){
   .game-topbar{padding:0 8px}.brand-name{font-size:.9rem}.brand-logo{width:34px;height:23px}.room-chip{display:none}.top-actions button{width:34px;height:34px;}
@@ -666,7 +674,10 @@ function showMessage(msg, isError){
 }
 
 function cleanup(){
-  try{ if(guestReconnectTimer) clearTimeout(guestReconnectTimer); }catch(e){} guestReconnectTimer=null; guestReconnectAttempts=0; try{ if(peer) peer.destroy(); }catch(e){}
+  try{ if(guestReconnectTimer) clearTimeout(guestReconnectTimer); }catch(e){} guestReconnectTimer=null; guestReconnectAttempts=0;
+  try{ if(peer && peer.__hostRetryTimer) clearTimeout(peer.__hostRetryTimer); }catch(e){}
+  window.__activeHostPeer=null;
+  try{ if(peer) peer.destroy(); }catch(e){}
   peer=null; guestConn=null; otherConns=[]; hostConn=null; selected=null; guestCommandQueue=[]; guestConnectInProgress=false;
   stateVersion=0; lastRemoteStateVersion=0; nextGuestCommandId=1; pendingGuestMoveCommand=null; lastAppliedMoveCommandId=null; processedMoveCommandIds=new Set();
   window.__names=null;
@@ -678,11 +689,25 @@ function cleanup(){
 // ---------- HOST ----------
 function hostGame(){
   roomCode = randomCode();
+  createHostPeer();
+}
+
+function createHostPeer(retryCount){
+  if(!roomCode) roomCode = randomCode();
+  retryCount = Number.isFinite(retryCount) ? retryCount : 0;
+  try{ if(peer) peer.destroy(); }catch(e){}
   peer = new Peer('chess-' + roomCode);
+  peer.__hostOpened = false;
+  peer.__hostRetryCount = retryCount;
+
   peer.on('open', () => {
+    peer.__hostOpened = true;
+    peer.__hostRetryCount = 0;
+    if(peer.__hostRetryTimer){ clearTimeout(peer.__hostRetryTimer); peer.__hostRetryTimer=null; }
     isHost = true; myColor = hostColor;
     showWaitingHost();
   });
+
   peer.on('connection', conn => {
     conn.on('open', () => {
       // A mobile browser can temporarily lose/recreate its PeerJS DataConnection.
@@ -708,7 +733,54 @@ function hostGame(){
       renderGame();
     });
   });
-  peer.on('error', err => showMessage('Could not create room (' + err.type + '). Try again.', true));
+
+  peer.on('disconnected', () => {
+    if(peer.__hostOpened && peer === window.__activeHostPeer){
+      connectionState = 'reconnecting';
+      try{ peer.reconnect(); }catch(e){}
+      renderGame();
+    }
+  });
+
+  peer.on('error', err => {
+    // A temporary signaling-server/network failure during room creation should not
+    // immediately destroy the user's room. Retry the same room ID automatically.
+    // Once the room is already open, let PeerJS reconnect instead of showing an error.
+    if(peer !== window.__activeHostPeer) return;
+    const type = err && err.type ? err.type : 'network';
+    if(peer.__hostOpened){
+      if(type === 'network' || type === 'socket-error' || type === 'server-error'){
+        connectionState='reconnecting';
+        try{ peer.reconnect(); }catch(e){}
+        return;
+      }
+      return;
+    }
+
+    if(type === 'unavailable-id'){
+      // The room was never exposed to the user, so it is safe to create a fresh code.
+      roomCode = randomCode();
+    }
+
+    if(type === 'network' || type === 'socket-error' || type === 'server-error' || type === 'unavailable-id'){
+      const nextRetryCount = (peer.__hostRetryCount || 0) + 1;
+      if(nextRetryCount > 6){
+        showMessage('Could not create room due to a network connection problem. Please check your internet connection and try again.', true);
+        return;
+      }
+      peer.__hostRetryCount = nextRetryCount;
+      const delay = Math.min(6000, 1000 + nextRetryCount * 750);
+      if(peer.__hostRetryTimer) clearTimeout(peer.__hostRetryTimer);
+      peer.__hostRetryTimer = setTimeout(() => {
+        if(peer && peer.__hostRetryTimer){ peer.__hostRetryTimer=null; }
+        createHostPeer(nextRetryCount);
+      }, delay);
+      return;
+    }
+
+    showMessage('Could not create room (' + type + '). Try again.', true);
+  });
+  window.__activeHostPeer = peer;
 }
 
 function showWaitingHost(){
@@ -829,6 +901,8 @@ function handleHostData(conn, data){
         lastAppliedMoveCommandId=commandId;
       }
       pendingGuestMove=null;
+      drawOfferBy=null;
+      takebackOfferBy=null;
       startClockAfterMove(mover);
       try{ if(conn.open) conn.send({type:'moveAck',commandId,accepted:true,stateVersion:stateVersion+1,lastAppliedMoveCommandId:commandId}); }catch(e){}
       hostSync();
@@ -867,10 +941,10 @@ function handleHostData(conn, data){
     drawOfferBy = conn.role || conn.playerColor;
     hostSync();
   }
-  if(data.type === 'drawAccept' && conn === guestConn && drawOfferBy === (conn.role || conn.playerColor) && !getGameResult()){
+  if(data.type === 'drawAccept' && conn === guestConn && drawOfferBy === myColor && !getGameResult()){
     drawOfferBy=null; setGameResult('0.5-0.5','Draw agreed'); hostSync();
   }
-  if(data.type === 'drawDecline' && conn === guestConn && drawOfferBy === (conn.role || conn.playerColor)){
+  if(data.type === 'drawDecline' && conn === guestConn && drawOfferBy === myColor){
     drawOfferBy=null; hostSync();
   }
   if(data.type === 'resign' && conn === guestConn && !getGameResult()){
@@ -1044,7 +1118,7 @@ function renderGame(){
       </div>
     </div>
     <div class="game-layout">
-      <div class="board-zone"><div id="board"></div></div>
+      <div class="board-zone"><div id="board"></div><div class="mobile-offer-slot" id="mobileOfferSlot"></div></div>
       <aside class="side-panel">
         <div class="players-panel">
           <div class="player-row ${turn==='w'?'active':''}">
@@ -1079,7 +1153,7 @@ function renderGame(){
             <input id="customMinutes" type="number" min="1" max="180" value="${customClockMinutes}" placeholder="Minutes" ${isHost?'':'disabled'}>
             <input id="customIncrement" type="number" min="0" max="60" value="${customClockIncrement}" placeholder="Increment (sec)" ${isHost?'':'disabled'}>
           </div>
-          ${drawOfferBy && drawOfferBy!==myColor ? `<div class="draw-offer"><span>Opponent offered a draw.</span><span class="offer-buttons"><button id="acceptDrawBtn">Accept</button><button class="ghost" id="declineDrawBtn">Decline</button></span></div>` : ''}${takebackOfferBy && takebackOfferBy!==myColor ? `<div class="offer-card"><span>Opponent requests a takeback.</span><span class="offer-buttons"><button id="acceptTakebackBtn">Accept</button><button class="ghost" id="declineTakebackBtn">Decline</button></span></div>` : ''}${rematchOfferBy && rematchOfferBy!==myColor ? `<div class="offer-card"><span>Opponent wants a rematch.</span><span class="offer-buttons"><button id="acceptRematchBtn">Accept</button><button class="ghost" id="declineRematchBtn">Decline</button></span></div>` : ''}
+          <div class="desktop-offers">${drawOfferBy && drawOfferBy!==myColor ? `<div class="draw-offer"><span>Opponent offered a draw.</span><span class="offer-buttons"><button id="acceptDrawBtn">Accept</button><button class="ghost" id="declineDrawBtn">Decline</button></span></div>` : ''}${takebackOfferBy && takebackOfferBy!==myColor ? `<div class="offer-card takeback-offer"><span>Opponent requests a takeback.</span><span class="offer-buttons"><button id="acceptTakebackBtn">Accept</button><button class="ghost" id="declineTakebackBtn">Decline</button></span></div>` : ''}${rematchOfferBy && rematchOfferBy!==myColor ? `<div class="offer-card"><span>Opponent wants a rematch.</span><span class="offer-buttons"><button id="acceptRematchBtn">Accept</button><button class="ghost" id="declineRematchBtn">Decline</button></span></div>` : ''}</div>
           <div class="game-actions">
             <button id="drawBtn" class="ghost" ${getGameResult()||drawOfferBy?'disabled':''}>Offer Draw</button>
             <button id="resignBtn" class="secondary" ${getGameResult()?'disabled':''}>Resign</button>
@@ -1092,6 +1166,14 @@ function renderGame(){
       </aside>
     </div>
   </div>`;
+
+  const mobileOfferSlot=document.getElementById('mobileOfferSlot');
+  if(mobileOfferSlot){
+    const mobileOffers=[];
+    if(drawOfferBy && drawOfferBy!==myColor) mobileOffers.push(`<div class="mobile-offer-card"><span><b>Draw Offer</b><br>Opponent offered a draw.</span><span class="offer-buttons"><button id="mobileAcceptDrawBtn">Accept</button><button class="ghost" id="mobileDeclineDrawBtn">Decline</button></span></div>`);
+    if(takebackOfferBy && takebackOfferBy!==myColor) mobileOffers.push(`<div class="mobile-offer-card"><span><b>Takeback Request</b><br>Opponent requests a takeback.</span><span class="offer-buttons"><button id="mobileAcceptTakebackBtn">Accept</button><button class="ghost" id="mobileDeclineTakebackBtn">Decline</button></span></div>`);
+    mobileOfferSlot.innerHTML=mobileOffers.join('');
+  }
 
   document.getElementById('leaveBtn').onclick=()=>{cleanup();renderLobby();};
   document.getElementById('themeBtn').onclick=toggleTheme;
@@ -1114,6 +1196,8 @@ function renderGame(){
   const dt=document.getElementById('declineTakebackBtn'); if(dt) dt.onclick=()=>respondTakeback(false);
   const ar=document.getElementById('acceptRematchBtn'); if(ar) ar.onclick=()=>respondRematch(true);
   const dr=document.getElementById('declineRematchBtn'); if(dr) dr.onclick=()=>respondRematch(false);
+  const mat=document.getElementById('mobileAcceptTakebackBtn'); if(mat) mat.onclick=()=>respondTakeback(true);
+  const mdt=document.getElementById('mobileDeclineTakebackBtn'); if(mdt) mdt.onclick=()=>respondTakeback(false);
   document.getElementById('resignBtn').onclick=()=>resignGame();
   document.getElementById('pgnBtn').onclick=exportPGN;
   document.getElementById('pdfBtn').onclick=exportPDF;
@@ -1121,6 +1205,8 @@ function renderGame(){
   document.getElementById('clockSelect').onchange=()=>{const box=document.getElementById('customClockBox');if(box)box.classList.toggle('show',document.getElementById('clockSelect').value==='custom');};
   const accept=document.getElementById('acceptDrawBtn'); if(accept) accept.onclick=()=>respondDraw(true);
   const decline=document.getElementById('declineDrawBtn'); if(decline) decline.onclick=()=>respondDraw(false);
+  const mAccept=document.getElementById('mobileAcceptDrawBtn'); if(mAccept) mAccept.onclick=()=>respondDraw(true);
+  const mDecline=document.getElementById('mobileDeclineDrawBtn'); if(mDecline) mDecline.onclick=()=>respondDraw(false);
   drawBoard(); updateClockDisplay(); startClockTicker();
   updateMoveNavigation(hist);
   const nbox=document.getElementById('notation'); if(nbox) nbox.scrollTop=nbox.scrollHeight;
@@ -1140,7 +1226,11 @@ function respondTakeback(accept){
   if(isHost){
     if(!takebackOfferBy || takebackOfferBy===myColor) return;
     if(accept){ if(restoreLastMove()){ takebackOfferBy=null; hostSync(); } } else { takebackOfferBy=null; hostSync(); }
-  } else sendGuestCommand({type:accept?'takebackAccept':'takebackDecline', fromColor:myColor});
+  } else {
+    takebackOfferBy=null;
+    renderGame();
+    sendGuestCommand({type:accept?'takebackAccept':'takebackDecline', fromColor:myColor});
+  }
 }
 function offerRematch(){
   if(!getGameResult()) return;
@@ -1167,6 +1257,8 @@ function respondDraw(accept){
     else drawOfferBy=null;
     hostSync();
   } else {
+    drawOfferBy=null;
+    renderGame();
     sendGuestCommand({type:accept?'drawAccept':'drawDecline'});
   }
 }
@@ -1552,11 +1644,13 @@ function onSquareClick(sq){
         const mover=chess.turn();
         saveMoveSnapshot();
         chess.move({from:fromSq,to:toSq,promotion:'q'});
+        drawOfferBy=null; takebackOfferBy=null;
         selected=null; startClockAfterMove(mover); hostSync();
       } else {
         const mover=chess.turn();
         const moveResult=chess.move({from:fromSq,to:toSq,promotion:'q'});
         pendingGuestMove=moveResult;
+        drawOfferBy=null; takebackOfferBy=null;
         viewPly=null; selected=null; renderGame();
         sendGuestCommand({type:'move',from:fromSq,to:toSq});
       }
