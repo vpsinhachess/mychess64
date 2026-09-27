@@ -488,9 +488,11 @@ function randomCode(){
 }
 
 function randomHostColor(previous){
-  const first = Math.random() < 0.5 ? 'w' : 'b';
-  if(previous === 'w' || previous === 'b') return first === previous ? (previous === 'w' ? 'b' : 'w') : first;
-  return first;
+  // In Random mode, every New Game must switch the Host's colour.
+  // The initial room may be either colour; subsequent games always use the opposite colour.
+  if(previous === 'w') return 'b';
+  if(previous === 'b') return 'w';
+  return Math.random() < 0.5 ? 'w' : 'b';
 }
 function clearReconnectGrace(){
   if(reconnectGraceTimer){ clearTimeout(reconnectGraceTimer); reconnectGraceTimer=null; }
@@ -1085,7 +1087,17 @@ function handleHostData(conn, data){
   if(data.type === 'resign' && conn === guestConn && !getGameResult()){
     setGameResult(conn.role==='w'?'0-1':'1-0',(conn.role==='w'?'White':'Black')+' resigned'); hostSync();
   }
-  if(data.type === 'newgame' && conn === guestConn){ if(hostColorMode==='r') hostColor=randomHostColor(hostColor); myColor=hostColor; conn.role=(hostColor==='w')?'b':'w'; conn.playerColor=conn.role; chess = new Chess(); resetGameState(); resetClock(clockPreset); markConnectionConnected(); hostSync(); }
+  if(data.type === 'newgame' && conn === guestConn){
+    if(hostColorMode==='r') hostColor=randomHostColor(hostColor);
+    myColor=hostColor;
+    conn.role=(hostColor==='w')?'b':'w';
+    conn.playerColor=conn.role;
+    chess = new Chess();
+    resetGameState();
+    resetClock(clockPreset);
+    markConnectionConnected();
+    hostSync();
+  }
 }
 
 // ---------- GUEST ----------
@@ -1348,7 +1360,20 @@ function renderGame(){
     e.stopPropagation();
     setViewPly(Number(cell.dataset.ply)||0);
   });
-  document.getElementById('newGameBtn').onclick=()=>{if(isHost){if(hostColorMode==='r') hostColor=randomHostColor(hostColor); myColor=hostColor; if(guestConn){guestConn.role=(hostColor==='w')?'b':'w';guestConn.playerColor=guestConn.role;} chess=new Chess();resetGameState();resetClock(clockPreset);hostSync();}};
+  document.getElementById('newGameBtn').onclick=()=>{
+    if(!isHost) return;
+    // Random mode is deliberately guaranteed to change colour every new game.
+    if(hostColorMode==='r') hostColor=randomHostColor(hostColor);
+    myColor=hostColor;
+    if(guestConn){
+      guestConn.role=(hostColor==='w')?'b':'w';
+      guestConn.playerColor=guestConn.role;
+    }
+    chess=new Chess();
+    resetGameState();
+    resetClock(clockPreset);
+    hostSync();
+  };
   document.getElementById('drawBtn').onclick=()=>offerDraw();
   document.getElementById('takebackBtn').onclick=()=>offerTakeback();
   const at=document.getElementById('acceptTakebackBtn'); if(at) at.onclick=()=>respondTakeback(true);
@@ -1406,7 +1431,19 @@ function offerRematch(){
 function respondRematch(accept){
   if(isHost){
     if(rematchOfferBy!==((hostColor==='w')?'b':'w')) return;
-    if(accept){ if(hostColorMode==='r') hostColor=randomHostColor(hostColor); myColor=hostColor; if(guestConn){guestConn.role=(hostColor==='w')?'b':'w';guestConn.playerColor=guestConn.role;} chess=new Chess(); resetGameState(); resetClock(clockPreset); markConnectionConnected(); hostSync(); }
+    if(accept){
+      if(hostColorMode==='r') hostColor=randomHostColor(hostColor);
+      myColor=hostColor;
+      if(guestConn){
+        guestConn.role=(hostColor==='w')?'b':'w';
+        guestConn.playerColor=guestConn.role;
+      }
+      chess=new Chess();
+      resetGameState();
+      resetClock(clockPreset);
+      markConnectionConnected();
+      hostSync();
+    }
     else { rematchOfferBy=null; hostSync(); }
   } else sendGuestCommand({type:accept?'rematchAccept':'rematchDecline'});
 }
