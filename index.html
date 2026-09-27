@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1d33">
 <meta name="description" content="MyChess64 — a simple browser-based online chess platform for playing live chess with a friend.">
 <meta name="application-name" content="MyChess64">
@@ -30,6 +30,7 @@ body.dark-theme{
   --clock:#07101d;
 }
 *{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
 html,body{width:100%;height:100%;margin:0;overflow:hidden;}
 body{background:radial-gradient(circle at top,#eef5ff 0,#f4f7fb 45%,#edf2f8 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:background .2s,color .2s;}
 button,input,select{font:inherit;}
@@ -330,16 +331,17 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
 /* Tablet / mobile portrait: the board remains large, with both players + clocks
    immediately below it. Notation and controls continue below and may scroll. */
 @media (max-width:900px) and (orientation:portrait){
-  html,body{overflow:auto;}
-  .game-app{height:auto;min-height:100dvh;grid-template-rows:48px auto;}
+  html,body{overflow:hidden;}
+  .game-app{height:100dvh;min-height:0;grid-template-rows:48px minmax(0,1fr);overflow:hidden;}
   .game-topbar{padding:0 8px;}
-  .game-layout{height:auto;min-height:0;display:grid;grid-template-columns:1fr;gap:6px;padding:4px;}
-  .board-zone{height:auto;min-height:0;overflow:visible;}
-  #board{width:min(calc(100vw - 8px),calc(100dvh - 180px));height:auto;max-width:calc(100vw - 8px);max-height:calc(100dvh - 180px);aspect-ratio:1/1;}
-  .side-panel{height:auto;max-height:none;min-height:0;overflow:hidden;border-radius:8px;}
+  .game-layout{height:100%;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:6px;padding:4px;overflow:hidden;}
+  .board-zone{height:auto;min-height:0;overflow:hidden;display:flex;align-items:flex-start;justify-content:center;}
+  #board{width:min(calc(100vw - 8px),calc(100dvh - 180px));height:auto;max-width:calc(100vw - 8px);max-height:calc(100dvh - 180px);aspect-ratio:1/1;flex:0 0 auto;}
+  .side-panel{height:100%;max-height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;border-radius:8px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
   .players-panel{padding:7px;gap:5px;flex:0 0 auto;}
   .player-row{padding:7px 8px;}
   .clock{font-size:1.18rem;min-width:78px;}
+  .mobile-offer-slot{flex:0 0 auto;padding:0 7px 2px;}
   .notation-wrap{height:clamp(150px,24vh,260px);min-height:150px;flex:0 0 auto;overflow:hidden;}
   .notation{min-height:0;overflow-y:auto;}
   .controls{flex:0 0 auto;}
@@ -425,6 +427,14 @@ let peer = null, isHost = false, myName = '', roomCode = '';
 let guestConn = null, otherConns = [], hostConn = null;
 let chess = new Chess();
 let myColor = null, myRole = 'spectator';
+let hostColorMode = 'w';
+let clientSessionId = localStorage.getItem('mychess64_client_session') || ('s' + Date.now().toString(36) + Math.random().toString(36).slice(2,8));
+localStorage.setItem('mychess64_client_session', clientSessionId);
+let guestSessionId = null;
+let reconnectGraceTimer = null;
+let lastConnectionWasUsable = false;
+let restoringActiveHostSession = false;
+const ACTIVE_SESSION_KEY = 'mychess64_active_session_v4';
 let selected = null;
 // Board analysis arrows are local UI annotations and survive every board redraw.
 let boardArrows = [];
@@ -472,6 +482,70 @@ function randomCode(){
   const letters='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='';
   for(let i=0;i<4;i++) c += letters[Math.floor(Math.random()*letters.length)];
   return c;
+}
+
+function randomHostColor(){ return Math.random() < 0.5 ? 'w' : 'b'; }
+function clearReconnectGrace(){
+  if(reconnectGraceTimer){ clearTimeout(reconnectGraceTimer); reconnectGraceTimer=null; }
+}
+function markConnectionConnected(){
+  clearReconnectGrace();
+  lastConnectionWasUsable=true;
+  connectionState='connected';
+}
+function markConnectionRecovering(){
+  if(getGameResult()) return;
+  clearReconnectGrace();
+  // Keep the normal Connected indicator during a short browser/OS wake-up window.
+  // Only show Reconnecting if recovery actually takes longer than the grace period.
+  reconnectGraceTimer=setTimeout(()=>{
+    reconnectGraceTimer=null;
+    if(!getGameResult() && connectionState!=='connected') return;
+    if(!getGameResult()) { connectionState='reconnecting'; renderGame(); }
+  }, 4500);
+  if(!lastConnectionWasUsable){ connectionState='reconnecting'; renderGame(); }
+}
+function sessionSnapshot(){
+  return {
+    version:4, role:isHost?'host':'guest', roomCode, myName, hostColor, hostColorMode, guestName,
+    guestSessionId, myColor, fen:chess.fen(), history:chess.history({verbose:true}),
+    remoteHistory, clock:clockPayload(), result:gameResultCode, reason:gameResultReason,
+    stateVersion, lastRemoteStateVersion, lastAppliedMoveCommandId,
+    moveSnapshots, savedAt:Date.now()
+  };
+}
+function saveSessionSnapshot(){
+  if(!roomCode) return;
+  try{ localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(sessionSnapshot())); }catch(e){}
+}
+function clearSessionSnapshot(){
+  try{ localStorage.removeItem(ACTIVE_SESSION_KEY); }catch(e){}
+}
+function restoreChessSnapshot(data){
+  chess=new Chess();
+  const hist=Array.isArray(data.history)?data.history:[];
+  hist.forEach(m=>{ try{ chess.move({from:m.from,to:m.to,promotion:m.promotion||'q'}); }catch(e){} });
+  if(data.fen && chess.fen()!==data.fen){ try{ chess.load(data.fen); }catch(e){} }
+  remoteHistory=Array.isArray(data.remoteHistory)?data.remoteHistory:hist;
+  moveSnapshots=Array.isArray(data.moveSnapshots)?data.moveSnapshots:[];
+  gameResultCode=data.result||null;
+  gameResultReason=data.reason||'';
+  if(data.clock) applyRemoteClock(data.clock); else resetClock('off');
+}
+function restoreActiveSession(){
+  let data=null;
+  try{ data=JSON.parse(localStorage.getItem(ACTIVE_SESSION_KEY)||'null'); }catch(e){ data=null; }
+  if(!data || !data.roomCode || !data.role) return false;
+  roomCode=data.roomCode; myName=data.myName||''; hostColor=data.hostColor==='b'?'b':'w'; hostColorMode=data.hostColorMode||hostColor; guestName=data.guestName||''; guestSessionId=data.guestSessionId||null;
+  myColor=data.myColor==='b'?'b':data.myColor==='w'?'w':null;
+  stateVersion=Number(data.stateVersion)||0; lastRemoteStateVersion=Number(data.lastRemoteStateVersion)||0; lastAppliedMoveCommandId=data.lastAppliedMoveCommandId||null;
+  restoreChessSnapshot(data);
+  if(data.role==='host'){
+    isHost=true; myColor=hostColor; connectionState='waiting'; restoringActiveHostSession=true; createHostPeer();
+  }else{
+    isHost=false; connectionState='reconnecting'; joinGame(roomCode,true);
+  }
+  return true;
 }
 
 function clockPresetInfo(key){
@@ -643,7 +717,9 @@ function showHostForm(savedName){
   document.getElementById('hostBtn').onclick = () => {
     myName = document.getElementById('nameInput').value.trim() || 'Teacher';
     localStorage.setItem('cc_name', myName);
-    hostColor = chosen === 'r' ? (Math.random() < 0.5 ? 'w' : 'b') : chosen;
+    hostColorMode = chosen;
+    hostColor = chosen === 'r' ? randomHostColor() : chosen;
+    clearSessionSnapshot();
     hostGame();
   };
 }
@@ -674,6 +750,8 @@ function showMessage(msg, isError){
 }
 
 function cleanup(){
+  clearReconnectGrace();
+  clearSessionSnapshot();
   try{ if(guestReconnectTimer) clearTimeout(guestReconnectTimer); }catch(e){} guestReconnectTimer=null; guestReconnectAttempts=0;
   try{ if(peer && peer.__hostRetryTimer) clearTimeout(peer.__hostRetryTimer); }catch(e){}
   window.__activeHostPeer=null;
@@ -687,8 +765,24 @@ function cleanup(){
 }
 
 // ---------- HOST ----------
+function promoteGuestConnection(conn, sessionId){
+  const oldGuest=guestConn;
+  guestConn=conn;
+  conn.role=(hostColor==='w')?'b':'w';
+  conn.playerColor=conn.role;
+  if(sessionId) guestSessionId=sessionId;
+  markConnectionConnected();
+  if(oldGuest && oldGuest!==conn){ try{ oldGuest.close(); }catch(e){} }
+  renderGame();
+  sendTo(conn);
+  saveSessionSnapshot();
+}
+
 function hostGame(){
   roomCode = randomCode();
+  guestSessionId=null;
+  chess=new Chess(); resetGameState(); resetClock(clockPreset);
+  saveSessionSnapshot();
   createHostPeer();
 }
 
@@ -705,38 +799,38 @@ function createHostPeer(retryCount){
     peer.__hostRetryCount = 0;
     if(peer.__hostRetryTimer){ clearTimeout(peer.__hostRetryTimer); peer.__hostRetryTimer=null; }
     isHost = true; myColor = hostColor;
+    restoringActiveHostSession = false;
+    saveSessionSnapshot();
     showWaitingHost();
   });
 
   peer.on('connection', conn => {
     conn.on('open', () => {
-      // A mobile browser can temporarily lose/recreate its PeerJS DataConnection.
-      // If the incoming connection belongs to the same guest peer, replace the stale
-      // connection instead of classifying the new connection as a spectator.
+      // A reconnecting Guest can have a new PeerJS connection/peer id after refresh.
+      // The stable browser session id lets the Host restore the same playing seat.
       const sameGuestPeer = guestConn && guestConn.peer && conn.peer === guestConn.peer;
       const guestConnectionUsable = guestConn && guestConn.open;
       if(!guestConn || !guestConnectionUsable || sameGuestPeer){
-        const oldGuest = guestConn;
-        guestConn = conn; connectionState='connected'; conn.role = (hostColor === 'w') ? 'b' : 'w'; conn.playerColor = conn.role;
-        if(oldGuest && oldGuest !== conn){ try{ oldGuest.close(); }catch(e){} }
+        promoteGuestConnection(conn);
       } else {
         conn.role = 'spectator';
         otherConns.push(conn);
+        try{ conn.send({type:'sessionRequest'}); }catch(e){}
+        sendTo(conn);
       }
-      renderGame();
-      sendTo(conn);
     });
     conn.on('data', data => handleHostData(conn, data));
     conn.on('close', () => {
-      if(conn === guestConn){ guestConn = null; connectionState = getGameResult() ? 'waiting' : 'reconnecting'; }
+      if(conn === guestConn){ guestConn = null; lastConnectionWasUsable=true; markConnectionRecovering(); }
       otherConns = otherConns.filter(c => c !== conn);
+      if(!getGameResult()) saveSessionSnapshot();
       renderGame();
     });
   });
 
   peer.on('disconnected', () => {
     if(peer.__hostOpened && peer === window.__activeHostPeer){
-      connectionState = 'reconnecting';
+      markConnectionRecovering();
       try{ peer.reconnect(); }catch(e){}
       renderGame();
     }
@@ -758,8 +852,9 @@ function createHostPeer(retryCount){
     }
 
     if(type === 'unavailable-id'){
-      // The room was never exposed to the user, so it is safe to create a fresh code.
-      roomCode = randomCode();
+      // During an active-session refresh the old PeerJS id may take a moment to clear.
+      // Keep the same room code so the Guest can reconnect to the original game.
+      if(!restoringActiveHostSession) roomCode = randomCode();
     }
 
     if(type === 'network' || type === 'socket-error' || type === 'server-error' || type === 'unavailable-id'){
@@ -844,6 +939,18 @@ function hostSync(){
 }
 
 function handleHostData(conn, data){
+  if(data.type === 'sessionHello') {
+    const sid=String(data.sessionId||'');
+    if(!sid) return;
+    if(!guestConn || conn===guestConn || sid===guestSessionId){
+      promoteGuestConnection(conn,sid);
+    }
+    return;
+  }
+  if(data.type === 'sessionRequest'){
+    try{ if(conn.open) conn.send({type:'sessionAck',sessionId:clientSessionId}); }catch(e){}
+    return;
+  }
   if(data.type === 'ping' && conn === guestConn){
     try{ if(conn.open) conn.send({type:'pong',stateVersion}); }catch(e){}
     return;
@@ -966,13 +1073,13 @@ function handleHostData(conn, data){
   if(data.type === 'resign' && conn === guestConn && !getGameResult()){
     setGameResult(conn.role==='w'?'0-1':'1-0',(conn.role==='w'?'White':'Black')+' resigned'); hostSync();
   }
-  if(data.type === 'newgame'){ chess = new Chess(); resetGameState(); resetClock(clockPreset); connectionState='connected'; hostSync(); }
+  if(data.type === 'newgame' && conn === guestConn){ if(hostColorMode==='r') hostColor=randomHostColor(); myColor=hostColor; conn.role=(hostColor==='w')?'b':'w'; conn.playerColor=conn.role; chess = new Chess(); resetGameState(); resetClock(clockPreset); markConnectionConnected(); hostSync(); }
 }
 
 // ---------- GUEST ----------
 function scheduleGuestReconnect(){
   if(guestReconnectTimer || !roomCode || !peer) return;
-  connectionState='reconnecting'; renderGame();
+  markConnectionRecovering();
   guestReconnectTimer=setTimeout(()=>{ guestReconnectTimer=null; connectGuestToHost(); }, Math.min(8000,1500+guestReconnectAttempts*750));
 }
 function flushGuestCommands(){
@@ -1001,7 +1108,8 @@ function connectGuestToHost(){
   guestReconnectAttempts++;
   const conn=peer.connect('chess-'+roomCode,{reliable:true}); hostConn=conn;
   conn.on('open',()=>{
-    guestReconnectAttempts=0; guestConnectInProgress=false; connectionState='connected'; renderGame();
+    guestReconnectAttempts=0; guestConnectInProgress=false; markConnectionConnected(); renderGame();
+    try{ conn.send({type:'sessionHello',sessionId:clientSessionId}); }catch(e){}
     try{ conn.send({type:'name',name:myName}); }catch(e){}
     // Always ask the Host for the latest authoritative position after a
     // reconnect. This also heals a mobile page that was briefly suspended.
@@ -1012,12 +1120,14 @@ function connectGuestToHost(){
     flushGuestCommands();
   });
   conn.on('data',data=>handleGuestData(data));
-  conn.on('close',()=>{ guestConnectInProgress=false; if(hostConn===conn) scheduleGuestReconnect(); });
+  conn.on('close',()=>{ guestConnectInProgress=false; if(hostConn===conn){ hostConn=null; scheduleGuestReconnect(); } });
   conn.on('error',()=>{ guestConnectInProgress=false; if(hostConn===conn) scheduleGuestReconnect(); });
 }
 
-function joinGame(code){
+function joinGame(code, isResume=false){
   roomCode = code;
+  if(!isResume) clearSessionSnapshot();
+  saveSessionSnapshot();
   peer = new Peer();
   peer.on('open', () => {
     isHost = false; connectionState='reconnecting';
@@ -1071,11 +1181,12 @@ function handleGuestData(data){
     drawOfferBy = data.drawOfferBy || null;
     takebackOfferBy = data.takebackOfferBy || null;
     rematchOfferBy = data.rematchOfferBy || null;
-    connectionState='connected';
+    markConnectionConnected();
     gameResultCode = data.result || null;
     gameResultReason = data.resultReason || '';
     if(data.clock) applyRemoteClock(data.clock);
     renderGame();
+    saveSessionSnapshot();
   }
 }
 
@@ -1097,6 +1208,11 @@ function resetGameState(){
 }
 
 function renderGame(){
+  const oldNotation=document.getElementById('notation');
+  const oldNotationHistory=lastRenderedHistory;
+  const oldNotationScroll=oldNotation ? oldNotation.scrollTop : 0;
+  const oldNotationMax=oldNotation ? Math.max(0,oldNotation.scrollHeight-oldNotation.clientHeight) : 0;
+  const oldNotationNearBottom=oldNotation ? (oldNotationMax-oldNotationScroll<40) : true;
   const names = isHost
     ? { white: hostColor==='w'?myName:guestName, black: hostColor==='w'?guestName:myName, status: connectionState }
     : Object.assign({ white:'', black:'' }, (window.__names || {}), { status: connectionState });
@@ -1127,14 +1243,14 @@ function renderGame(){
     <div class="game-topbar">
       <div class="brand"><img class="brand-logo" src="${MYCHESS64_LOGO}" alt="MyChess64"><span class="brand-name">MyChess64</span></div>
       <div class="top-actions">
-        <span class="status-chip"><span class="connection-dot ${names.status==='playing'?'connected':names.status==='reconnecting'?'reconnecting':''}"></span>${names.status==='playing'?'Connected':names.status==='reconnecting'?'Reconnecting…':'Waiting'}</span>
+        <span class="status-chip"><span class="connection-dot ${names.status==='connected'||names.status==='playing'?'connected':names.status==='reconnecting'?'reconnecting':''}"></span>${names.status==='connected'||names.status==='playing'?'Connected':names.status==='reconnecting'?'Reconnecting…':'Waiting'}</span>
         <span class="room-chip">Game <b>${esc(roomCode)}</b></span>
         <button class="icon-btn" id="themeBtn" title="Light / Dark">◐</button>
         <button class="secondary" id="leaveBtn">Leave</button>
       </div>
     </div>
     <div class="game-layout">
-      <div class="board-zone"><div id="board"></div><div class="mobile-offer-slot" id="mobileOfferSlot"></div></div>
+      <div class="board-zone"><div id="board"></div></div>
       <aside class="side-panel">
         <div class="players-panel">
           <div class="player-row ${turn==='w'?'active':''}">
@@ -1146,6 +1262,7 @@ function renderGame(){
             <div class="clock" id="clock-b">${clockPreset==='off'?'—':formatClock(clockMs('b'))}</div>
           </div>
         </div>
+        <div class="mobile-offer-slot" id="mobileOfferSlot"></div>
         ${result ? `<div class="result-card"><div class="result-kicker">Game Result</div><div class="result-main">${result==='1-0'?'White Wins':result==='0-1'?'Black Wins':'Draw'} · ${result}</div><div class="result-reason">${esc(gameResultReason || (clockWinner ? 'Time expired' : chess.in_checkmate() ? 'Checkmate' : chess.in_stalemate() ? 'Stalemate' : 'Game drawn'))}</div></div>` : ''}
         <div class="notation-wrap">
           <div class="notation-columns"><span></span><span>White</span><span>Black</span></div>
@@ -1205,7 +1322,7 @@ function renderGame(){
     e.stopPropagation();
     setViewPly(Number(cell.dataset.ply)||0);
   });
-  document.getElementById('newGameBtn').onclick=()=>{if(isHost){chess=new Chess();resetGameState();resetClock(clockPreset);hostSync();}};
+  document.getElementById('newGameBtn').onclick=()=>{if(isHost){if(hostColorMode==='r') hostColor=randomHostColor(); myColor=hostColor; if(guestConn){guestConn.role=(hostColor==='w')?'b':'w';guestConn.playerColor=guestConn.role;} chess=new Chess();resetGameState();resetClock(clockPreset);hostSync();}};
   document.getElementById('drawBtn').onclick=()=>offerDraw();
   document.getElementById('takebackBtn').onclick=()=>offerTakeback();
   const at=document.getElementById('acceptTakebackBtn'); if(at) at.onclick=()=>respondTakeback(true);
@@ -1225,7 +1342,14 @@ function renderGame(){
   const mDecline=document.getElementById('mobileDeclineDrawBtn'); if(mDecline) mDecline.onclick=()=>respondDraw(false);
   drawBoard(); updateClockDisplay(); startClockTicker();
   updateMoveNavigation(hist);
-  const nbox=document.getElementById('notation'); if(nbox) nbox.scrollTop=nbox.scrollHeight;
+  const nbox=document.getElementById('notation');
+  const newHistoryKey=hist.map(m=>m.from+'-'+m.to+'-'+(m.promotion||'')+'-'+(m.san||'')).join('|');
+  if(nbox){
+    if(oldNotationHistory===newHistoryKey){ nbox.scrollTop=Math.min(oldNotationScroll,nbox.scrollHeight); }
+    else if(oldNotationNearBottom){ nbox.scrollTop=nbox.scrollHeight; }
+  }
+  lastRenderedHistory=newHistoryKey;
+  saveSessionSnapshot();
 }
 
 function offerTakeback(){
@@ -1256,7 +1380,7 @@ function offerRematch(){
 function respondRematch(accept){
   if(isHost){
     if(rematchOfferBy!==((hostColor==='w')?'b':'w')) return;
-    if(accept){ chess=new Chess(); resetGameState(); resetClock(clockPreset); connectionState='connected'; hostSync(); }
+    if(accept){ if(hostColorMode==='r') hostColor=randomHostColor(); myColor=hostColor; if(guestConn){guestConn.role=(hostColor==='w')?'b':'w';guestConn.playerColor=guestConn.role;} chess=new Chess(); resetGameState(); resetClock(clockPreset); markConnectionConnected(); hostSync(); }
     else { rematchOfferBy=null; hostSync(); }
   } else sendGuestCommand({type:accept?'rematchAccept':'rematchDecline'});
 }
@@ -1299,6 +1423,19 @@ function currentNames(){
   return { white: (window.__names&&window.__names.white)||'White', black: (window.__names&&window.__names.black)||'Black' };
 }
 
+function downloadBlob(blob, filename){
+  try{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=filename; a.rel='noopener';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ try{ a.remove(); URL.revokeObjectURL(url); }catch(e){} },1500);
+    return true;
+  }catch(e){ return false; }
+}
+
 function exportPGN(){
   const n = currentNames();
   try{
@@ -1307,12 +1444,9 @@ function exportPGN(){
       'Event', 'MyChess64', 'Site', 'MyChess64 — Online Chess', 'Result', getGameResult() || '*');
   }catch(e){}
   const pgn = chess.pgn({ max_width: 8 });
-  const blob = new Blob([pgn], { type: 'application/x-chess-pgn' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'chess-' + (roomCode||'game') + '.pgn';
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(a.href);
+  if(!downloadBlob(new Blob([pgn], {type:'application/x-chess-pgn;charset=utf-8'}), 'chess-' + (roomCode||'game') + '.pgn')){
+    try{ navigator.clipboard.writeText(pgn); alert('PGN download was blocked by the browser. The PGN has been copied to the clipboard.'); }catch(e){ alert('PGN export could not be started on this browser.'); }
+  }
 }
 
 function exportPDF(){
@@ -1440,7 +1574,8 @@ function exportPDF(){
   doc.setFontSize(6.5);
   doc.text(String(hist.length/2).replace('.5','½')+' moves',pageW-margin,291,{align:'right'});
 
-  doc.save('mychess64-'+(roomCode||'game')+'.pdf');
+  const pdfBlob=doc.output('blob');
+  if(!downloadBlob(pdfBlob,'mychess64-'+(roomCode||'game')+'.pdf')){ try{ doc.save('mychess64-'+(roomCode||'game')+'.pdf'); }catch(e){ alert('PDF export could not be started on this browser.'); } }
 }
 
 function squareName(fileIdx, rankIdx){ return 'abcdefgh'[fileIdx] + (rankIdx+1); }
@@ -1491,10 +1626,11 @@ function clearBoardAnnotations(){
   if(board){ board.classList.remove('arrow-drawing','arrow-mode'); const svg=board.querySelector('.arrow-layer'); if(svg) svg.remove(); }
 }
 
+function boardFlipForColor(){ return myColor === 'b'; }
 function drawBoard(){
   const board = document.getElementById('board');
   board.innerHTML = '';
-  const flip = myColor === 'b';
+  const flip = boardFlipForColor();
   const hist=getDisplayHistory();
   const boardGame=getDisplayChess(hist);
   const interactive = (viewPly===null || viewPly===undefined);
@@ -1699,14 +1835,14 @@ function startGuestHeartbeat(){
     } else ensureGuestConnection();
   },8000);
 }
-window.addEventListener('online',ensureGuestConnection);
-window.addEventListener('offline',()=>{ if(!isHost){ connectionState='reconnecting'; renderGame(); } });
-window.addEventListener('pageshow',ensureGuestConnection);
-window.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') ensureGuestConnection(); });
+window.addEventListener('offline',()=>{ if(!getGameResult()){ markConnectionRecovering(); } });
+window.addEventListener('online',()=>{ if(isHost){ try{ if(peer && peer.disconnected) peer.reconnect(); }catch(e){} } else ensureGuestConnection(); });
+window.addEventListener('pageshow',()=>{ clearReconnectGrace(); if(isHost){ if(peer && peer.disconnected){ try{ peer.reconnect(); }catch(e){} } renderGame(); } else ensureGuestConnection(); });
+window.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ clearReconnectGrace(); if(isHost){ try{ if(peer && peer.disconnected) peer.reconnect(); }catch(e){} renderGame(); } else ensureGuestConnection(); } });
 window.addEventListener('beforeunload',()=>{ if(guestHeartbeatTimer) clearInterval(guestHeartbeatTimer); });
 
 loadTheme();
-renderLobby();
+if(!restoreActiveSession()) renderLobby();
 </script>
 </body>
 </html>
