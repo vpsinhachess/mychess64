@@ -764,6 +764,8 @@ function cleanup(){
   window.__activeHostPeer=null;
   try{ if(peer) peer.destroy(); }catch(e){}
   peer=null; guestConn=null; otherConns=[]; hostConn=null; selected=null; guestCommandQueue=[]; guestConnectInProgress=false;
+  if(typeof clearGuestLivenessTimer==='function') clearGuestLivenessTimer();
+  guestReconnectInProgress=false;
   stateVersion=0; lastRemoteStateVersion=0; nextGuestCommandId=1; pendingGuestMoveCommand=null; lastAppliedMoveCommandId=null; processedMoveCommandIds=new Set();
   window.__names=null;
   chess = new Chess(); myColor=null;
@@ -960,7 +962,9 @@ function handleHostData(conn, data){
     return;
   }
   if(data.type === 'ping' && conn === guestConn){
-    try{ if(conn.open) conn.send({type:'pong',stateVersion}); }catch(e){}
+    // Echo the probe id so a mobile Guest can verify that this exact
+    // DataConnection is still responsive after the browser wakes up.
+    try{ if(conn.open) conn.send({type:'pong',stateVersion,pingId:data.pingId||null}); }catch(e){}
     return;
   }
   if(data.type === 'syncRequest' && conn === guestConn){
@@ -1163,7 +1167,17 @@ function handleGuestData(data){
     return;
   }
   if(data.type === 'pong'){
-    connectionState='connected';
+    // A WebRTC DataConnection may still report .open after Android has
+    // suspended Chrome even though packets are no longer flowing.  A
+    // matching pong is the actual liveness proof.
+    if(!guestPendingPingId || data.pingId === guestPendingPingId){
+      if(guestPongTimer){ clearTimeout(guestPongTimer); guestPongTimer=null; }
+      guestPendingPingId=null;
+      markConnectionConnected();
+      if(hostConn && hostConn.open){
+        try{ hostConn.send({type:'syncRequest',knownVersion:lastRemoteStateVersion}); }catch(e){}
+      }
+    }
     return;
   }
   if(data.type === 'state'){
@@ -1827,31 +1841,127 @@ function onSquareClick(sq){
   }
 }
 
-// Mobile browser lifecycle recovery. PeerJS can be paused while a tab is
-// backgrounded; on return, verify the data channel and request a fresh state.
+// Mobile browser lifecycle recovery. Android may suspend Chrome and leave a
+// PeerJS DataConnection object looking open even though the WebRTC channel is
+// no longer carrying packets.  Recovery therefore uses a real ping/pong
+// liveness probe and forcibly replaces a stale connection when the probe times out.
 let guestHeartbeatTimer = null;
-function ensureGuestConnection(){
-  if(isHost || !peer || !roomCode) return;
-  if(hostConn && hostConn.open){
-    try{ hostConn.send({type:'syncRequest',knownVersion:lastRemoteStateVersion}); }catch(e){ scheduleGuestReconnect(); }
-  } else {
-    scheduleGuestReconnect();
+let guestPongTimer = null;
+let guestPendingPingId = null;
+let guestPingSequence = 0;
+let guestReconnectInProgress = false;
+
+function clearGuestLivenessTimer(){
+  if(guestPongTimer){ clearTimeout(guestPongTimer); guestPongTimer=null; }
+  guestPendingPingId=null;
+}
+
+function forceGuestReconnect(reason){
+  if(isHost || !peer || !roomCode || getGameResult()) return;
+  if(guestReconnectInProgress) return;
+  guestReconnectInProgress=true;
+  clearGuestLivenessTimer();
+  if(guestReconnectTimer){ clearTimeout(guestReconnectTimer); guestReconnectTimer=null; }
+  markConnectionRecovering();
+
+  const stale=hostConn;
+  hostConn=null;
+  guestConnectInProgress=false;
+  if(stale){ try{ stale.close(); }catch(e){} }
+
+  const connectNow=()=>{
+    guestReconnectInProgress=false;
+    if(!peer || !roomCode || getGameResult()) return;
+    connectGuestToHost();
+  };
+
+  if(peer && peer.disconnected){
+    try{ peer.reconnect(); }catch(e){}
+    setTimeout(connectNow,1200);
+  }else{
+    setTimeout(connectNow,150);
   }
 }
+
+function probeGuestConnection(){
+  if(isHost || !peer || !roomCode || getGameResult()) return;
+  if(document.visibilityState !== 'visible') return;
+
+  if(!hostConn || !hostConn.open){
+    forceGuestReconnect('no-open-connection');
+    return;
+  }
+
+  clearGuestLivenessTimer();
+  const pingId='p'+Date.now().toString(36)+'-'+(++guestPingSequence);
+  guestPendingPingId=pingId;
+  try{
+    hostConn.send({type:'ping',at:Date.now(),pingId});
+  }catch(e){
+    forceGuestReconnect('ping-send-failed');
+    return;
+  }
+
+  // Android/Chrome can leave .open=true on a stale channel. If no matching
+  // pong arrives, replace that channel instead of waiting indefinitely.
+  guestPongTimer=setTimeout(()=>{
+    guestPongTimer=null;
+    if(guestPendingPingId!==pingId) return;
+    guestPendingPingId=null;
+    if(document.visibilityState==='visible') forceGuestReconnect('pong-timeout');
+  },3000);
+}
+
+function ensureGuestConnection(){
+  if(isHost || !peer || !roomCode) return;
+  if(document.visibilityState !== 'visible') return;
+  probeGuestConnection();
+}
+
 function startGuestHeartbeat(){
   if(guestHeartbeatTimer || isHost) return;
   guestHeartbeatTimer=setInterval(()=>{
     if(document.visibilityState==='hidden') return;
-    if(hostConn && hostConn.open){
-      try{ hostConn.send({type:'ping',at:Date.now()}); }catch(e){ scheduleGuestReconnect(); }
-    } else ensureGuestConnection();
+    probeGuestConnection();
   },8000);
 }
-window.addEventListener('offline',()=>{ if(!getGameResult()){ markConnectionRecovering(); } });
-window.addEventListener('online',()=>{ if(isHost){ try{ if(peer && peer.disconnected) peer.reconnect(); }catch(e){} } else ensureGuestConnection(); });
-window.addEventListener('pageshow',()=>{ clearReconnectGrace(); if(isHost){ if(peer && peer.disconnected){ try{ peer.reconnect(); }catch(e){} } renderGame(); } else ensureGuestConnection(); });
-window.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ clearReconnectGrace(); if(isHost){ try{ if(peer && peer.disconnected) peer.reconnect(); }catch(e){} renderGame(); } else ensureGuestConnection(); } });
-window.addEventListener('beforeunload',()=>{ if(guestHeartbeatTimer) clearInterval(guestHeartbeatTimer); });
+
+window.addEventListener('offline',()=>{ if(!getGameResult()){ clearGuestLivenessTimer(); markConnectionRecovering(); } });
+window.addEventListener('online',()=>{
+  if(isHost){
+    try{ if(peer && peer.disconnected) peer.reconnect(); }catch(e){}
+  }else{
+    forceGuestReconnect('network-online');
+  }
+});
+window.addEventListener('pageshow',()=>{
+  clearReconnectGrace();
+  if(isHost){
+    if(peer && peer.disconnected){ try{ peer.reconnect(); }catch(e){} }
+    renderGame();
+  }else{
+    // pageshow is a strong wake/resume signal on mobile browsers. Never trust
+    // a pre-suspension .open flag here; perform a real liveness probe.
+    ensureGuestConnection();
+  }
+});
+window.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    clearReconnectGrace();
+    if(isHost){
+      try{ if(peer && peer.disconnected) peer.reconnect(); }catch(e){}
+      renderGame();
+    }else{
+      // Force a fresh connection after a background/foreground cycle. This
+      // avoids the stale-WebRTC-channel state that previously blocked moves.
+      forceGuestReconnect('browser-resume');
+    }
+  }
+});
+window.addEventListener('beforeunload',()=>{
+  if(guestHeartbeatTimer) clearInterval(guestHeartbeatTimer);
+  clearGuestLivenessTimer();
+});
 
 loadTheme();
 if(!restoreActiveSession()) renderLobby();
