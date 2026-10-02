@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1020">
+<meta name="description" content="MyChess64 Chess Websites — discover useful chess websites for playing, learning, puzzles, analysis, openings, tournaments, books, software and more.">
+<title>Chess Websites | MyChess64</title>
+<style>
+:root{
+  --bg:#080c16; --panel:#101727; --panel2:#151d30; --text:#f5f7fb;
+  --muted:#98a5bb; --line:rgba(255,255,255,.09); --accent:#7c5cff;
+  --accent2:#19c7a0; --gold:#f4c76b; --danger:#ff6b7a;
+  --shadow:0 18px 50px rgba(0,0,0,.28); --radius:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+ margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ background:
+ radial-gradient(circle at 10% 0%,rgba(124,92,255,.16),transparent 30%),
+ radial-gradient(circle at 90% 10%,rgba(25,199,160,.11),transparent 28%),
+ var(--bg); color:var(--text); min-height:100vh;
+}
+button,input{font:inherit}
+a{color:inherit;text-decoration:none}
+.container{width:min(1240px,calc(100% - 32px));margin:auto}
+header{
+ position:sticky;top:0;z-index:20;background:rgba(8,12,22,.82);
+ backdrop-filter:blur(18px);border-bottom:1px solid var(--line)
+}
+.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:.3px}
+.logo{
+ width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+ background:linear-gradient(135deg,var(--accent),#3f8cff);font-size:22px;
+ box-shadow:0 8px 25px rgba(124,92,255,.3)
+}
+.brand span{font-size:18px}.brand small{display:block;color:var(--muted);font-weight:600;font-size:10px}
+.nav a{color:var(--muted);font-size:14px;font-weight:700}
+.hero{padding:62px 0 34px;text-align:center}
+.badge{
+ display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border:1px solid var(--line);
+ background:rgba(255,255,255,.035);border-radius:999px;color:#c8d1e1;font-size:12px;font-weight:800
+}
+h1{font-size:clamp(38px,7vw,72px);line-height:.98;margin:20px 0 16px;letter-spacing:-3px}
+.gradient{background:linear-gradient(90deg,#fff,#b9c4ff 42%,#70e0c5);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:720px;margin:auto;color:var(--muted);font-size:17px;line-height:1.7}
+.searchWrap{max-width:820px;margin:28px auto 0;position:relative}
+.search{
+ width:100%;height:58px;border:1px solid var(--line);background:rgba(255,255,255,.06);
+ color:var(--text);border-radius:17px;padding:0 20px 0 52px;outline:none;
+ box-shadow:var(--shadow)
+}
+.search:focus{border-color:rgba(124,92,255,.7);box-shadow:0 0 0 4px rgba(124,92,255,.1)}
+.searchIcon{position:absolute;left:19px;top:18px;color:var(--muted)}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0}
+.stat{padding:8px 12px;border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:10px;color:#b9c4d7;font-size:12px;font-weight:800}
+.controls{position:sticky;top:72px;z-index:10;padding:12px 0;background:rgba(8,12,22,.76);backdrop-filter:blur(15px)}
+.controlRow{display:flex;gap:9px;overflow:auto;padding-bottom:2px;scrollbar-width:none}
+.controlRow::-webkit-scrollbar{display:none}
+.chip{
+ flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.035);color:#aeb9cb;
+ padding:10px 14px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:800;transition:.2s
+}
+.chip:hover{border-color:rgba(124,92,255,.45);color:#fff}
+.chip.active{background:linear-gradient(135deg,var(--accent),#5b7cff);color:white;border-color:transparent}
+.sectionHead{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:28px 0 16px}
+.sectionHead h2{margin:0;font-size:23px;letter-spacing:-.6px}
+.sectionHead p{margin:0;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:50px}
+.card{
+ background:linear-gradient(145deg,rgba(21,29,48,.96),rgba(13,19,32,.96));
+ border:1px solid var(--line);border-radius:var(--radius);padding:19px;
+ box-shadow:0 12px 35px rgba(0,0,0,.14);position:relative;overflow:hidden;transition:.25s
+}
+.card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 0%,rgba(124,92,255,.12),transparent 42%);pointer-events:none}
+.card:hover{transform:translateY(-4px);border-color:rgba(124,92,255,.35);box-shadow:0 22px 50px rgba(0,0,0,.28)}
+.top{display:flex;gap:13px;align-items:flex-start;position:relative}
+.icon{
+ width:48px;height:48px;flex:0 0 48px;border-radius:14px;display:grid;place-items:center;
+ background:rgba(124,92,255,.13);border:1px solid rgba(124,92,255,.18);font-size:24px
+}
+.card h3{margin:1px 0 4px;font-size:17px}.domain{font-size:11px;color:#76839a}
+.desc{color:#aab5c7;font-size:13px;line-height:1.55;margin:15px 0}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tag{font-size:10px;font-weight:900;padding:5px 7px;border-radius:7px;background:rgba(255,255,255,.055);color:#b8c3d4}
+.tag.free{color:#61e4bf;background:rgba(25,199,160,.09)} .tag.official{color:#8fa7ff;background:rgba(124,92,255,.09)}
+.actions{display:flex;gap:8px}
+.open{
+ flex:1;text-align:center;padding:10px;border-radius:11px;background:#fff;color:#101522;
+ font-size:12px;font-weight:900;transition:.2s
+}
+.open:hover{background:#dfe5ff}
+.copy{
+ border:1px solid var(--line);background:rgba(255,255,255,.04);color:#d5dbea;
+ border-radius:11px;padding:0 12px;cursor:pointer;font-size:12px;font-weight:800
+}
+.empty{text-align:center;padding:55px 20px;color:var(--muted);display:none}
+.empty strong{display:block;color:white;font-size:18px;margin-bottom:6px}
+footer{border-top:1px solid var(--line);padding:28px 0 42px;color:#738096;font-size:12px;text-align:center}
+footer b{color:#bfc9d9}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){
+ .container{width:min(100% - 22px,1240px)} .nav{height:64px}
+ .nav a{display:none}.hero{padding:42px 0 24px} h1{letter-spacing:-2px}
+ .hero p{font-size:14px}.controls{top:64px}.grid{grid-template-columns:1fr;gap:12px}
+ .card{padding:16px}.sectionHead{align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+<body>
+<header>
+ <div class="container nav">
+  <a class="brand" href="index.html">
+   <div class="logo">♞</div>
+   <div>MyChess64<small>LEARN · PLAY · IMPROVE</small></div>
+  </a>
+  <a href="index.html">← Back to MyChess64</a>
+ </div>
+</header>
+
+<main>
+<section class="hero container">
+ <div class="badge">♟ CHESS RESOURCE HUB</div>
+ <h1><span class="gradient">Chess Websites</span></h1>
+ <p>Discover useful chess websites for playing, learning, puzzles, analysis, openings, tournaments, books, software, news and more — all in one place.</p>
+ <div class="searchWrap">
+  <span class="searchIcon">⌕</span>
+  <input id="search" class="search" placeholder="Search websites, categories, features..." autocomplete="off">
+ </div>
+ <div class="stats">
+  <div class="stat"><span id="count">0</span> Websites</div>
+  <div class="stat">15 Categories</div>
+  <div class="stat">One-click Access</div>
+ </div>
+</section>
+
+<div class="controls">
+ <div class="container controlRow" id="categories"></div>
+</div>
+
+<section class="container">
+ <div class="sectionHead">
+  <div><h2 id="sectionTitle">Featured Chess Websites</h2><p id="resultText"></p></div>
+ </div>
+ <div class="grid" id="grid"></div>
+ <div class="empty" id="empty"><strong>No websites found</strong>Try another search or category.</div>
+</section>
+</main>
+
+<footer>
+ <div class="container"><b>MyChess64</b> · Chess resources in one place<br>External websites open in a new tab. Their content and trademarks belong to their respective owners.</div>
+</footer>
+
+<script>
+const sites = [
+ {n:"Lichess",d:"lichess.org",c:"Play Chess",i:"♟",desc:"Free online chess with games, puzzles, studies, analysis, tournaments and an open database.",t:["Free","Official"],u:"https://lichess.org/"},
+ {n:"Chess.com",d:"chess.com",c:"Play Chess",i:"♞",desc:"Online chess, puzzles, lessons, bots, tournaments, news and a huge chess community.",t:["Freemium"],u:"https://www.chess.com/"},
+ {n:"ChessTempo",d:"chesstempo.com",c:"Play Chess",i:"⚡",desc:"Tactics, opening training, endgames, game database and chess analysis.",t:["Freemium"],u:"https://www.chesstempo.com/"},
+ {n:"Chess.org",d:"chess.org",c:"Play Chess",i:"♚",desc:"Online chess playing and chess resources.",t:["Free"],u:"https://chess.org/"},
+ {n:"Lichess Training",d:"lichess.org/training",c:"Puzzles",i:"🧩",desc:"Adaptive tactical puzzle training using real chess positions.",t:["Free"],u:"https://lichess.org/training"},
+ {n:"Chess.com Puzzles",d:"chess.com/puzzles",c:"Puzzles",i:"🧩",desc:"Daily puzzles and tactical challenges across many difficulty levels.",t:["Freemium"],u:"https://www.chess.com/puzzles"},
+ {n:"Chess Puzzle Net",d:"chesspuzzle.net",c:"Puzzles",i:"🧠",desc:"Chess puzzle collection and tactical training.",t:["Free"],u:"https://chesspuzzle.net/"},
+ {n:"Chessable",d:"chessable.com",c:"Learning",i:"📚",desc:"Interactive chess courses and spaced-repetition training.",t:["Freemium"],u:"https://www.chessable.com/"},
+ {n:"Lichess Studies",d:"lichess.org/study",c:"Learning",i:"📖",desc:"Create and study interactive chess lessons, repertoires and annotated games.",t:["Free"],u:"https://lichess.org/study"},
+ {n:"Chess Strategy Online",d:"chessstrategyonline.com",c:"Learning",i:"🎓",desc:"Free tutorials covering tactics, strategy, openings and endgames.",t:["Free"],u:"https://www.chessstrategyonline.com/"},
+ {n:"ChessBase",d:"chessbase.com",c:"Learning",i:"💡",desc:"Professional chess news, databases, training and software ecosystem.",t:["Freemium"],u:"https://en.chessbase.com/"},
+ {n:"Lichess Analysis",d:"lichess.org/analysis",c:"Analysis",i:"🔍",desc:"Powerful browser analysis board with Stockfish and opening explorer.",t:["Free"],u:"https://lichess.org/analysis"},
+ {n:"Chess.com Analysis",d:"chess.com/analysis",c:"Analysis",i:"🔎",desc:"Analyze games and positions with browser-based chess tools.",t:["Freemium"],u:"https://www.chess.com/analysis"},
+ {n:"OpeningTree",d:"openingtree.com",c:"Analysis",i:"🌳",desc:"Explore player games, openings, PGNs and opening trees.",t:["Free"],u:"https://www.openingtree.com/"},
+ {n:"DecodeChess",d:"decodechess.com",c:"Analysis",i:"💬",desc:"AI-assisted explanations of chess positions and engine ideas.",t:["Freemium"],u:"https://decodechess.com/"},
+ {n:"365Chess",d:"365chess.com",c:"Game Databases",i:"🗄️",desc:"Large searchable chess-game database with players, openings, ECO and statistics.",t:["Freemium"],u:"https://www.365chess.com/"},
+ {n:"Chessgames.com",d:"chessgames.com",c:"Game Databases",i:"🗃️",desc:"Extensive collection of historic and master chess games.",t:["Free"],u:"https://www.chessgames.com/"},
+ {n:"The Week in Chess",d:"theweekinchess.com",c:"Game Databases",i:"📰",desc:"Chess news, tournament coverage and downloadable current game files.",t:["Free"],u:"https://theweekinchess.com/"},
+ {n:"Lichess Open Database",d:"database.lichess.org",c:"Game Databases",i:"💾",desc:"Open downloadable Lichess game and chess data database.",t:["Free","Open Source"],u:"https://database.lichess.org/"},
+ {n:"Lichess Opening Explorer",d:"lichess.org/analysis",c:"Openings",i:"🌳",desc:"Explore opening moves, statistics and master/player databases.",t:["Free"],u:"https://lichess.org/analysis"},
+ {n:"365Chess Opening Explorer",d:"365chess.com/opening",c:"Openings",i:"📊",desc:"Browse opening continuations and database statistics.",t:["Freemium"],u:"https://www.365chess.com/opening.php"},
+ {n:"Chess.com Openings",d:"chess.com/openings",c:"Openings",i:"📚",desc:"Opening encyclopedia with move sequences, ideas and variations.",t:["Freemium"],u:"https://www.chess.com/openings"},
+ {n:"Stockfish",d:"stockfishchess.org",c:"Engines",i:"♜",desc:"One of the strongest open-source chess engines, available across platforms.",t:["Free","Open Source"],u:"https://stockfishchess.org/"},
+ {n:"Stockfish GitHub",d:"github.com/official-stockfish",c:"Engines",i:"💻",desc:"Source code and development repository for Stockfish.",t:["Free","Open Source"],u:"https://github.com/official-stockfish/Stockfish"},
+ {n:"Stockfish.js",d:"github.com/lichess-org/stockfish.js",c:"Engines",i:"🌐",desc:"Stockfish compiled for browser use with WebAssembly/JavaScript.",t:["Free","Open Source"],u:"https://github.com/lichess-org/stockfish.js"},
+ {n:"Chess-Results",d:"chess-results.com",c:"Tournaments",i:"🏆",desc:"Tournament pairings, standings, player searches and results worldwide.",t:["Free"],u:"https://chess-results.com/"},
+ {n:"FIDE",d:"fide.com",c:"Official",i:"🌍",desc:"Official international chess federation: events, news, regulations and resources.",t:["Free","Official"],u:"https://www.fide.com/"},
+ {n:"FIDE Ratings",d:"ratings.fide.com",c:"Ratings",i:"📈",desc:"Official FIDE player ratings and player information.",t:["Free","Official"],u:"https://ratings.fide.com/"},
+ {n:"FIDE Handbook",d:"handbook.fide.com",c:"Official",i:"📜",desc:"Official Laws of Chess and FIDE regulations.",t:["Free","Official"],u:"https://handbook.fide.com/"},
+ {n:"FIDE Calendar",d:"fide.com/calendar",c:"Tournaments",i:"📅",desc:"Official FIDE event and competition calendar.",t:["Free","Official"],u:"https://www.fide.com/calendar"},
+ {n:"AICF",d:"aicf.in",c:"Official",i:"🇮🇳",desc:"All India Chess Federation — Indian chess events, players, ratings and information.",t:["Free","Official"],u:"https://aicf.in/"},
+ {n:"ChessBase India",d:"chessbase.in",c:"News",i:"🇮🇳",desc:"Indian chess news, tournament coverage, videos and player stories.",t:["Free"],u:"https://chessbase.in/"},
+ {n:"FIDE News",d:"fide.com/news",c:"News",i:"📣",desc:"Official FIDE chess news and announcements.",t:["Free","Official"],u:"https://www.fide.com/news"},
+ {n:"Chess.com News",d:"chess.com/news",c:"News",i:"📰",desc:"Chess news, events, interviews and features.",t:["Free"],u:"https://www.chess.com/news"},
+ {n:"Lichess Blog",d:"lichess.org/@/lichess/blog",c:"News",i:"✍️",desc:"Lichess announcements, development news and community updates.",t:["Free"],u:"https://lichess.org/@/lichess/blog"},
+ {n:"Internet Archive",d:"archive.org",c:"Free Books",i:"📖",desc:"Digital library with many historical and public-domain chess books.",t:["Free"],u:"https://archive.org/"},
+ {n:"Project Gutenberg",d:"gutenberg.org",c:"Free Books",i:"📚",desc:"Large public-domain ebook library, including classic chess titles.",t:["Free"],u:"https://www.gutenberg.org/"},
+ {n:"Google Books",d:"books.google.com",c:"Free Books",i:"🔎",desc:"Search and preview digitized books, including chess literature.",t:["Free"],u:"https://books.google.com/"},
+ {n:"SCID",d:"scid.sourceforge.net",c:"Software",i:"💻",desc:"Free chess database application for managing and analyzing games.",t:["Free","Open Source"],u:"https://scid.sourceforge.net/"},
+ {n:"ChessX",d:"chessx.sourceforge.net",c:"Software",i:"🖥️",desc:"Free open-source chess database and analysis program.",t:["Free","Open Source"],u:"https://chessx.sourceforge.net/"},
+ {n:"Cute Chess",d:"cutechess.com",c:"Software",i:"⚙️",desc:"Chess GUI and toolset for playing, analysis and engine testing.",t:["Free","Open Source"],u:"https://cutechess.com/"},
+ {n:"Arena Chess",d:"playwitharena.de",c:"Software",i:"♜",desc:"Free chess GUI for playing against engines and analysis.",t:["Free"],u:"http://www.playwitharena.de/"},
+ {n:"ChessBase India YouTube",d:"youtube.com/@ChessBaseIndia",c:"Videos",i:"▶️",desc:"Indian chess videos, tournament coverage, interviews and educational content.",t:["Free"],u:"https://www.youtube.com/@ChessBaseIndia"},
+ {n:"Chess.com YouTube",d:"youtube.com/@chess",c:"Videos",i:"▶️",desc:"Chess lessons, events, commentary and entertainment.",t:["Free"],u:"https://www.youtube.com/@chess"},
+ {n:"Saint Louis Chess Club",d:"youtube.com/@STLChessClub",c:"Videos",i:"🎥",desc:"Lectures, tournaments, interviews and high-level chess education.",t:["Free"],u:"https://www.youtube.com/@STLChessClub"},
+ {n:"FIDE YouTube",d:"youtube.com/@FIDE_chess",c:"Videos",i:"📺",desc:"Official FIDE broadcasts, interviews and chess events.",t:["Free","Official"],u:"https://www.youtube.com/@FIDE_chess"}
+];
+
+const categories = ["All","Play Chess","Puzzles","Learning","Analysis","Game Databases","Openings","Engines","Tournaments","Ratings","Official","News","Videos","Free Books","Software"];
+let active="All";
+
+const catBox=document.getElementById("categories");
+const grid=document.getElementById("grid");
+const search=document.getElementById("search");
+const empty=document.getElementById("empty");
+const count=document.getElementById("count");
+const resultText=document.getElementById("resultText");
+const title=document.getElementById("sectionTitle");
+
+function renderCats(){
+ catBox.innerHTML=categories.map(c=>`<button class="chip ${c===active?'active':''}" onclick="setCat('${c.replaceAll("'","\\'")}')">${c}</button>`).join("");
+}
+function setCat(c){active=c;renderCats();render()}
+function matches(s,q){
+ const text=(s.n+" "+s.d+" "+s.c+" "+s.desc+" "+s.t.join(" ")).toLowerCase();
+ return !q || text.includes(q);
+}
+function render(){
+ const q=search.value.trim().toLowerCase();
+ const filtered=sites.filter(s=>(active==="All"||s.c===active||s.t.includes(active))&&matches(s,q));
+ count.textContent=sites.length;
+ resultText.textContent=`Showing ${filtered.length} of ${sites.length} resources`;
+ title.textContent=active==="All"?"Featured Chess Websites":active;
+ grid.innerHTML=filtered.map(s=>`
+  <article class="card">
+   <div class="top">
+    <div class="icon">${s.i}</div>
+    <div><h3>${esc(s.n)}</h3><div class="domain">${esc(s.d)}</div></div>
+   </div>
+   <div class="desc">${esc(s.desc)}</div>
+   <div class="tags">${s.t.map(x=>`<span class="tag ${x==="Free"?"free":x==="Official"?"official":""}">${esc(x)}</span>`).join("")}<span class="tag">${esc(s.c)}</span></div>
+   <div class="actions">
+    <a class="open" href="${s.u}" target="_blank" rel="noopener noreferrer">OPEN WEBSITE ↗</a>
+    <button class="copy" onclick="copyUrl('${s.u.replaceAll("'","\\'")}',this)">COPY</button>
+   </div>
+  </article>`).join("");
+ empty.style.display=filtered.length?"none":"block";
+}
+function esc(v){return v.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+async function copyUrl(url,btn){
+ try{await navigator.clipboard.writeText(url);const old=btn.textContent;btn.textContent="COPIED ✓";setTimeout(()=>btn.textContent=old,1200)}
+ catch{alert(url)}
+}
+search.addEventListener("input",render);
+renderCats();render();
+</script>
+</body>
+</html>
