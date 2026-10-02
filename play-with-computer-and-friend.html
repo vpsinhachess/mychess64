@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f6f8"><title>MyChess64 — Play Chess</title>
+<style>
+:root{--bg:#eef2f6;--panel:#fff;--line:#d7dee7;--text:#142033;--muted:#667386;--accent:#1769e0;--light:#f0d9b5;--dark:#b58863;--frame:#202a36;--green:#16834a;--red:#b42318;--shadow:0 10px 30px rgba(20,32,51,.12)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;min-height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:var(--bg)}body{overflow-x:hidden}
+.topbar{height:58px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:12px}.brand{display:flex;flex-direction:column;line-height:1.05}.brand strong{font-size:17px}.brand span{font-size:14px;font-weight:800;margin-top:2px}.mode-badge{font-size:12px;font-weight:900;color:var(--muted)}
+.app-shell{width:100%;min-height:calc(100vh - 58px);display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:12px;padding:10px}.board-area{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}.board-frame{width:min(100%,calc(100vh - 80px));aspect-ratio:1/1;background:#20252b;border:7px solid #20252b;box-shadow:0 16px 42px rgba(20,32,51,.24),0 2px 8px rgba(0,0,0,.18);border-radius:6px;overflow:hidden;flex:0 1 auto}.board{width:100%;height:100%;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));}
+.square{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;border:0;margin:0;padding:0;cursor:pointer;overflow:hidden}.square.light{background:#f0d9b5}.square.dark{background:#b58863}.square:hover{filter:brightness(1.035)}.square:focus-visible{outline:3px solid #1769e0;outline-offset:-3px;z-index:5}
+.piece-img{width:92%;height:92%;display:block;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none;filter:drop-shadow(0 2px 1px rgba(0,0,0,.16));transform:translateZ(0)}.piece-img.friend-black{transform:rotate(180deg)}
+.coord{position:absolute;font-size:10px;font-weight:900;line-height:1;opacity:.75;z-index:3;pointer-events:none}.coord.file{right:4px;bottom:3px}.coord.rank{left:4px;top:3px}.light .coord{color:#704621}.dark .coord{color:#f7eadb}
+.square.selected{box-shadow:inset 0 0 0 4px rgba(23,105,224,.8)}.square.last-from{box-shadow:inset 0 0 0 999px rgba(255,224,80,.20)}.square.last-to{box-shadow:inset 0 0 0 999px rgba(255,224,80,.42)}.square.move-target::after{content:"";width:18%;height:18%;border-radius:50%;background:rgba(20,32,51,.35);position:absolute}.square.capture-target::after{content:"";position:absolute;inset:8%;border:4px solid rgba(180,35,24,.55);border-radius:50%}.square.check-square{box-shadow:inset 0 0 0 5px rgba(180,35,24,.82)}
+.panel{min-width:0;display:flex;flex-direction:column;gap:9px}.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px;box-shadow:0 2px 10px rgba(20,32,51,.04)}.players{display:grid;grid-template-columns:1fr 1fr;gap:8px}.player{border:1px solid var(--line);border-radius:8px;padding:9px;background:#f8fafc}.player.active{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}.player .name{font-weight:900;font-size:14px}.player .sub{font-size:10px;color:var(--muted);margin-top:2px}.clock{font-variant-numeric:tabular-nums;font-size:22px;font-weight:900;margin-top:5px}.clock.active{color:var(--accent)}
+.status{font-weight:900;font-size:13px}.substatus{font-size:11px;color:var(--muted);margin-top:3px}.controls{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.controls button,.select,.promotion button{min-height:40px;border:1px solid var(--line);background:#fff;border-radius:8px;color:var(--text);font-weight:850;cursor:pointer}.controls button:hover,.select:hover,.promotion button:hover{border-color:#aeb9c7}.controls button:disabled{opacity:.45;cursor:not-allowed}.select{width:100%;padding:0 8px}.wide{grid-column:1/-1}.notation{max-height:235px;overflow:auto;border:1px solid var(--line);border-radius:8px}.notation-head,.move-row{display:grid;grid-template-columns:44px 1fr 1fr;align-items:center}.notation-head{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--line);font-size:11px;font-weight:900;padding:7px}.move-row{font-size:12px;padding:6px 7px;border-bottom:1px solid #edf0f4;cursor:pointer}.move-row:last-child{border-bottom:0}.move-row.active{background:#e8f0ff}.move-no{color:var(--muted)}.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.nav button{min-height:36px;border:1px solid var(--line);background:#fff;border-radius:8px;font-weight:850;cursor:pointer}.footer-note{font-size:10px;color:var(--muted);text-align:center;line-height:1.35}.promotion{position:fixed;inset:0;background:rgba(10,16,25,.48);display:flex;align-items:center;justify-content:center;z-index:50}.promotion.hidden{display:none}.promotion-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.28);width:min(92vw,360px)}.promotion-title{font-weight:900;margin-bottom:10px}.promotion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.promotion button{font-size:28px;height:58px}.result{padding:12px;border-radius:9px;background:#f7fafc;border:1px solid var(--line)}.result strong{display:block;font-size:16px}.result span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+@media(max-width:900px){.app-shell{grid-template-columns:1fr;min-height:auto;padding:8px}.board-frame{width:min(100%,calc(100vw - 16px));max-width:760px}.panel{display:grid;grid-template-columns:1fr 1fr;align-items:start}.card.full{grid-column:1/-1}}
+@media(max-width:560px){.topbar{height:54px;padding:0 11px}.brand strong{font-size:15px}.brand span{font-size:12px}.mode-badge{font-size:10px}.app-shell{padding:6px}.board-frame{width:calc(100vw - 12px);border-radius:6px}.panel{display:flex}.notation{max-height:210px}.controls{grid-template-columns:1fr 1fr}.players{grid-template-columns:1fr 1fr}.piece-img{width:94%;height:94%}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+.diag-row{display:flex;justify-content:space-between;gap:12px;font-size:11px;padding:3px 0}.diag-row strong{font-variant-numeric:tabular-nums}.ok{color:var(--green)}.bad{color:var(--red)}
+
+.primary-action{width:100%;margin-top:9px;min-height:40px;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:8px;font-weight:900;cursor:pointer}.primary-action:disabled{opacity:.55;cursor:not-allowed}.result.analysis-open{border-bottom-left-radius:0;border-bottom-right-radius:0}.analysis-box{margin-top:-9px;border-top-left-radius:0;border-top-right-radius:0}.analysis-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}.analysis-state{font-size:10px;font-weight:900;color:var(--green)}.analysis-state.bad{color:var(--red)}.analysis-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:9px}.analysis-summary>div{border:1px solid var(--line);border-radius:8px;padding:7px;background:#f8fafc}.analysis-summary span,.analysis-pv>span{display:block;font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase}.analysis-summary strong{display:block;font-size:13px;margin-top:2px;font-variant-numeric:tabular-nums}.analysis-pv{margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff}.analysis-pv div{font-size:12px;font-weight:800;line-height:1.45;margin-top:3px;word-break:break-word}.analysis-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.analysis-actions button{min-height:36px;border:1px solid var(--line);background:#fff;border-radius:8px;font-weight:850;cursor:pointer}.analysis-actions button:disabled{opacity:.45;cursor:not-allowed}.analysis-actions button:nth-child(3){border-color:var(--accent);color:var(--accent)}
+@media(max-width:560px){.analysis-summary{grid-template-columns:1fr 1fr}.analysis-actions{grid-template-columns:1fr 1fr}}
+
+
+/* MyChess64 premium visual layer */
+.topbar{background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);box-shadow:0 1px 8px rgba(20,32,51,.06)}
+.brand strong{letter-spacing:.08em}.brand span{letter-spacing:.03em;color:#1769e0}.mode-badge{padding:6px 9px;border:1px solid #d7dee7;border-radius:999px;background:#f8fafc;letter-spacing:.06em}
+.app-shell{background:radial-gradient(circle at 28% 12%,rgba(255,255,255,.95),rgba(238,242,246,.92) 42%,#e9eef3 100%)}
+.board-area{padding:2px}.panel{padding:1px}.card{border-radius:12px;box-shadow:0 3px 14px rgba(20,32,51,.055)}
+.player{background:linear-gradient(180deg,#fbfcfd,#f5f7fa)}.player.active{background:#f8fbff}
+.controls button,.nav button,.select{transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}.controls button:hover,.nav button:hover,.select:hover{box-shadow:0 3px 10px rgba(20,32,51,.08);transform:translateY(-1px)}
+.controls button:active,.nav button:active{transform:translateY(0)}
+.notation{background:#fff}.move-row.active{box-shadow:inset 3px 0 0 #1769e0}
+
+/* MyChess64 board-first production UI */
+:root{
+  --bg:#e8edf2;--panel:#ffffff;--line:#d8dee6;--text:#18212d;--muted:#748092;
+  --accent:#1769e0;--light:#f0d9b5;--dark:#b58863;--frame:#171c22;
+  --shadow:0 18px 50px rgba(20,28,38,.18)
+}
+html,body{min-height:100%;background:linear-gradient(135deg,#edf1f5 0%,#e3e8ed 100%)}
+body{overflow:auto}
+.topbar{height:52px;padding:0 14px;border-bottom:1px solid rgba(20,32,51,.10);background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.brand strong{font-size:16px;letter-spacing:.12em}.brand span{font-size:10px;letter-spacing:.18em;color:var(--accent);margin-top:3px}.mode-badge{font-size:10px;padding:5px 9px;border-radius:999px;background:#f3f6fa;border:1px solid #dbe2ea}
+.app-shell{min-height:calc(100vh - 52px);height:calc(100vh - 52px);padding:10px;gap:14px;grid-template-columns:minmax(0,1fr) 318px;background:radial-gradient(circle at 32% 42%,rgba(255,255,255,.78),rgba(234,239,244,.55) 55%,rgba(224,230,236,.55))}
+.board-area{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;padding:0}
+.board-frame{width:min(100%,calc(100vh - 78px),calc(100vw - 360px));height:auto;aspect-ratio:1/1;padding:0;border:8px solid var(--frame);background:var(--frame);border-radius:5px;box-shadow:0 24px 55px rgba(17,24,32,.24),0 4px 12px rgba(17,24,32,.16)}
+.board{width:100%;height:100%;}
+.square{cursor:pointer;touch-action:manipulation}.square:hover{filter:brightness(1.02)}
+.piece-img{width:94%;height:94%;filter:drop-shadow(0 2px 1px rgba(0,0,0,.16))}
+.coord{font-size:9px;opacity:.72}.coord.file{right:3px;bottom:2px}.coord.rank{left:3px;top:2px}
+.panel{min-height:0;overflow:auto;padding:0;gap:8px;scrollbar-width:thin}.card{padding:9px;border-radius:10px;box-shadow:0 3px 14px rgba(20,32,51,.055)}
+.players{gap:6px}.player{padding:7px;border-radius:8px}.player .name{font-size:13px}.player .sub{display:none}.clock{font-size:24px;margin-top:3px;letter-spacing:.01em}
+.status{font-size:12px}.substatus{display:none}
+.controls{gap:6px}.controls button,.select{min-height:36px;font-size:12px;border-radius:7px}.controls button{padding:0 8px}.controls button:hover,.nav button:hover,.select:hover{transform:none;box-shadow:none;border-color:#b6c0cc}
+#friendBtn,#selfBtn,#computerBtn{font-weight:900}.select{background:#fff}.wide{grid-column:1/-1}
+.nav{gap:5px}.nav button{min-height:34px;border-radius:7px;font-size:13px;padding:0}.notation{max-height:none;min-height:80px}.notation-head{padding:6px;font-size:10px}.move-row{padding:5px 6px;font-size:11px}
+.result{padding:9px}.result strong{font-size:14px}.result span{font-size:10px}.primary-action{min-height:36px;margin-top:7px;font-size:12px}
+.analysis-box{margin-top:-8px;padding:9px}.analysis-summary{gap:5px;margin-top:7px}.analysis-summary>div{padding:6px}.analysis-summary strong{font-size:12px}.analysis-pv{margin-top:6px;padding:7px}.analysis-actions{gap:5px;margin-top:6px}.analysis-actions button{min-height:34px;font-size:11px}
+.production-state{display:none!important}.footer-note,.diag-row{display:none!important}
+.promotion-card{padding:14px}.promotion-title{font-size:14px}.promotion button{min-height:54px}
+@media (max-width:1100px) and (min-width:901px){.app-shell{grid-template-columns:minmax(0,1fr) 290px}.board-frame{width:min(100%,calc(100vh - 78px),calc(100vw - 330px))}}
+@media (max-width:900px){
+  .topbar{height:50px}.app-shell{height:auto;min-height:calc(100vh - 50px);grid-template-columns:1fr;padding:8px;gap:10px}
+  .board-area{order:0}.board-frame{width:min(calc(100vw - 16px),calc(100vh - 78px),760px);max-width:760px}
+  .panel{order:1;display:grid;grid-template-columns:1fr 1fr;align-items:start;overflow:visible}.panel>.card:nth-child(4),.panel>.card:nth-child(5),.panel>.card:nth-child(6),.panel>.card:nth-child(7){grid-column:1/-1}
+}
+@media (max-width:600px){
+  .topbar{height:48px;padding:0 10px}.brand strong{font-size:14px}.brand span{font-size:9px}.mode-badge{font-size:9px;padding:4px 7px}
+  .app-shell{min-height:calc(100vh - 48px);padding:5px;gap:7px}.board-frame{width:min(calc(100vw - 10px),calc(100vh - 60px));border-width:5px;border-radius:4px}
+  .panel{display:flex;gap:6px}.card{padding:7px;border-radius:8px}.clock{font-size:21px}.controls{gap:5px}.controls button,.select{min-height:34px;font-size:11px}
+  .notation{max-height:190px}.nav button{min-height:32px}.player{padding:6px}
+}
+@media (orientation:landscape) and (max-width:900px) and (max-height:600px){
+  .app-shell{grid-template-columns:minmax(0,1fr) 270px;height:calc(100vh - 50px);min-height:0;gap:8px;padding:6px}.board-frame{width:min(calc(100vw - 292px),calc(100vh - 62px));max-width:none}.panel{display:flex;overflow:auto}.notation{max-height:150px}
+}
+@media (orientation:portrait) and (max-width:600px){.board-frame{width:min(calc(100vw - 10px),calc(100vh - 64px))}}
+@media (min-width:901px) and (max-height:700px){.app-shell{padding:6px;gap:9px}.board-frame{width:min(100%,calc(100vh - 64px),calc(100vw - 330px));border-width:6px}.panel{gap:6px}.card{padding:7px}.notation{max-height:180px}}
+@media (min-width:1400px){.app-shell{grid-template-columns:minmax(0,1fr) 330px}.board-frame{max-width:calc(100vh - 78px)}}
+@media (prefers-reduced-motion:reduce){.controls button,.nav button,.select{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="brand"><strong>MYCHESS64</strong><span>PLAY</span></div><div id="modeLabel" class="mode-badge">FRIEND</div></header>
+<main class="app-shell">
+<section class="board-area"><div class="board-frame"><div id="board" class="board" role="grid" aria-label="Chess board"></div></div></section>
+<aside class="panel">
+<div class="card"><div class="players"><div class="player" id="blackPlayer"><div class="name">Black</div><div class="sub">BLACK</div><div id="clockB" class="clock">00:00</div></div><div class="player active" id="whitePlayer"><div class="name">White</div><div class="sub">WHITE</div><div id="clockW" class="clock active">00:00</div></div></div></div>
+<div class="card"><div id="status" class="status">White to Move</div><div id="substatus" class="substatus">Two players</div></div>
+<div class="card"><div class="controls"><button id="friendBtn">Friend</button><button id="selfBtn">Self</button><button id="computerBtn">Computer</button><button id="flipBtn">↻ Flip</button><select id="humanColor" class="select" aria-label="Your color"><option value="w">White</option><option value="b">Black</option></select><select id="level" class="select" aria-label="Computer level"><option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option><option value="4">Level 4</option><option value="5" selected>Level 5</option><option value="6">Level 6</option><option value="7">Level 7</option><option value="8">Level 8</option><option value="9">Level 9</option><option value="10">Level 10</option></select><select id="clockPreset" class="select wide" aria-label="Clock"><option value="0">No Clock</option><option value="60">1 + 0</option><option value="180">3 + 0</option><option value="300">5 + 0</option><option value="600">10 + 0</option><option value="900">15 + 0</option><option value="1800">30 + 0</option></select></div></div>
+<div class="card"><div class="nav"><button id="startBtn">|◀</button><button id="prevBtn">◀</button><button id="nextBtn">▶</button><button id="lastBtn">▶|</button></div></div>
+<div class="card"><div class="notation-head"><span>#</span><span>W</span><span>B</span></div><div id="notation" class="notation"></div></div>
+<div id="resultBox" class="card result" hidden><strong id="resultTitle">GAME OVER</strong><span id="resultReason"></span><button id="analyzeBtn" class="primary-action">Analyze Game</button></div>
+<div id="analysisBox" class="card analysis-box" hidden>
+  <div class="analysis-head"><strong>ANALYSIS</strong><span id="analysisState" class="analysis-state">READY</span></div>
+  <div class="analysis-summary"><div><span>Position</span><strong id="analysisMove">Start</strong></div><div><span>Evaluation</span><strong id="analysisEval">—</strong></div><div><span>Best Move</span><strong id="analysisBest">—</strong></div><div><span>Depth</span><strong id="analysisDepth">—</strong></div></div>
+  <div class="analysis-pv"><span>Engine Line</span><div id="analysisPV">—</div></div>
+  <div class="analysis-actions"><button id="analysisPrev">◀</button><button id="analysisNext">▶</button><button id="analysisRun">Analyze</button><button id="analysisClose">Close</button></div>
+</div>
+<div class="card"><div class="controls"><button id="takebackBtn">↶ Undo</button><button id="resignBtn">Resign</button><button id="exportPgnBtn">PGN</button><button id="newGameBtn">New</button></div></div>
+<div class="production-state" aria-hidden="true"><span id="squareCount">—</span><span id="geometry">—</span><span id="engineStatus">OFF</span><span id="engineDepth">—</span></div>
+</aside></main>
+<div id="promotion" class="promotion hidden"><div class="promotion-card"><div class="promotion-title">Choose promotion piece</div><div class="promotion-grid"><button data-promotion="q">♕</button><button data-promotion="r">♖</button><button data-promotion="b">♗</button><button data-promotion="n">♘</button></div></div></div>
+<script>
+'use strict';
+
+// Self-contained FIDE chess rules core for MyChess64 P2.
+// No external runtime dependency. Board coordinates are algebraic squares (a1..h8).
+
+const MC64_FILES = ['a','b','c','d','e','f','g','h'];
+const MC64_PIECE_VALUE = {p:100,n:320,b:330,r:500,q:900,k:20000};
+const MC64_BACK_RANK = {w:1,b:8};
+
+function mc64Opp(c){ return c === 'w' ? 'b' : 'w'; }
+function mc64Square(file,rank){ return MC64_FILES[file] + rank; }
+function mc64FileIndex(sq){ return MC64_FILES.indexOf(sq[0]); }
+function mc64Rank(sq){ return Number(sq[1]); }
+function mc64InBounds(f,r){ return f>=0 && f<8 && r>=1 && r<=8; }
+function mc64Piece(color,type){ return {color,type}; }
+function mc64CloneBoard(b){ const n={}; for(const k in b) n[k]={...b[k]}; return n; }
+function mc64CloneState(s){ return {board:mc64CloneBoard(s.board),turn:s.turn,castling:s.castling,ep:s.ep,halfmove:s.halfmove,fullmove:s.fullmove}; }
+
+function mc64InitialState(){
+  const b={};
+  const back=['r','n','b','q','k','b','n','r'];
+  for(let i=0;i<8;i++){
+    b[mc64Square(i,1)] = mc64Piece('w',back[i]);
+    b[mc64Square(i,2)] = mc64Piece('w','p');
+    b[mc64Square(i,7)] = mc64Piece('b','p');
+    b[mc64Square(i,8)] = mc64Piece('b',back[i]);
+  }
+  return {board:b,turn:'w',castling:'KQkq',ep:null,halfmove:0,fullmove:1};
+}
+
+function mc64PositionKey(s){
+  const rows=[];
+  for(let r=8;r>=1;r--){
+    let row='',empty=0;
+    for(let f=0;f<8;f++){
+      const p=s.board[mc64Square(f,r)];
+      if(!p){empty++;continue;}
+      if(empty){row+=String(empty);empty=0;}
+      row += p.color==='w' ? p.type.toUpperCase() : p.type;
+    }
+    if(empty)row+=String(empty);
+    rows.push(row);
+  }
+  // For repetition, an en-passant square matters only when an en-passant capture is actually possible.
+  let ep='-';
+  if(s.ep){
+    const moves=mc64PseudoMoves(s,s.turn,false).filter(m=>m.enPassant&&m.to===s.ep);
+    if(moves.length)ep=s.ep;
+  }
+  return rows.join('/')+' '+s.turn+' '+(s.castling||'-')+' '+ep;
+}
+
+function mc64FindKing(s,color){
+  for(const sq in s.board){ const p=s.board[sq]; if(p.color===color&&p.type==='k') return sq; }
+  return null;
+}
+
+function mc64IsSquareAttacked(s,sq,byColor){
+  const tf=mc64FileIndex(sq), tr=mc64Rank(sq);
+  // Pawns: a white pawn attacks rank +1, black rank -1.
+  const pawnRank=tr+(byColor==='w'?-1:1);
+  for(const df of [-1,1]){
+    const f=tf+df;
+    if(mc64InBounds(f,pawnRank)){
+      const p=s.board[mc64Square(f,pawnRank)];
+      if(p&&p.color===byColor&&p.type==='p') return true;
+    }
+  }
+  const knightD=[[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]];
+  for(const [df,dr] of knightD){
+    const f=tf+df,r=tr+dr;
+    if(mc64InBounds(f,r)){ const p=s.board[mc64Square(f,r)]; if(p&&p.color===byColor&&p.type==='n') return true; }
+  }
+  const kingD=[[1,1],[1,0],[1,-1],[0,1],[0,-1],[-1,1],[-1,0],[-1,-1]];
+  for(const [df,dr] of kingD){
+    const f=tf+df,r=tr+dr;
+    if(mc64InBounds(f,r)){ const p=s.board[mc64Square(f,r)]; if(p&&p.color===byColor&&p.type==='k') return true; }
+  }
+  const lines=[[[1,0],[-1,0],[0,1],[0,-1]],[[1,1],[1,-1],[-1,1],[-1,-1]]];
+  for(let group=0;group<2;group++) for(const [df,dr] of lines[group]){
+    let f=tf+df,r=tr+dr;
+    while(mc64InBounds(f,r)){
+      const p=s.board[mc64Square(f,r)];
+      if(p){
+        if(p.color===byColor && (p.type==='q'||(group===0&&p.type==='r')||(group===1&&p.type==='b'))) return true;
+        break;
+      }
+      f+=df;r+=dr;
+    }
+  }
+  return false;
+}
+
+function mc64InCheck(s,color){ const k=mc64FindKing(s,color); return !!k && mc64IsSquareAttacked(s,k,mc64Opp(color)); }
+
+function mc64PseudoMoves(s,color=s.turn,includeCastling=true){
+  const moves=[];
+  for(const from in s.board){
+    const p=s.board[from]; if(p.color!==color) continue;
+    const f=mc64FileIndex(from),r=mc64Rank(from);
+    if(p.type==='p'){
+      const dir=color==='w'?1:-1, start=color==='w'?2:7, promo=color==='w'?8:1;
+      const oneR=r+dir;
+      if(mc64InBounds(f,oneR)){
+        const one=mc64Square(f,oneR);
+        if(!s.board[one]){
+          if(oneR===promo){ for(const pr of ['q','r','b','n']) moves.push({from,to:one,promotion:pr}); }
+          else moves.push({from,to:one});
+          const twoR=r+2*dir,two=mc64Square(f,twoR);
+          if(r===start&&!s.board[two]) moves.push({from,to:two});
+        }
+      }
+      for(const df of [-1,1]){
+        const nf=f+df,nr=r+dir; if(!mc64InBounds(nf,nr))continue;
+        const to=mc64Square(nf,nr),target=s.board[to];
+        if(target&&target.color!==color){
+          if(nr===promo){ for(const pr of ['q','r','b','n']) moves.push({from,to,promotion:pr}); }
+          else moves.push({from,to});
+        } else if(s.ep===to){
+          moves.push({from,to,enPassant:true});
+        }
+      }
+    } else if(p.type==='n'){
+      for(const [df,dr] of [[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]]){
+        const nf=f+df,nr=r+dr;if(!mc64InBounds(nf,nr))continue;const to=mc64Square(nf,nr),t=s.board[to];if(!t||t.color!==color)moves.push({from,to});
+      }
+    } else if(p.type==='b'||p.type==='r'||p.type==='q'){
+      const dirs=[];
+      if(p.type==='b'||p.type==='q')dirs.push([1,1],[1,-1],[-1,1],[-1,-1]);
+      if(p.type==='r'||p.type==='q')dirs.push([1,0],[-1,0],[0,1],[0,-1]);
+      for(const [df,dr] of dirs){
+        let nf=f+df,nr=r+dr;
+        while(mc64InBounds(nf,nr)){
+          const to=mc64Square(nf,nr),t=s.board[to];
+          if(!t)moves.push({from,to}); else {if(t.color!==color)moves.push({from,to});break;}
+          nf+=df;nr+=dr;
+        }
+      }
+    } else if(p.type==='k'){
+      for(const [df,dr] of [[1,1],[1,0],[1,-1],[0,1],[0,-1],[-1,1],[-1,0],[-1,-1]]){
+        const nf=f+df,nr=r+dr;if(!mc64InBounds(nf,nr))continue;const to=mc64Square(nf,nr),t=s.board[to];if(!t||t.color!==color)moves.push({from,to});
+      }
+      if(includeCastling){
+        if(color==='w'&&from==='e1'&&!mc64InCheck(s,'w')){
+          if(s.castling.includes('K')&&!s.board.f1&&!s.board.g1&&!mc64IsSquareAttacked(s,'f1','b')&&!mc64IsSquareAttacked(s,'g1','b')) moves.push({from:'e1',to:'g1',castle:'K'});
+          if(s.castling.includes('Q')&&!s.board.d1&&!s.board.c1&&!s.board.b1&&!mc64IsSquareAttacked(s,'d1','b')&&!mc64IsSquareAttacked(s,'c1','b')) moves.push({from:'e1',to:'c1',castle:'Q'});
+        }
+        if(color==='b'&&from==='e8'&&!mc64InCheck(s,'b')){
+          if(s.castling.includes('k')&&!s.board.f8&&!s.board.g8&&!mc64IsSquareAttacked(s,'f8','w')&&!mc64IsSquareAttacked(s,'g8','w')) moves.push({from:'e8',to:'g8',castle:'k'});
+          if(s.castling.includes('q')&&!s.board.d8&&!s.board.c8&&!s.board.b8&&!mc64IsSquareAttacked(s,'d8','w')&&!mc64IsSquareAttacked(s,'c8','w')) moves.push({from:'e8',to:'c8',castle:'q'});
+        }
+      }
+    }
+  }
+  return moves;
+}
+
+function mc64Apply(s,m){
+  const n=mc64CloneState(s), p=n.board[m.from], target=n.board[m.to];
+  delete n.board[m.from];
+  if(m.enPassant){ const capRank=mc64Rank(m.to)+(p.color==='w'?-1:1); delete n.board[mc64Square(mc64FileIndex(m.to),capRank)]; }
+  if(target) delete n.board[m.to];
+  n.board[m.to]={color:p.color,type:m.promotion||p.type};
+  if(m.castle){
+    const rank=p.color==='w'?1:8;
+    if(m.to[0]==='g'){
+      const rookFrom='h'+rank,rookTo='f'+rank; const rook=n.board[rookFrom]; delete n.board[rookFrom]; if(rook)n.board[rookTo]=rook;
+    } else {
+      const rookFrom='a'+rank,rookTo='d'+rank; const rook=n.board[rookFrom]; delete n.board[rookFrom]; if(rook)n.board[rookTo]=rook;
+    }
+  }
+  if(p.type==='k') n.castling=p.color==='w'?n.castling.replace(/[KQ]/g,''):n.castling.replace(/[kq]/g,'');
+  if(p.type==='r'){
+    if(m.from==='a1')n.castling=n.castling.replace('Q',''); if(m.from==='h1')n.castling=n.castling.replace('K','');
+    if(m.from==='a8')n.castling=n.castling.replace('q',''); if(m.from==='h8')n.castling=n.castling.replace('k','');
+  }
+  if(target&&target.type==='r'){
+    if(m.to==='a1')n.castling=n.castling.replace('Q',''); if(m.to==='h1')n.castling=n.castling.replace('K','');
+    if(m.to==='a8')n.castling=n.castling.replace('q',''); if(m.to==='h8')n.castling=n.castling.replace('k','');
+  }
+  n.ep=null;
+  if(p.type==='p'&&Math.abs(mc64Rank(m.to)-mc64Rank(m.from))===2){ n.ep=mc64Square(mc64FileIndex(m.from),(mc64Rank(m.from)+mc64Rank(m.to))/2); }
+  n.halfmove=(p.type==='p'||target||m.enPassant)?0:n.halfmove+1;
+  if(p.color==='b')n.fullmove++;
+  n.turn=mc64Opp(p.color);
+  return n;
+}
+
+function mc64LegalMoves(s,color=s.turn){
+  const out=[];
+  for(const m of mc64PseudoMoves(s,color,true)){
+    const n=mc64Apply(s,m);
+    if(!mc64InCheck(n,color))out.push(m);
+  }
+  return out;
+}
+
+function mc64IsCapture(s,m){ return !!s.board[m.to] || !!m.enPassant; }
+function mc64PieceLetter(t){ return t==='p'?'':t.toUpperCase(); }
+
+function mc64SAN(s,m,legalBefore){
+  const p=s.board[m.from];
+  if(m.castle) return (m.to[0]==='g'?'O-O':'O-O-O') + mc64MoveGivesCheck(s,m);
+  const capture=mc64IsCapture(s,m);
+  let san=mc64PieceLetter(p.type);
+  if(p.type==='p'&&capture)san+=m.from[0];
+  if(p.type!=='p'){
+    const rivals=legalBefore.filter(x=>x.from!==m.from&&x.to===m.to&&s.board[x.from]&&s.board[x.from].type===p.type);
+    if(rivals.length){
+      const sameFile=rivals.some(x=>x.from[0]===m.from[0]);
+      const sameRank=rivals.some(x=>x.from[1]===m.from[1]);
+      if(!sameFile)san+=m.from[0]; else if(!sameRank)san+=m.from[1]; else san+=m.from;
+    }
+  }
+  if(capture)san+='x';
+  san+=m.to;
+  if(m.promotion)san+='='+m.promotion.toUpperCase();
+  const n=mc64Apply(s,m);
+  if(mc64InCheck(n,n.turn)){
+    const reply=mc64LegalMoves(n,n.turn); san += reply.length?'+' : '#';
+  }
+  return san;
+}
+function mc64MoveGivesCheck(s,m){
+  const n=mc64Apply(s,m); if(!mc64InCheck(n,n.turn))return '';
+  return mc64LegalMoves(n,n.turn).length?'+' : '#';
+}
+
+function mc64DeadPosition(s){
+  const pieces=[];
+  for(const sq in s.board){ const p=s.board[sq]; if(p.type!=='k')pieces.push({sq,...p}); }
+  if(pieces.length===0)return true;
+  if(pieces.some(p=>p.type==='p'||p.type==='r'||p.type==='q'))return false;
+  if(pieces.length===1 && (pieces[0].type==='b'||pieces[0].type==='n'))return true;
+  if(pieces.length===2 && pieces.every(p=>p.type==='b')){
+    const colors=pieces.map(p=>(mc64FileIndex(p.sq)+mc64Rank(p.sq))%2);
+    return colors[0]===colors[1];
+  }
+  if(pieces.length===2 && pieces.every(p=>p.type==='n') && pieces[0].color===pieces[1].color)return true;
+  return false;
+}
+
+class MyChess64GameCore{
+  constructor(){ this.reset(); }
+  reset(){
+    this.state=mc64InitialState();
+    this.history=[];
+    this.positionCounts=new Map([[mc64PositionKey(this.state),1]]);
+  }
+  get turn(){return this.state.turn;}
+  get historyLength(){return this.history.length;}
+  get legalMoves(){return mc64LegalMoves(this.state);}
+  move(from,to,promotion='q'){
+    const legal=this.legalMoves;
+    const candidates=legal.filter(m=>m.from===from&&m.to===to);
+    if(!candidates.length)return null;
+    let m=candidates.find(x=>x.promotion===promotion) || candidates[0];
+    if(candidates.some(x=>x.promotion) && !m.promotion)return null;
+    const san=mc64SAN(this.state,m,legal);
+    const before=mc64CloneState(this.state);
+    const after=mc64Apply(this.state,m);
+    this.state=after;
+    const key=mc64PositionKey(this.state);
+    this.positionCounts.set(key,(this.positionCounts.get(key)||0)+1);
+    const rec={...m,san,before,after:mc64CloneState(after),key};
+    this.history.push(rec);
+    return rec;
+  }
+  undo(){
+    if(!this.history.length)return false;
+    const last=this.history.pop();
+    this.positionCounts.set(last.key,(this.positionCounts.get(last.key)||1)-1);
+    if(this.positionCounts.get(last.key)<=0)this.positionCounts.delete(last.key);
+    this.state=mc64CloneState(last.before);
+    return true;
+  }
+  status(){
+    const legal=this.legalMoves, inCheck=mc64InCheck(this.state,this.turn);
+    if(!legal.length){
+      if(inCheck)return {over:true,type:'checkmate',winner:mc64Opp(this.turn),reason:'Checkmate'};
+      return {over:true,type:'stalemate',winner:null,reason:'Stalemate'};
+    }
+    if(mc64DeadPosition(this.state))return {over:true,type:'insufficient',winner:null,reason:'Draw by insufficient material'};
+    if(this.state.halfmove>=150)return {over:true,type:'75move',winner:null,reason:'Draw by 75-move rule'};
+    const key=mc64PositionKey(this.state), count=this.positionCounts.get(key)||0;
+    if(count>=5)return {over:true,type:'fivefold',winner:null,reason:'Draw by fivefold repetition'};
+    return {over:false,type:inCheck?'check':'playing',winner:null,reason:inCheck?'Check':'Playing'};
+  }
+  isThreefold(){ return (this.positionCounts.get(mc64PositionKey(this.state))||0)>=3; }
+  isFiftyMoveClaimable(){ return this.state.halfmove>=100; }
+  fen(){
+    const rows=[];
+    for(let r=8;r>=1;r--){let row='',empty=0;for(let f=0;f<8;f++){const p=this.state.board[mc64Square(f,r)];if(!p){empty++;continue;}if(empty){row+=empty;empty=0;}row+=p.color==='w'?p.type.toUpperCase():p.type;}if(empty)row+=empty;rows.push(row);}
+    return rows.join('/')+' '+this.turn+' '+(this.state.castling||'-')+' '+(this.state.ep||'-')+' '+this.state.halfmove+' '+this.state.fullmove;
+  }
+  boardMap(){return mc64CloneBoard(this.state.board);}
+}
+
+window.MyChess64GameCore=MyChess64GameCore;
+
+
+'use strict';
+
+const MC64_GLYPH = {
+  wk:'♔',wq:'♕',wr:'♖',wb:'♗',wn:'♘',wp:'♙',
+  bk:'♚',bq:'♛',br:'♜',bb:'♝',bn:'♞',bp:'♟'
+};
+
+class MyChess64Board {
+  constructor(element,onSquare){
+    if(!element) throw new Error('Board element not found.');
+    this.el=element;
+    this.onSquare=onSquare||(()=>{});
+    this.orientation='w';
+    this.mode='friend';
+    this.position={};
+    this.selected=null;
+    this.legalTargets=new Map();
+    this.lastMove=null;
+    this.checkedKing=null;
+  }
+  setPosition(position,orientation='w',mode='friend',selected=null,targets=new Map(),lastMove=null,checkedKing=null){
+    this.position=position||{};
+    this.orientation=orientation==='b'?'b':'w';
+    this.mode=mode;
+    this.selected=selected;
+    this.legalTargets=targets;
+    this.lastMove=lastMove;
+    this.checkedKing=checkedKing;
+    this.render();
+  }
+  render(){
+    const frag=document.createDocumentFragment();
+    const ranks=this.orientation==='w'?[8,7,6,5,4,3,2,1]:[1,2,3,4,5,6,7,8];
+    const files=this.orientation==='w'?[0,1,2,3,4,5,6,7]:[7,6,5,4,3,2,1,0];
+    for(let row=0;row<8;row++){
+      for(let col=0;col<8;col++){
+        const rank=ranks[row], fi=files[col], file=MC64_FILES[fi], sq=file+rank;
+        const cell=document.createElement('button');
+        cell.type='button';
+        cell.className='square '+(((rank+fi)%2)?'dark':'light');
+        cell.dataset.square=sq;
+        cell.setAttribute('role','gridcell');
+        cell.setAttribute('aria-label',sq);
+        if(this.lastMove&&(this.lastMove.from===sq||this.lastMove.to===sq))cell.classList.add(this.lastMove.to===sq?'last-to':'last-from');
+        if(this.selected===sq)cell.classList.add('selected');
+        if(this.legalTargets.has(sq))cell.classList.add(this.legalTargets.get(sq)?'capture-target':'move-target');
+        if(this.checkedKing===sq)cell.classList.add('check-square');
+
+        if(col===0){const c=document.createElement('span');c.className='coord rank';c.textContent=rank;cell.appendChild(c);}
+        if(row===7){const c=document.createElement('span');c.className='coord file';c.textContent=file;cell.appendChild(c);}
+
+        const piece=this.position[sq];
+        if(piece){
+          const p=document.createElement('img');
+          p.className='piece-img';
+          if(this.mode==='friend'&&piece.color==='b')p.classList.add('friend-black');
+          const code=piece.color+(piece.type==='p'?'P':piece.type.toUpperCase());
+          p.src='https://lichess1.org/assets/piece/cburnett/'+code+'.svg';
+          p.alt='';
+          p.draggable=false;
+          p.setAttribute('aria-hidden','true');
+          p.onerror=()=>{
+            p.remove();
+            const fallback=document.createElement('span');
+            fallback.textContent=MC64_GLYPH[piece.color+piece.type];
+            fallback.style.fontSize='clamp(25px,7vw,76px)';
+            fallback.style.lineHeight='1';
+            fallback.setAttribute('aria-hidden','true');
+            cell.appendChild(fallback);
+          };
+          cell.appendChild(p);
+        }
+        cell.addEventListener('pointerdown',e=>{e.preventDefault();this.onSquare(sq);});
+        frag.appendChild(cell);
+      }
+    }
+    this.el.replaceChildren(frag);
+    this.validateGeometry();
+  }
+  validateGeometry(){
+    const count=this.el.children.length,cs=getComputedStyle(this.el);
+    const columns=cs.gridTemplateColumns.split(' ').filter(Boolean).length;
+    const rows=cs.gridTemplateRows.split(' ').filter(Boolean).length;
+    const rect=this.el.getBoundingClientRect();
+    const ratio=rect.height?rect.width/rect.height:0;
+    return {ok:count===64&&columns===8&&rows===8&&Math.abs(ratio-1)<0.02,count,columns,rows,width:rect.width,height:rect.height,ratio};
+  }
+}
+window.MyChess64Board=MyChess64Board;
+
+
+'use strict';
+
+/* MyChess64 Stockfish 19 engine manager.
+   Browser-safe single Worker, explicit lifecycle, stale-search protection. */
+class MyChess64Engine{
+  constructor(options={}){
+    this.worker=null; this.state='idle'; this.ready=false; this.busy=false;
+    this.startPromise=null; this.resolveStart=null; this.rejectStart=null; this.startTimer=null;
+    this.onState=options.onState||(()=>{}); this.onInfo=options.onInfo||(()=>{});
+    this.onBestMove=options.onBestMove||(()=>{}); this.onAnalysis=options.onAnalysis||(()=>{}); this.onError=options.onError||(()=>{});
+    this.searchId=0; this.searchMode='move'; this.analysisInfo={depth:null,cp:null,mate:null,pv:''};
+  }
+  setState(state,message=''){this.state=state;this.onState(state,message);}
+  terminate(){
+    this.searchId++;
+    if(this.startTimer)clearTimeout(this.startTimer);
+    this.startTimer=null;
+    if(this.worker){try{this.worker.terminate();}catch(_){} this.worker=null;}
+    this.ready=false; this.busy=false; this.startPromise=null; this.resolveStart=null; this.rejectStart=null; this.searchMode='move';
+    this.setState('idle');
+  }
+  start(){
+    if(this.ready&&this.worker)return Promise.resolve();
+    if(this.startPromise)return this.startPromise;
+    this.terminate(); this.setState('loading','Loading Stockfish 19…');
+    this.startPromise=new Promise((resolve,reject)=>{
+      this.resolveStart=resolve; this.rejectStart=reject;
+      try{
+        this.worker=new Worker(URL.createObjectURL(new Blob(["importScripts('https://cdn.jsdelivr.net/npm/stockfish@19.0.0/stockfish-19-lite-single.js');"],{type:'application/javascript'})));
+        this.worker.onmessage=e=>this.handleMessage(typeof e.data==='string'?e.data:'');
+        this.worker.onerror=e=>this.fail(new Error(e.message||'Stockfish worker error.'));
+        this.worker.onmessageerror=()=>this.fail(new Error('Stockfish worker message error.'));
+        this.worker.postMessage('uci');
+      }catch(error){this.fail(error);return;}
+      this.startTimer=setTimeout(()=>this.fail(new Error('Stockfish startup timeout.')),20000);
+    });
+    return this.startPromise;
+  }
+  fail(error){
+    const err=error instanceof Error?error:new Error(String(error||'Unknown engine error'));
+    if(this.startTimer)clearTimeout(this.startTimer);
+    this.startTimer=null; this.ready=false; this.busy=false;
+    const reject=this.rejectStart; this.startPromise=null; this.resolveStart=null; this.rejectStart=null;
+    this.setState('error',err.message); this.onError(err); if(reject)reject(err);
+  }
+  handleMessage(line){
+    if(!line)return;
+    if(line.startsWith('MYCHESS64_ENGINE_LOAD_ERROR')){this.fail(new Error(line));return;}
+    if(line==='uciok'){
+      this.setState('initializing','Stockfish 19 UCI ready…');
+      /* lite single-threaded is intentionally used; no Threads option is required. */
+      this.worker.postMessage('setoption name Hash value 16');
+      this.worker.postMessage('isready'); return;
+    }
+    if(line==='readyok'&&!this.ready){
+      this.ready=true; this.busy=false; if(this.startTimer)clearTimeout(this.startTimer); this.startTimer=null;
+      const resolve=this.resolveStart; this.startPromise=null; this.resolveStart=null; this.rejectStart=null;
+      this.setState('ready','Stockfish 19 ready'); if(resolve)resolve(); return;
+    }
+    if(line.startsWith('info '))this.parseInfo(line);
+    if(line.startsWith('bestmove ')){
+      this.busy=false;
+      const parts=line.trim().split(/\s+/), bestMove=parts[1]||'';
+      if(this.searchMode==='analysis'){
+        const info={...this.analysisInfo,bestMove,id:this.searchId}; this.setState('ready','Stockfish 19 ready'); this.onAnalysis(info);
+      }else{this.setState('ready','Stockfish 19 ready');this.onBestMove(bestMove);}
+    }
+  }
+  parseInfo(line){
+    const depth=line.match(/\bdepth\s+(\d+)/), scoreCp=line.match(/\bscore\s+cp\s+(-?\d+)/), scoreMate=line.match(/\bscore\s+mate\s+(-?\d+)/), pv=line.match(/\bpv\s+(.+)$/);
+    const info={depth:depth?Number(depth[1]):null,cp:scoreCp?Number(scoreCp[1]):null,mate:scoreMate?Number(scoreMate[1]):null,pv:pv?pv[1].trim():''};
+    if(info.depth!=null)this.analysisInfo.depth=info.depth;
+    if(info.cp!=null)this.analysisInfo.cp=info.cp;
+    if(info.mate!=null)this.analysisInfo.mate=info.mate;
+    if(info.pv)this.analysisInfo.pv=info.pv;
+    this.onInfo(info);
+  }
+  depthForLevel(level){return ({1:5,2:6,3:7,4:8,5:9,6:10,7:11,8:12,9:13,10:14})[Math.max(1,Math.min(10,Number(level)||5))]||9;}
+  async findBestMove(fen,level=5){
+    await this.start(); if(!this.worker||!this.ready)throw new Error('Stockfish is not ready.');
+    this.stopSearch(); this.busy=true; this.searchMode='move'; const id=++this.searchId;
+    this.setState('thinking','Stockfish thinking…');
+    this.worker.postMessage('setoption name Skill Level value '+Math.max(0,Math.min(20,(Number(level)||5)*2)));
+    this.worker.postMessage('ucinewgame'); this.worker.postMessage('position fen '+fen); this.worker.postMessage('go depth '+this.depthForLevel(level));
+    return id;
+  }
+  async analyze(fen,depth=16){
+    await this.start(); if(!this.worker||!this.ready)throw new Error('Stockfish is not ready.');
+    this.stopSearch(); this.busy=true; this.searchMode='analysis'; this.analysisInfo={depth:null,cp:null,mate:null,pv:''}; const id=++this.searchId;
+    this.setState('analyzing','Analyzing position…');
+    this.worker.postMessage('ucinewgame'); this.worker.postMessage('position fen '+fen); this.worker.postMessage('go depth '+Math.max(8,Math.min(24,Number(depth)||16)));
+    return id;
+  }
+  stopSearch(){
+    if(this.worker&&this.busy){try{this.worker.postMessage('stop');}catch(_){} this.searchId++;}
+    this.busy=false; this.searchMode='move';
+  }
+}
+window.MyChess64Engine=MyChess64Engine;
+
+
+'use strict';
+
+class MyChess64GameController{
+  constructor(board,ui){
+    this.board=board; this.ui=ui;
+    this.mode='friend'; this.humanColor='w'; this.level=5;
+    this.clockPreset=0; this.clock={w:0,b:0}; this.clockRunning=false; this.timer=null; this.lastTick=0;
+    this.game=new MyChess64GameCore(); this.viewPly=0; this.selected=null; this.targets=new Map(); this.lastMove=null;
+    this.result=null; this.computerThinking=false; this.pendingPromotion=null; this.engineJob=0; this.engineError='';
+    this.analysisMode=false; this.analysisBusy=false; this.analysisPly=0; this.analysisDepth=16; this.analysisJob=0;
+    this.engine=new MyChess64Engine({
+      onState:(state,message)=>{
+        this.engineError=state==='error'?message:'';
+        this.ui.engineStatus.textContent=state==='ready'?'READY':state==='thinking'?'THINKING':state==='analyzing'?'ANALYZING':state==='loading'?'LOADING':'OFF';
+        this.ui.engineStatus.className=state==='error'?'bad':(state==='ready'?'ok':'');
+        if(state==='analyzing')this.setAnalysisState('Analyzing…');
+        this.renderPanel(this.viewPly===this.game.history.length);
+      },
+      onInfo:info=>{
+        if(info.depth)this.ui.engineDepth.textContent=String(info.depth);
+        if(this.analysisMode)this.updateAnalysisFromInfo(info);
+      },
+      onBestMove:uci=>this.receiveEngineMove(uci),
+      onAnalysis:info=>this.receiveAnalysis(info),
+      onError:error=>{
+        this.computerThinking=false;
+        this.analysisBusy=false;
+        this.engineError=error.message;
+        if(this.analysisMode)this.setAnalysisState('ERROR');
+        this.render();
+      }
+    });
+    this.startNewGame();
+  }
+  setMode(mode){this.closeAnalysis();this.mode=mode;this.engineError='';this.startNewGame();}
+  setHumanColor(color){this.closeAnalysis();this.humanColor=color==='b'?'b':'w';this.startNewGame();}
+  setLevel(level){this.level=Math.max(1,Math.min(10,Number(level)||5));if(this.mode==='computer'&&!this.result&&this.computerThinking)this.requestComputerMove();}
+  setClock(seconds){this.closeAnalysis();this.clockPreset=Math.max(0,Number(seconds)||0);this.startNewGame();}
+  startNewGame(){
+    this.closeAnalysis();
+    this.stopClock();this.engine.stopSearch();this.engineJob++;this.game=new MyChess64GameCore();this.viewPly=0;this.selected=null;this.targets=new Map();this.lastMove=null;this.result=null;this.computerThinking=false;this.pendingPromotion=null;this.engineError='';this.ui.engineDepth.textContent='—';
+    this.clock={w:this.clockPreset*1000,b:this.clockPreset*1000};
+    this.render();
+    if(this.mode==='computer'){
+      this.engine.start().then(()=>{if(this.mode==='computer'&&this.humanColor==='b'&&!this.result)this.requestComputerMove();else if(this.clockPreset>0)this.startClock();}).catch(()=>{if(this.clockPreset>0)this.startClock();});
+    }else if(this.clockPreset>0)this.startClock();
+  }
+  orientationForView(){
+    if(this.mode==='friend')return 'w';
+    if(this.mode==='computer')return this.humanColor;
+    return this.viewPly%2===0?'w':'b';
+  }
+  positionForPly(ply){return ply===0?mc64InitialState().board:this.game.history[ply-1].after.board;}
+  positionForView(){return this.positionForPly(this.viewPly);}
+  stateForPly(ply){return ply===0?mc64InitialState():this.game.history[ply-1].after;}
+  checkedKingForView(){const st=this.stateForPly(this.viewPly);const k=mc64FindKing(st,st.turn);return k&&mc64InCheck(st,st.turn)?k:null;}
+  legalTargetsForSelection(){
+    const map=new Map(); if(!this.selected||this.viewPly!==this.game.history.length||this.result||this.analysisMode)return map;
+    for(const m of this.game.legalMoves)if(m.from===this.selected)map.set(m.to,mc64IsCapture(this.game.state,m));
+    return map;
+  }
+  clickSquare(sq){
+    if(this.analysisMode||this.result||this.viewPly!==this.game.history.length||this.computerThinking)return;
+    if(this.mode==='computer'&&this.game.turn!==this.humanColor)return;
+    const piece=this.game.state.board[sq];
+    if(this.selected){
+      const target=this.game.legalMoves.filter(m=>m.from===this.selected&&m.to===sq);
+      if(target.length){if(target.some(m=>m.promotion)){this.pendingPromotion={from:this.selected,to:sq};this.ui.showPromotion();return;}this.commitMove(this.selected,sq,'q');return;}
+      if(piece&&piece.color===this.game.turn){this.selected=sq;this.render();return;}
+      this.selected=null;this.render();return;
+    }
+    if(piece&&piece.color===this.game.turn)this.selected=sq,this.render();
+  }
+  choosePromotion(piece){if(!this.pendingPromotion)return;const p=this.pendingPromotion;this.pendingPromotion=null;this.ui.hidePromotion();this.commitMove(p.from,p.to,piece);}
+  commitMove(from,to,promotion='q'){
+    const beforeClock={...this.clock};const rec=this.game.move(from,to,promotion);if(!rec)return false;
+    rec.clockBefore=beforeClock;this.viewPly=this.game.history.length;this.selected=null;this.targets=new Map();this.lastMove={from:rec.from,to:rec.to};this.afterMove(rec);return true;
+  }
+  afterMove(){
+    this.result=this.game.status();
+    if(this.result.over){this.stopClock();this.computerThinking=false;this.render();return;}
+    if(this.clockPreset>0){this.stopClock();this.startClock();}
+    this.render();
+    if(this.mode==='computer'&&this.game.turn!==this.humanColor)this.requestComputerMove();
+  }
+  async requestComputerMove(){
+    if(this.mode!=='computer'||this.result||this.game.turn===this.humanColor||this.viewPly!==this.game.history.length)return;
+    this.computerThinking=true;const job=++this.engineJob;this.ui.engineDepth.textContent='—';this.render();this.stopClock();
+    try{
+      const fen=this.game.fen();
+      await this.engine.findBestMove(fen,this.level);
+      if(job!==this.engineJob||this.mode!=='computer'||this.result)return;
+    }catch(error){if(job===this.engineJob){this.computerThinking=false;this.engineError=error.message;this.render();}}
+  }
+  receiveEngineMove(uci){
+    if(!this.computerThinking||this.mode!=='computer'||this.result)return;
+    const job=this.engineJob;this.computerThinking=false;
+    const match=/^([a-h][1-8])([a-h][1-8])([qrbn])?$/i.exec((uci||'').trim());
+    if(!match){this.engineError='Engine returned no legal move.';this.render();return;}
+    const from=match[1],to=match[2],promotion=match[3]?match[3].toLowerCase():'q';
+    const legal=this.game.legalMoves.find(m=>m.from===from&&m.to===to&&((m.promotion||'q')===promotion));
+    if(!legal){this.engineError='Engine returned an illegal move.';this.render();return;}
+    if(job!==this.engineJob)return;
+    this.engineError='';this.commitMove(from,to,promotion);
+  }
+  takeback(){
+    if(!this.game.history.length||this.computerThinking)return;
+    this.closeAnalysis();this.stopClock();this.engine.stopSearch();this.engineJob++;
+    let count=this.mode==='computer'?Math.min(2,this.game.history.length):1;
+    while(count--){const last=this.game.history[this.game.history.length-1];if(last&&last.clockBefore)this.clock={...last.clockBefore};this.game.undo();}
+    this.viewPly=this.game.history.length;this.selected=null;this.result=null;this.lastMove=this.game.history.length?{from:this.game.history.at(-1).from,to:this.game.history.at(-1).to}:null;this.computerThinking=false;this.render();if(this.clockPreset>0)this.startClock();
+  }
+  resign(){if(this.result||this.computerThinking)return;this.engine.stopSearch();this.engineJob++;this.result={over:true,type:'resign',winner:mc64Opp(this.game.turn),reason:'Resignation'};this.stopClock();this.render();}
+  navigate(ply){
+    this.engine.stopSearch();this.engineJob++;this.computerThinking=false;
+    this.viewPly=Math.max(0,Math.min(this.game.history.length,Number(ply)));this.selected=null;this.targets=new Map();
+    if(this.analysisMode)this.analysisPly=this.viewPly;
+    this.render();
+    if(this.analysisMode)this.runAnalysis();
+  }
+  clockDisplay(ms){const sec=Math.ceil(Math.max(0,ms)/1000),m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+  startClock(){if(this.clockPreset<=0||this.result||this.viewPly!==this.game.history.length||this.computerThinking||this.analysisMode)return;this.clockRunning=true;this.lastTick=performance.now();clearInterval(this.timer);this.timer=setInterval(()=>this.tickClock(),100);this.updateClocks();}
+  stopClock(){this.clockRunning=false;clearInterval(this.timer);this.timer=null;}
+  tickClock(){if(!this.clockRunning||this.result||this.viewPly!==this.game.history.length||this.computerThinking||this.analysisMode)return;const now=performance.now(),dt=now-this.lastTick;this.lastTick=now;const c=this.game.turn;this.clock[c]-=dt;if(this.clock[c]<=0){this.clock[c]=0;this.result={over:true,type:'timeout',winner:mc64Opp(c),reason:'Time out'};this.stopClock();this.render();return;}this.updateClocks();}
+  updateClocks(){this.ui.clockW.textContent=this.clockDisplay(this.clock.w);this.ui.clockB.textContent=this.clockDisplay(this.clock.b);this.ui.clockW.classList.toggle('active',!this.result&&!this.computerThinking&&!this.analysisMode&&this.game.turn==='w'&&this.viewPly===this.game.history.length&&this.clockPreset>0);this.ui.clockB.classList.toggle('active',!this.result&&!this.computerThinking&&!this.analysisMode&&this.game.turn==='b'&&this.viewPly===this.game.history.length&&this.clockPreset>0);}
+
+  // ---------- Post-game analysis ----------
+  analyzeGame(){
+    if(!this.result||!this.game.history.length)return;
+    this.stopClock();this.engine.stopSearch();this.engineJob++;this.computerThinking=false;
+    this.analysisMode=true;this.analysisPly=this.game.history.length;this.viewPly=this.analysisPly;this.analysisBusy=false;this.analysisJob++;
+    this.ui.analysisBox.hidden=false;this.ui.analyzeBtn.disabled=true;this.ui.resultBox.classList.add('analysis-open');
+    this.resetAnalysisDisplay();this.render();this.runAnalysis();
+  }
+  closeAnalysis(){
+    if(!this.analysisMode)return;
+    this.analysisMode=false;this.analysisBusy=false;this.analysisJob++;this.engine.stopSearch();this.ui.analysisBox.hidden=true;this.ui.analyzeBtn.disabled=false;this.ui.resultBox.classList.remove('analysis-open');
+    this.viewPly=this.game.history.length;this.selected=null;this.render();
+  }
+  setAnalysisState(text){this.ui.analysisState.textContent=text;this.ui.analysisState.className='analysis-state'+(text==='ERROR'?' bad':'');}
+  resetAnalysisDisplay(){this.setAnalysisState('READY');this.ui.analysisMove.textContent=this.analysisLabel(this.analysisPly);this.ui.analysisEval.textContent='—';this.ui.analysisBest.textContent='—';this.ui.analysisDepth.textContent='—';this.ui.analysisPV.textContent='—';}
+  analysisLabel(ply){return ply===0?'Start position':'After '+this.game.history[ply-1].san+' • Move '+ply;}
+  runAnalysis(){
+    if(!this.analysisMode||!this.result)return;
+    this.engine.stopSearch();this.analysisJob++;const job=this.analysisJob;this.analysisBusy=true;this.ui.analysisRun.disabled=true;this.ui.analysisPrev.disabled=this.analysisPly===0;this.ui.analysisNext.disabled=this.analysisPly===this.game.history.length;this.resetAnalysisDisplay();this.setAnalysisState('Analyzing…');
+    const fen=this.fenForPly(this.analysisPly);
+    this.engine.analyze(fen,this.analysisDepth).then(()=>{if(job!==this.analysisJob||!this.analysisMode)return;}).catch(error=>{if(job!==this.analysisJob||!this.analysisMode)return;this.analysisBusy=false;this.ui.analysisRun.disabled=false;this.setAnalysisState('ERROR');this.ui.analysisPV.textContent=error.message;});
+  }
+  receiveAnalysis(info){
+    if(!this.analysisMode||!this.analysisBusy)return;
+    this.analysisBusy=false;this.ui.analysisRun.disabled=false;this.setAnalysisState('READY');
+    this.ui.analysisMove.textContent=this.analysisLabel(this.analysisPly);
+    this.ui.analysisEval.textContent=this.formatEvaluation(info,this.stateForPly(this.analysisPly).turn);
+    this.ui.analysisBest.textContent=this.bestMoveLabel(this.analysisPly,info.bestMove);
+    this.ui.analysisDepth.textContent=info.depth?String(info.depth):'—';
+    this.ui.analysisPV.textContent=this.pvLabel(this.analysisPly,info.pv)||'—';
+  }
+  updateAnalysisFromInfo(info){
+    if(!this.analysisMode||!this.analysisBusy)return;
+    if(info.depth)this.ui.analysisDepth.textContent=String(info.depth);
+    if(info.cp!=null||info.mate!=null)this.ui.analysisEval.textContent=this.formatEvaluation(info,this.stateForPly(this.analysisPly).turn);
+    if(info.pv)this.ui.analysisPV.textContent=this.pvLabel(this.analysisPly,info.pv)||'—';
+  }
+  formatEvaluation(info,turn){
+    if(info.mate!=null){const m=turn==='w'?info.mate:-info.mate;return m>0?'M+'+Math.abs(m):m<0?'M-'+Math.abs(m):'Mate';}
+    if(info.cp==null)return '—';
+    const cp=(turn==='w'?info.cp:-info.cp)/100;
+    return (cp>=0?'+':'')+cp.toFixed(2);
+  }
+  fenForPly(ply){
+    const g=new MyChess64GameCore();for(let i=0;i<ply;i++){const h=this.game.history[i];g.move(h.from,h.to,h.promotion||'q');}return g.fen();
+  }
+  coreAtPly(ply){
+    const g=new MyChess64GameCore();for(let i=0;i<ply;i++){const h=this.game.history[i];g.move(h.from,h.to,h.promotion||'q');}return g;
+  }
+  bestMoveLabel(ply,uci){
+    if(!uci||uci==='(none)')return '—';
+    const m=/^([a-h][1-8])([a-h][1-8])([qrbn])?$/i.exec(uci.trim());if(!m)return uci;
+    const g=this.coreAtPly(ply);const promotion=m[3]?m[3].toLowerCase():'q';const legal=g.legalMoves.find(x=>x.from===m[1]&&x.to===m[2]&&((x.promotion||'q')===promotion));
+    if(!legal)return uci;const rec=g.move(m[1],m[2],promotion);return rec?rec.san:uci;
+  }
+  pvLabel(ply,pv){
+    if(!pv)return '';
+    const tokens=pv.trim().split(/\s+/).filter(Boolean);const g=this.coreAtPly(ply);const out=[];
+    for(const uci of tokens){const m=/^([a-h][1-8])([a-h][1-8])([qrbn])?$/i.exec(uci);if(!m)break;const promotion=m[3]?m[3].toLowerCase():'q';const legal=g.legalMoves.find(x=>x.from===m[1]&&x.to===m[2]&&((x.promotion||'q')===promotion));if(!legal)break;const rec=g.move(m[1],m[2],promotion);if(!rec)break;out.push(rec.san);if(out.length>=8)break;}
+    return out.join(' ');
+  }
+  analysisPrevious(){if(!this.analysisMode)return;this.navigate(this.analysisPly-1);}
+  analysisNext(){if(!this.analysisMode)return;this.navigate(this.analysisPly+1);}
+
+  render(){
+    const live=this.viewPly===this.game.history.length;const orientation=this.analysisMode?'w':this.orientationForView();const targets=live&&!this.analysisMode?this.legalTargetsForSelection():new Map();
+    this.board.setPosition(this.positionForView(),orientation,this.mode,this.selected,targets,live?this.lastMove:(this.viewPly?{from:this.game.history[this.viewPly-1].from,to:this.game.history[this.viewPly-1].to}:null),this.checkedKingForView());
+    this.renderPanel(live);this.updateClocks();this.updateNotation();this.updateNav();const d=this.board.validateGeometry();this.ui.geometry.textContent=d.ok?'PASS':'FAIL';this.ui.geometry.className=d.ok?'ok':'bad';this.ui.squareCount.textContent=d.count+' / 64';
+    if(this.analysisMode){this.ui.analysisMove.textContent=this.analysisLabel(this.analysisPly);this.ui.analysisPrev.disabled=this.analysisPly===0||this.analysisBusy;this.ui.analysisNext.disabled=this.analysisPly===this.game.history.length||this.analysisBusy;}
+  }
+  renderPanel(live){
+    const st=this.result||this.game.status();let text='White to Move';
+    if(this.analysisMode)text='Computer Analysis • Move '+this.analysisPly;
+    else if(this.result)text=this.result.reason+(this.result.winner?' • '+(this.result.winner==='w'?'White':'Black')+' wins':'');
+    else if(!live)text='Review • Move '+this.viewPly;
+    else if(st.type==='check')text=(this.game.turn==='w'?'White':'Black')+' in Check';
+    else if(this.computerThinking)text='Computer thinking…';
+    else text=(this.game.turn==='w'?'White':'Black')+' to Move';
+    this.ui.status.textContent=text;this.ui.substatus.textContent=this.analysisMode?'Stockfish 19 post-game analysis':this.mode==='computer'?'Play vs Computer':this.mode==='self'?'Play both sides • board rotates':'Two players • fixed board • black pieces face Black';
+    this.ui.modeLabel.textContent=this.mode==='computer'?'COMPUTER':this.mode==='self'?'SELF':'FRIEND';this.ui.humanColor.disabled=this.mode!=='computer';this.ui.level.disabled=this.mode!=='computer';
+    this.ui.takeback.disabled=!this.game.history.length||this.computerThinking||this.analysisMode;this.ui.resign.disabled=!!this.result||this.computerThinking||this.analysisMode;this.ui.newGame.disabled=false;
+    if(this.result){this.ui.resultBox.hidden=false;this.ui.resultTitle.textContent=this.result.winner?(this.result.winner==='w'?'WHITE WINS':'BLACK WINS'):'DRAW';this.ui.resultReason.textContent=this.result.reason;this.ui.analyzeBtn.hidden=!this.game.history.length;}
+    else {this.ui.resultBox.hidden=true;this.ui.analyzeBtn.hidden=true;}
+    if(this.mode==='computer'&&this.engineError&&!this.analysisMode)this.ui.substatus.textContent=this.engineError;
+  }
+  updateNotation(){
+    const rows=[];for(let i=0;i<this.game.history.length;i+=2)rows.push({ply:i+1,no:Math.floor(i/2)+1,w:this.game.history[i]?.san||'',b:this.game.history[i+1]?.san||''});
+    this.ui.notation.innerHTML='';if(!rows.length){this.ui.notation.innerHTML='<div class="empty">No moves yet</div>';return;}
+    for(const r of rows){const row=document.createElement('div');row.className='move-row';if(this.viewPly===r.ply||this.viewPly===r.ply+1)row.classList.add('active');row.innerHTML='<span class="move-no">'+r.no+'.</span><span>'+r.w+'</span><span>'+r.b+'</span>';row.addEventListener('click',()=>this.navigate(r.b?r.ply+1:r.ply));this.ui.notation.appendChild(row);}if(this.viewPly===this.game.history.length)this.ui.notation.lastElementChild?.scrollIntoView({block:'nearest'});
+  }
+  updateNav(){const end=this.game.history.length;this.ui.start.disabled=this.viewPly===0;this.ui.prev.disabled=this.viewPly===0;this.ui.next.disabled=this.viewPly===end;this.ui.last.disabled=this.viewPly===end;}
+  exportPGN(){
+    const result=this.result?(this.result.winner?(this.result.winner==='w'?'1-0':'0-1'):'1/2-1/2'):'*';
+    const esc=v=>String(v).replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+    const headers=[
+      '[Event "MyChess64 Game"]',
+      '[Site "MyChess64"]',
+      '[Date "'+new Date().toISOString().slice(0,10).replace(/-/g,'.')+'"]',
+      '[Round "-"]',
+      '[White "White"]',
+      '[Black "Black"]',
+      '[Result "'+esc(result)+'"]'
+    ];
+    const moves=[];
+    for(let i=0;i<this.game.history.length;i+=2){
+      const no=Math.floor(i/2)+1, w=this.game.history[i]?.san||'', b=this.game.history[i+1]?.san||'';
+      moves.push(no+'. '+w+(b?' '+b:''));
+    }
+    const pgn=headers.join('\n')+'\n\n'+moves.join(' ')+' '+result+'\n';
+    const blob=new Blob([pgn],{type:'application/x-chess-pgn'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download='mychess64-game.pgn'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+}
+window.MyChess64GameController=MyChess64GameController;
+
+
+'use strict';
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const $=id=>document.getElementById(id);
+  const ui={
+    modeLabel:$('modeLabel'),status:$('status'),substatus:$('substatus'),clockW:$('clockW'),clockB:$('clockB'),humanColor:$('humanColor'),level:$('level'),
+    notation:$('notation'),start:$('startBtn'),prev:$('prevBtn'),next:$('nextBtn'),last:$('lastBtn'),takeback:$('takebackBtn'),resign:$('resignBtn'),newGame:$('newGameBtn'),exportPgn:$('exportPgnBtn'),engineStatus:$('engineStatus'),engineDepth:$('engineDepth'),
+    resultBox:$('resultBox'),resultTitle:$('resultTitle'),resultReason:$('resultReason'),geometry:$('geometry'),squareCount:$('squareCount'),analyzeBtn:$('analyzeBtn'),analysisBox:$('analysisBox'),analysisState:$('analysisState'),analysisMove:$('analysisMove'),analysisEval:$('analysisEval'),analysisBest:$('analysisBest'),analysisDepth:$('analysisDepth'),analysisPV:$('analysisPV'),analysisPrev:$('analysisPrev'),analysisNext:$('analysisNext'),analysisRun:$('analysisRun'),analysisClose:$('analysisClose')
+  };
+  const promotion=$('promotion');
+  const board=new MyChess64Board($('board'),sq=>controller.clickSquare(sq));
+  const controller=new MyChess64GameController(board,ui);
+  ui.humanColor.addEventListener('change',e=>controller.setHumanColor(e.target.value));
+  ui.level.addEventListener('change',e=>controller.setLevel(e.target.value));
+  $('friendBtn').addEventListener('click',()=>controller.setMode('friend'));
+  $('selfBtn').addEventListener('click',()=>controller.setMode('self'));
+  $('computerBtn').addEventListener('click',()=>controller.setMode('computer'));
+  $('flipBtn').addEventListener('click',()=>{board.orientation=board.orientation==='w'?'b':'w';board.render();});
+  $('clockPreset').addEventListener('change',e=>controller.setClock(e.target.value));
+  ui.start.addEventListener('click',()=>controller.navigate(0));ui.prev.addEventListener('click',()=>controller.navigate(controller.viewPly-1));ui.next.addEventListener('click',()=>controller.navigate(controller.viewPly+1));ui.last.addEventListener('click',()=>controller.navigate(controller.game.history.length));
+  ui.analyzeBtn.addEventListener('click',()=>controller.analyzeGame());ui.analysisPrev.addEventListener('click',()=>controller.analysisPrevious());ui.analysisNext.addEventListener('click',()=>controller.analysisNext());ui.analysisRun.addEventListener('click',()=>controller.runAnalysis());ui.analysisClose.addEventListener('click',()=>controller.closeAnalysis());ui.takeback.addEventListener('click',()=>controller.takeback());ui.resign.addEventListener('click',()=>controller.resign());ui.newGame.addEventListener('click',()=>controller.startNewGame());ui.exportPgn.addEventListener('click',()=>controller.exportPGN());
+  promotion.querySelectorAll('[data-promotion]').forEach(b=>b.addEventListener('click',()=>controller.choosePromotion(b.dataset.promotion)));
+  controller.ui.showPromotion=()=>promotion.classList.remove('hidden');controller.ui.hidePromotion=()=>promotion.classList.add('hidden');
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){e.preventDefault();controller.navigate(controller.viewPly-1);}else if(e.key==='ArrowRight'){e.preventDefault();controller.navigate(controller.viewPly+1);}else if(e.key==='Home'){e.preventDefault();controller.navigate(0);}else if(e.key==='End'){e.preventDefault();controller.navigate(controller.game.history.length);}});
+  window.addEventListener('resize',()=>controller.render(),{passive:true});
+});
+
+</script>
