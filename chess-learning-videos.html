@@ -1,0 +1,281 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>MyChess64 — Chess Videos</title>
+<style>
+:root{--bg:#080a0d;--panel:#11161c;--text:#f4f6f8;--muted:#8f9aa5;--line:#29323c;--gold:#d9aa55;--gold2:#f4ca72}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#192029 0,#080a0d 40%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{height:64px;display:flex;align-items:center;padding:0 5vw;background:rgba(8,10,13,.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.logo{font-size:22px;font-weight:900;letter-spacing:-.7px}.logo b{color:var(--gold)}
+main{width:min(1450px,94vw);margin:auto;padding:25px 0 70px}
+.hero{display:flex;align-items:end;justify-content:space-between;margin-bottom:18px;gap:20px}
+h1{margin:0;font-size:clamp(32px,4.5vw,52px);letter-spacing:-2px;line-height:1}
+.total{color:var(--gold);font-size:13px;font-weight:850}
+.filters{position:sticky;top:64px;z-index:40;background:rgba(8,10,13,.91);backdrop-filter:blur(14px);padding:10px 0;border-bottom:1px solid var(--line);margin-bottom:18px}
+.filter-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}.filter-row::-webkit-scrollbar{display:none}
+.filter{border:1px solid var(--line);background:linear-gradient(180deg,#151b22,#10151a);color:#cfd6dd;border-radius:999px;padding:9px 15px;white-space:nowrap;font-size:13px;font-weight:850;cursor:pointer;transition:.18s}
+.filter:hover{transform:translateY(-1px);border-color:#697581;color:#fff}.filter.active{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111;border-color:var(--gold2);box-shadow:0 5px 20px rgba(217,170,85,.22)}
+.status{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:12px}.status strong{color:#e0e6eb}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.card{background:linear-gradient(180deg,#141a21,#101419);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 7px 25px rgba(0,0,0,.14);transition:.2s}
+.card:hover{transform:translateY(-3px);border-color:#4c5863}
+.video{aspect-ratio:16/9;background:#000}iframe{width:100%;height:100%;border:0;display:block}
+.body{padding:14px 16px 16px}.body span{font-size:10px;color:var(--gold);font-weight:850;letter-spacing:1px;text-transform:uppercase}
+h3{font-size:17px;line-height:1.3;margin:7px 0 11px}.body a{color:#dfe5ea;text-decoration:none;font-size:12px;font-weight:800}.body a:hover{color:var(--gold2)}
+.load-wrap{display:flex;justify-content:center;margin:30px 0 5px}
+.load-more{border:1px solid var(--gold);background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111;border-radius:13px;padding:14px 27px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 7px 24px rgba(217,170,85,.2);transition:.18s}
+.load-more:hover{transform:translateY(-2px);box-shadow:0 11px 30px rgba(217,170,85,.3)}.load-more:active{transform:scale(.98)}.load-more[hidden]{display:none}
+.empty{display:none;text-align:center;padding:65px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:22px;text-align:center;color:#69747f;font-size:11px}
+@media(max-width:800px){header{height:58px;padding:0 4vw}main{width:94vw;padding-top:22px}.filters{top:58px}.grid{grid-template-columns:1fr;gap:16px}h1{letter-spacing:-1.2px}.hero{align-items:start;display:block}.total{margin-top:8px}}
+</style></head>
+<body><header><div class="logo">MyChess<b>64</b></div></header>
+<main>
+<section class="hero"><h1>Chess Videos</h1><div class="total"><span id="totalCount"></span> videos</div></section>
+<div class="filters"><div class="filter-row">
+<button class="filter active" data-filter="all">All</button><button class="filter" data-filter="fide">🏆 FIDE</button>
+<button class="filter" data-filter="tactics">♞ Tactics</button><button class="filter" data-filter="strategy">♟ Strategy</button>
+<button class="filter" data-filter="openings">♜ Openings</button><button class="filter" data-filter="endgames">♔ Endgames</button>
+<button class="filter" data-filter="game-analysis">🎯 Game Analysis</button>
+</div></div>
+<div class="status"><span>Showing <strong id="shownCount"></strong></span><span id="topicName">All Videos</span></div>
+<div class="grid" id="videoGrid"><article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/fGON0E0ej60?rel=0" title="FIDE Candidates 2026 — Round 1 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 1 LIVE</h3><a href="https://www.youtube.com/watch?v=fGON0E0ej60" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/HSuoogTG-hI?rel=0" title="FIDE Candidates 2026 — Round 3 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 3 LIVE</h3><a href="https://www.youtube.com/watch?v=HSuoogTG-hI" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/DV1t49YFHLY?rel=0" title="FIDE Candidates 2026 — Round 5 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 5 LIVE</h3><a href="https://www.youtube.com/watch?v=DV1t49YFHLY" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/ViSAymeoGiU?rel=0" title="FIDE Candidates 2026 — Round 7 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 7 LIVE</h3><a href="https://www.youtube.com/watch?v=ViSAymeoGiU" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/SDBZJ3i_4fs?rel=0" title="FIDE Candidates 2026 — Round 9 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 9 LIVE</h3><a href="https://www.youtube.com/watch?v=SDBZJ3i_4fs" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/uEwWeI7FWj8?rel=0" title="FIDE Candidates 2026 — Round 10 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 10 LIVE</h3><a href="https://www.youtube.com/watch?v=uEwWeI7FWj8" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/YetaLdC9aBw?rel=0" title="FIDE Candidates 2026 — Round 13 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 13 LIVE</h3><a href="https://www.youtube.com/watch?v=YetaLdC9aBw" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/odd2bVZ_cv8?rel=0" title="FIDE Candidates 2026 — Round 14 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 14 LIVE</h3><a href="https://www.youtube.com/watch?v=odd2bVZ_cv8" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/5trWqyNQ-ho?rel=0" title="FIDE Candidates 2026 — Highlights — Round 5" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Highlights — Round 5</h3><a href="https://www.youtube.com/watch?v=5trWqyNQ-ho" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="fide">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/md06yCkBh2c?rel=0" title="FIDE Candidates 2026 — Highlights — Round 7" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Highlights — Round 7</h3><a href="https://www.youtube.com/watch?v=md06yCkBh2c" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="fide" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/l8gyL05ilUw?rel=0" title="FIDE Candidates 2026 — Round 6 LIVE" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 6 LIVE</h3><a href="https://www.youtube.com/watch?v=l8gyL05ilUw" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="fide" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/fAbQKzEGDLw?rel=0" title="More Than a Tournament — FIDE Chess Olympiad 2026" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>More Than a Tournament — FIDE Chess Olympiad 2026</h3><a href="https://www.youtube.com/watch?v=fAbQKzEGDLw" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="fide" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/Kj5QX30LpC4?rel=0" title="FIDE Candidates 2026 — Tournament Coverage" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Tournament Coverage</h3><a href="https://www.youtube.com/watch?v=Kj5QX30LpC4" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="tactics">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/E4F77emUnqQ?rel=0" title="ALL Chess Tactics Explained" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Talk</span><h3>ALL Chess Tactics Explained</h3><a href="https://www.youtube.com/watch?v=E4F77emUnqQ" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="tactics">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/W1gWHIpQNVU?rel=0" title="All The Chess Tactics You NEED To Know" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess.com</span><h3>All The Chess Tactics You NEED To Know</h3><a href="https://www.youtube.com/watch?v=W1gWHIpQNVU" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="tactics">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/hPR-usIxdb4?rel=0" title="Here&#x27;s How To Spot Tactics In Chess" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>Here&#x27;s How To Spot Tactics In Chess</h3><a href="https://www.youtube.com/watch?v=hPR-usIxdb4" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="tactics">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/o7ALEPcUaSU?rel=0" title="Top 18 Attacking Principles In Chess" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>Top 18 Attacking Principles In Chess</h3><a href="https://www.youtube.com/watch?v=o7ALEPcUaSU" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="tactics">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/GfmDBpbqMAI?rel=0" title="Chess Tactics: Blunder Check" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>Chess Tactics: Blunder Check</h3><a href="https://www.youtube.com/watch?v=GfmDBpbqMAI" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="tactics" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/Bo93mIhnDz4?rel=0" title="The Top 23 Checkmate Patterns" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>The Top 23 Checkmate Patterns</h3><a href="https://www.youtube.com/watch?v=Bo93mIhnDz4" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="tactics" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/Yh3g6Nx8Nz8?rel=0" title="Attacking The Castled King — Tactics" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>Attacking The Castled King — Tactics</h3><a href="https://www.youtube.com/watch?v=Yh3g6Nx8Nz8" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="tactics" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/_h4KLNqvLWw?rel=0" title="Fischer&#x27;s Rule Will Prevent Chess Mistakes" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Remote Chess Academy</span><h3>Fischer&#x27;s Rule Will Prevent Chess Mistakes</h3><a href="https://www.youtube.com/watch?v=_h4KLNqvLWw" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="strategy">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/nXyJdetptXg?rel=0" title="35 Vital Chess Principles" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>35 Vital Chess Principles</h3><a href="https://www.youtube.com/watch?v=nXyJdetptXg" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="strategy">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/F98JdnLyUXA?rel=0" title="The 10 Best Chess Plans For The Middlegame" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>The 10 Best Chess Plans For The Middlegame</h3><a href="https://www.youtube.com/watch?v=F98JdnLyUXA" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="strategy">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/BYtXMJjqfvw?rel=0" title="21 Positional Chess Concepts" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>21 Positional Chess Concepts</h3><a href="https://www.youtube.com/watch?v=BYtXMJjqfvw" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="strategy">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/yv7_0svOlQU?rel=0" title="Everything You Need To Know: Tactics &amp; Strategy" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess.com</span><h3>Everything You Need To Know: Tactics &amp; Strategy</h3><a href="https://www.youtube.com/watch?v=yv7_0svOlQU" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="strategy">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/ump_jFX5oXQ?rel=0" title="6 Steps To Make A Plan In ANY Situation" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>6 Steps To Make A Plan In ANY Situation</h3><a href="https://www.youtube.com/watch?v=ump_jFX5oXQ" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="strategy" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/XUTsWcWyYnw?rel=0" title="Master Tips To Defend In Chess" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>Master Tips To Defend In Chess</h3><a href="https://www.youtube.com/watch?v=XUTsWcWyYnw" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="openings">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/21L45Qo6EIY?rel=0" title="Everything You Need To Know About Chess: The Opening" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess.com</span><h3>Everything You Need To Know About Chess: The Opening</h3><a href="https://www.youtube.com/watch?v=21L45Qo6EIY" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="openings">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/6IegDENuxU4?rel=0" title="How To Learn &amp; Study Chess Openings" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>GothamChess</span><h3>How To Learn &amp; Study Chess Openings</h3><a href="https://www.youtube.com/watch?v=6IegDENuxU4" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="openings">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/Txvz97tzDfM?rel=0" title="Top 10 Chess Openings" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>thechesswebsite</span><h3>Top 10 Chess Openings</h3><a href="https://www.youtube.com/watch?v=Txvz97tzDfM" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="openings">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/nMuvv1HksL4?rel=0" title="Catalan Opening" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>GothamChess</span><h3>Catalan Opening</h3><a href="https://www.youtube.com/watch?v=nMuvv1HksL4" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="openings">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/AlS0KAxAx-g?rel=0" title="Chess Opening Strategies" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Talk</span><h3>Chess Opening Strategies</h3><a href="https://www.youtube.com/watch?v=AlS0KAxAx-g" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="openings" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/va0s92praEM?rel=0" title="How to Play the English Opening — 10-Minute Chess Openings" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>GothamChess</span><h3>How to Play the English Opening — 10-Minute Chess Openings</h3><a href="https://www.youtube.com/watch?v=va0s92praEM" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="openings" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/_vh0ztdYTws?rel=0" title="EVERY Chess Gambit for White and Black" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>GothamChess</span><h3>EVERY Chess Gambit for White and Black</h3><a href="https://www.youtube.com/watch?v=_vh0ztdYTws" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="openings" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/6IegDENuxU4?rel=0" title="How To Learn &amp; Study Chess Openings" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>GothamChess</span><h3>How To Learn &amp; Study Chess Openings</h3><a href="https://www.youtube.com/watch?v=6IegDENuxU4" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="endgames">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/9mhLQOZKVQs?rel=0" title="Everything You Need to Know About Chess: The Endgame" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess.com</span><h3>Everything You Need to Know About Chess: The Endgame</h3><a href="https://www.youtube.com/watch?v=9mhLQOZKVQs" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="endgames">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/bkec9moMm4k?rel=0" title="The God Level Chess Skills That Wins Every Single Endgame!" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>ProfessorChess</span><h3>The God Level Chess Skills That Wins Every Single Endgame!</h3><a href="https://www.youtube.com/watch?v=bkec9moMm4k" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="endgames">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/Qp_rB1fN3Gs?rel=0" title="5 Chess Endgames You MUST Know" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Anna Cramling</span><h3>5 Chess Endgames You MUST Know</h3><a href="https://www.youtube.com/watch?v=Qp_rB1fN3Gs" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="endgames">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/VWeZ8m34BSk?rel=0" title="Test Your Pawn Endgame Knowledge" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Daniel Naroditsky</span><h3>Test Your Pawn Endgame Knowledge</h3><a href="https://www.youtube.com/watch?v=VWeZ8m34BSk" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="endgames">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/dr5sA-IzEmM?rel=0" title="King &amp; Pawn Endgames Crash Course" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Vibes</span><h3>King &amp; Pawn Endgames Crash Course</h3><a href="https://www.youtube.com/watch?v=dr5sA-IzEmM" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="endgames" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/5wCPbQEO4-c?rel=0" title="Opposition — Chess Endgame" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Endgame Studies</span><h3>Opposition — Chess Endgame</h3><a href="https://www.youtube.com/watch?v=5wCPbQEO4-c" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="endgames" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/26c5Da-C8bQ?rel=0" title="Reti Endgame Study" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>Chess Endgame Studies</span><h3>Reti Endgame Study</h3><a href="https://www.youtube.com/watch?v=26c5Da-C8bQ" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="endgames" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/aLyRWZPXUzI?rel=0" title="King + Pawn Endings — John Bartholomew" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>John Bartholomew</span><h3>King + Pawn Endings — John Bartholomew</h3><a href="https://www.youtube.com/watch?v=aLyRWZPXUzI" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="game-analysis">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/fmIUJ044IPk?rel=0" title="Nihal Sarin vs Arif Abdul Hafiz — FIDE Chess Olympiad 2026" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>agadmator</span><h3>Nihal Sarin vs Arif Abdul Hafiz — FIDE Chess Olympiad 2026</h3><a href="https://www.youtube.com/watch?v=fmIUJ044IPk" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="game-analysis">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/y4ySPtyqXdU?rel=0" title="Nodirbek Abdusattorov vs Jorge Cori — FIDE Chess Olympiad 2026" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>agadmator</span><h3>Nodirbek Abdusattorov vs Jorge Cori — FIDE Chess Olympiad 2026</h3><a href="https://www.youtube.com/watch?v=y4ySPtyqXdU" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="game-analysis">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/DV1t49YFHLY?rel=0" title="FIDE Candidates 2026 — Round 5 Analysis" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 5 Analysis</h3><a href="https://www.youtube.com/watch?v=DV1t49YFHLY" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="game-analysis">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/ViSAymeoGiU?rel=0" title="FIDE Candidates 2026 — Round 7 Analysis" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates 2026 — Round 7 Analysis</h3><a href="https://www.youtube.com/watch?v=ViSAymeoGiU" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card" data-topic="game-analysis">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/md06yCkBh2c?rel=0" title="Highlights — FIDE Candidates Round 7" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>Highlights — FIDE Candidates Round 7</h3><a href="https://www.youtube.com/watch?v=md06yCkBh2c" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article>
+<article class="card more-card" data-topic="game-analysis" style="display:none">
+<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/5trWqyNQ-ho?rel=0" title="FIDE Candidates — Game Highlights" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="body"><span>FIDE</span><h3>FIDE Candidates — Game Highlights</h3><a href="https://www.youtube.com/watch?v=5trWqyNQ-ho" target="_blank" rel="noopener">YouTube ↗</a></div>
+</article></div>
+<div class="empty" id="empty">No videos found.</div>
+<div class="load-wrap"><button class="load-more" id="loadMore">＋ More Chess Videos</button></div>
+</main><footer>MyChess64</footer>
+<script>
+const cards=[...document.querySelectorAll('.card')];
+const buttons=[...document.querySelectorAll('.filter')];
+const shown=document.getElementById('shownCount'), total=document.getElementById('totalCount');
+const empty=document.getElementById('empty'), loadMore=document.getElementById('loadMore'), topicName=document.getElementById('topicName');
+const labels={"all": "\uff0b More Chess Videos", "fide": "\uff0b More FIDE Videos", "tactics": "\uff0b More Tactics Videos", "strategy": "\uff0b More Strategy Videos", "openings": "\uff0b More Opening Videos", "endgames": "\uff0b More Endgame Videos", "game-analysis": "\uff0b More Game Analysis Videos"};
+let current='all';
+const names={all:'All Videos',fide:'FIDE Videos',tactics:'Tactics Videos',strategy:'Strategy Videos',openings:'Opening Videos',endgames:'Endgame Videos','game-analysis':'Game Analysis Videos'};
+
+function updateCount(){
+  const visible=cards.filter(c=>c.style.display!=='none').length;
+  shown.textContent=visible;
+  total.textContent=cards.filter(c=>!c.classList.contains('more-card')).length;
+  empty.style.display=visible?'none':'block';
+}
+function updateMoreButton(){
+  const available=cards.some(c=>c.classList.contains('more-card') && c.dataset.topic===current && c.style.display==='none');
+  loadMore.hidden=!available;
+  loadMore.textContent=labels[current] || labels.all;
+}
+function applyFilter(filter){
+  current=filter;
+  cards.forEach(card=>{
+    const match=filter==='all'||card.dataset.topic===filter;
+    card.style.display=match && !card.classList.contains('more-card')?'block':'none';
+  });
+  buttons.forEach(b=>b.classList.toggle('active',b.dataset.filter===filter));
+  topicName.textContent=names[filter];
+  updateCount(); updateMoreButton();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+loadMore.addEventListener('click',()=>{
+  cards.forEach(card=>{
+    if(card.classList.contains('more-card') && card.dataset.topic===current) card.style.display='block';
+  });
+  updateCount(); updateMoreButton(); loadMore.blur();
+});
+buttons.forEach(b=>b.addEventListener('click',()=>applyFilter(b.dataset.filter)));
+applyFilter('all');
+</script></body></html>
