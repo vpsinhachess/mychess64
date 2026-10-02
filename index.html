@@ -35,7 +35,7 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .search svg{position:absolute;left:13px;top:50%;translate:0 -50%;width:16px;opacity:.6}
 .search kbd{position:absolute;right:12px;top:50%;translate:0 -50%;font:500 .75rem var(--sans);border:1px solid var(--line);border-radius:5px;padding:0 6px;color:var(--mute)}
 .install{height:40px;padding:0 16px;border-radius:999px;border:0;background:var(--accent);color:var(--onaccent);font-weight:600;font-size:.9rem;white-space:nowrap}.install:hover{filter:brightness(1.1)}
-dialog{max-width:420px;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);padding:24px;margin:auto}dialog::backdrop{background:rgba(5,12,28,.6)}dialog h2{font:700 1.5rem var(--serif);margin-bottom:10px}dialog p{margin-bottom:10px;color:var(--mute)}
+dialog{width:calc(100% - 32px);max-width:420px;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);padding:24px;margin:auto}dialog::backdrop{background:rgba(5,12,28,.6)}#chk{list-style:none;padding:0;margin:0 0 14px;font-size:.92rem;color:var(--text)}dialog h2{font:700 1.5rem var(--serif);margin-bottom:10px}dialog p{margin-bottom:10px;color:var(--mute)}
 .icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel);font-size:1.1rem}
 .icon-btn:hover{border-color:var(--accent)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
@@ -146,6 +146,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
 <p><b>Android (Chrome):</b> tap the menu <b>⋮</b>, then <b>Install app</b> or <b>Add to Home screen</b>.</p>
 <p><b>iPhone (Safari):</b> tap <b>Share</b>, then <b>Add to Home Screen</b>.</p>
 <p><b>Computer (Chrome or Edge):</b> click the install icon at the right end of the address bar.</p>
+<p><b>Install check</b> (for the site owner):</p><ul id="chk"><li>Checking…</li></ul>
 <button class="install" id="howclose" type="button">Got it</button></dialog>
 
 <footer><div class="wrap">
@@ -285,8 +286,15 @@ if(matchMedia('(display-mode: standalone)').matches)$('#install').classList.add(
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e});
 $('#install').onclick=async()=>{
  if(deferred){deferred.prompt();await deferred.userChoice;deferred=null}
- else $('#how').showModal();
+ else{$('#how').showModal();check()}
 };
+async function check(){
+ const out=[],t=async(n,u)=>{try{const r=await fetch(u,{cache:'no-store'});out.push((r.ok?'✅ ':'❌ ')+n)}catch(e){out.push('❌ '+n)}};
+ await t('manifest.json found','manifest.json');await t('App icon found','icons/icon-512.png');await t('sw.js found','sw.js');
+ let reg=null;try{reg=await navigator.serviceWorker.getRegistration()}catch(e){}
+ out.push((reg?'✅ ':'❌ ')+'Service worker running');
+ $('#chk').innerHTML=out.map(x=>'<li>'+x+'</li>').join('');
+}
 $('#howclose').onclick=()=>$('#how').close();
 addEventListener('appinstalled',()=>$('#install').classList.add('hidden'));
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
