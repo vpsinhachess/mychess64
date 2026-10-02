@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Opening Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f1e8; --paper:#fffdfa; --panel-border:#e6dac2;
+    --board-light:#f0d9b5; --board-dark:#b58863;
+    --ink:#2b2521; --muted:#8a7d6c; --accent:#9c6b3e; --accent-dark:#7c5330;
+    --wbar:#e8dcc4; --dbar:#b7ab98; --bbar:#4a423a;
+    --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:26px 16px 40px; }
+  header{ text-align:center; margin-bottom:18px; }
+  h1{ font-family:var(--serif); font-weight:700; font-size:clamp(24px,4vw,32px); margin:0 0 4px; }
+  header p{ margin:0; color:var(--muted); font-size:13px; }
+
+  .layout{ display:flex; gap:26px; align-items:flex-start; justify-content:center; flex-wrap:wrap; max-width:840px; width:100%; }
+  .board-col{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .movebar{ min-height:22px; font-family:var(--serif); font-size:15px; color:var(--accent-dark); text-align:center; max-width:380px; }
+  #board{ width:min(80vw,380px); height:min(80vw,380px); display:grid; grid-template-columns:repeat(8,1fr);
+    grid-template-rows:repeat(8,1fr); border-radius:5px; overflow:hidden;
+    box-shadow:0 1px 3px rgba(60,40,20,0.12), 0 16px 32px -16px rgba(60,40,20,0.4); }
+  .sq{ display:flex; align-items:center; justify-content:center; position:relative; }
+  .sq.light{ background:var(--board-light); } .sq.dark{ background:var(--board-dark); }
+  .piece-svg{ width:82%; height:82%; filter:drop-shadow(0 1px 1px rgba(0,0,0,0.25)); }
+  .piece-w{ color:#fefcf8; } .piece-b{ color:#232019; }
+  .board-actions{ display:flex; gap:8px; }
+  .btn-outline{ background:var(--paper); border:1px solid var(--panel-border); color:var(--muted);
+    font-family:var(--sans); font-weight:600; font-size:12.5px; padding:8px 14px; border-radius:8px; cursor:pointer; }
+  .btn-outline:hover{ border-color:var(--accent); color:var(--accent-dark); }
+
+  .panel{ background:var(--paper); border:1px solid var(--panel-border); border-radius:14px; padding:20px; width:320px;
+    display:flex; flex-direction:column; gap:14px; box-shadow:0 1px 2px rgba(60,40,20,0.05), 0 12px 28px -18px rgba(60,40,20,0.2); }
+  .opening-name{ font-family:var(--serif); font-size:18px; font-weight:700; }
+  .opening-eco{ font-size:12px; color:var(--muted); margin-top:1px; }
+  .movelist{ display:flex; flex-direction:column; gap:6px; }
+  .move-row{ display:flex; align-items:center; gap:8px; padding:7px 9px; border:1px solid var(--panel-border);
+    border-radius:8px; cursor:pointer; background:var(--bg); }
+  .move-row:hover{ border-color:var(--accent); }
+  .move-san{ font-family:var(--serif); font-weight:700; font-size:14px; width:38px; }
+  .move-freq{ font-size:10.5px; color:var(--muted); width:34px; }
+  .move-bar{ flex:1; height:9px; border-radius:5px; overflow:hidden; display:flex; }
+  .move-bar span{ height:100%; }
+  .empty-msg{ font-size:13px; color:var(--muted); line-height:1.5; }
+  .lichess-link{ display:block; text-align:center; background:var(--accent); color:#fff8ee; font-weight:600;
+    font-size:13px; padding:10px; border-radius:8px; text-decoration:none; }
+  .lichess-link:hover{ background:var(--accent-dark); }
+  .disclaimer{ font-size:10.5px; color:var(--muted); line-height:1.5; border-top:1px solid var(--panel-border); padding-top:10px; }
+</style>
+</head>
+<body>
+
+<svg style="display:none">
+  <defs>
+    <symbol id="p-P" viewBox="0 0 45 45"><circle cx="22.5" cy="10" r="5.5" fill="currentColor" stroke="#181410" stroke-width="2"/><path d="M22.5 14 C27 14 30 17.5 30 21.5 C30 24.5 28.7 26.4 28 27.8 C29 29.3 30 31 30 34 L15 34 C15 31 16 29.3 17 27.8 C16.3 26.4 15 24.5 15 21.5 C15 17.5 18 14 22.5 14 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><rect x="10" y="34" width="25" height="5.5" rx="1.5" fill="currentColor" stroke="#181410" stroke-width="2"/></symbol>
+    <symbol id="p-R" viewBox="0 0 45 45"><path d="M11.5 8 H15.5 V12 H19.5 V8 H25.5 V12 H29.5 V8 H33.5 V15.5 H29.5 V13.5 H25.5 V15.5 H19.5 V13.5 H15.5 V15.5 H11.5 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><path d="M14.5 17 H30.5 L29 34 H16 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><rect x="10" y="34" width="25" height="5.5" rx="1.5" fill="currentColor" stroke="#181410" stroke-width="2"/></symbol>
+    <symbol id="p-N" viewBox="0 0 45 45"><path d="M11 34 C11 29.5 13 26.5 17 24.5 C14.3 22.6 13.2 19 15 16 C13.2 15 12 13 13 10.5 C15 11.5 17 11.5 18.3 10.3 C17.5 8 18.5 5.7 21.3 4.6 C25.5 3 30.5 4.3 33 8 C36 12.3 37 17.5 35.8 22.3 C34.8 26.6 32 29.8 29.8 32 L29.8 34 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><circle cx="28.5" cy="13.5" r="1.1" fill="#181410"/><rect x="10" y="34" width="25" height="5.5" rx="1.5" fill="currentColor" stroke="#181410" stroke-width="2"/></symbol>
+    <symbol id="p-B" viewBox="0 0 45 45"><rect x="21.3" y="2" width="2.4" height="5" fill="currentColor" stroke="#181410" stroke-width="1.6"/><rect x="19.3" y="3.6" width="6.4" height="2.4" fill="currentColor" stroke="#181410" stroke-width="1.6"/><path d="M22.5 9 C27 9 30 14 30 19 C30 24 28 27 25 28.5 C26.5 30 28.5 31 30.5 32.5 L30.5 34 L14.5 34 L14.5 32.5 C16.5 31 18.5 30 20 28.5 C17 27 15 24 15 19 C15 14 18 9 22.5 9 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><path d="M17.5 14 L27 23" stroke="#181410" stroke-width="1.8" stroke-linecap="round"/><rect x="10" y="34" width="25" height="5.5" rx="1.5" fill="currentColor" stroke="#181410" stroke-width="2"/></symbol>
+    <symbol id="p-Q" viewBox="0 0 45 45"><path d="M12 19 L14 9.5 L18.3 15.5 L22.5 7.5 L26.7 15.5 L31 9.5 L33 19 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><circle cx="14" cy="8.5" r="1.6" fill="currentColor" stroke="#181410" stroke-width="1"/><circle cx="22.5" cy="6.5" r="1.6" fill="currentColor" stroke="#181410" stroke-width="1"/><circle cx="31" cy="8.5" r="1.6" fill="currentColor" stroke="#181410" stroke-width="1"/><path d="M13 19 L32 19 L30 34 L15 34 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><rect x="10" y="34" width="25" height="5.5" rx="1.5" fill="currentColor" stroke="#181410" stroke-width="2"/></symbol>
+    <symbol id="p-K" viewBox="0 0 45 45"><rect x="21.3" y="1.5" width="2.4" height="6" fill="currentColor" stroke="#181410" stroke-width="1.6"/><rect x="19" y="3.3" width="7" height="2.6" fill="currentColor" stroke="#181410" stroke-width="1.6"/><path d="M22.5 9 C27.5 9 30.5 12 30.5 16 C30.5 17.3 30.2 18.2 29.7 19 L15.3 19 C14.8 18.2 14.5 17.3 14.5 16 C14.5 12 17.5 9 22.5 9 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><path d="M14.5 19 L30.5 19 L29 34 L16 34 Z" fill="currentColor" stroke="#181410" stroke-width="2" stroke-linejoin="round"/><circle cx="16.5" cy="19" r="1.3" fill="#181410"/><circle cx="22.5" cy="19" r="1.3" fill="#181410"/><circle cx="28.5" cy="19" r="1.3" fill="#181410"/><rect x="10" y="34" width="25" height="5.5" rx="1.5" fill="currentColor" stroke="#181410" stroke-width="2"/></symbol>
+  </defs>
+</svg>
+
+<header>
+  <h1>Opening Explorer</h1>
+  <p>Click a move to see where it leads, plus how it tends to score.</p>
+</header>
+
+<div class="layout">
+  <div class="board-col">
+    <div class="movebar" id="movebar">Starting position</div>
+    <div id="board"></div>
+    <div class="board-actions">
+      <button class="btn-outline" id="backBtn">◀ Back</button>
+      <button class="btn-outline" id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div>
+      <div class="opening-name" id="openingName">Starting Position</div>
+      <div class="opening-eco" id="openingEco">Choose a move to begin</div>
+    </div>
+    <div class="movelist" id="movelist"></div>
+    <a class="lichess-link" id="lichessLink" href="https://lichess.org/analysis" target="_blank" rel="noopener">Open live stats on Lichess ↗</a>
+    <div class="disclaimer">Sample illustrative dataset covering common main lines — not live data. Use the Lichess link above for the real, current explorer stats on any position.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const files=['a','b','c','d','e','f','g','h'];
+  const board=document.getElementById('board');
+  const movebar=document.getElementById('movebar');
+  const movelist=document.getElementById('movelist');
+  const openingName=document.getElementById('openingName');
+  const openingEco=document.getElementById('openingEco');
+  const lichessLink=document.getElementById('lichessLink');
+  const backBtn=document.getElementById('backBtn');
+  const resetBtn=document.getElementById('resetBtn');
+
+  // Illustrative opening tree: w/d/b are approx % score outcomes, games is a relative popularity share.
+  const tree = { moves: {
+    e4:{w:54,d:24,b:22,games:38,eco:'B00',name:"King's Pawn Game", moves:{
+      e5:{w:52,d:28,b:20,games:25,eco:'C20',name:'Open Game', moves:{
+        Nf3:{w:54,d:27,b:19,games:20,eco:'C40',name:"King's Knight Opening", moves:{
+          Nc6:{w:53,d:28,b:19,games:16,eco:'C44',name:'Open Game (2...Nc6)', moves:{
+            Bb5:{w:55,d:29,b:16,games:9,eco:'C60',name:'Ruy Lopez'},
+            Bc4:{w:54,d:26,b:20,games:6,eco:'C50',name:'Italian Game'}
+          }},
+          Nf6:{w:50,d:30,b:20,games:3,eco:'C42',name:"Petrov's Defense"}
+        }}
+      }},
+      c5:{w:50,d:24,b:26,games:29,eco:'B20',name:'Sicilian Defense', moves:{
+        Nf3:{w:51,d:25,b:24,games:22,eco:'B27',name:'Sicilian Defense', moves:{
+          d6:{w:50,d:26,b:24,games:9,eco:'B50',name:'Sicilian (2...d6)'},
+          Nc6:{w:51,d:25,b:24,games:8,eco:'B30',name:'Sicilian (2...Nc6)'}
+        }}
+      }},
+      e6:{w:53,d:27,b:20,games:7,eco:'C00',name:'French Defense'},
+      c6:{w:52,d:26,b:22,games:6,eco:'B10',name:'Caro-Kann Defense'}
+    }},
+    d4:{w:53,d:27,b:20,games:35,eco:'A40',name:"Queen's Pawn Game", moves:{
+      d5:{w:52,d:29,b:19,games:20,eco:'D00',name:'Closed Game', moves:{
+        c4:{w:53,d:29,b:18,games:16,eco:'D06',name:"Queen's Gambit", moves:{
+          e6:{w:52,d:32,b:16,games:8,eco:'D30',name:"Queen's Gambit Declined"},
+          c6:{w:53,d:30,b:17,games:6,eco:'D10',name:'Slav Defense'}
+        }}
+      }},
+      Nf6:{w:52,d:26,b:22,games:14,eco:'A45',name:'Indian Defense', moves:{
+        c4:{w:52,d:27,b:21,games:11,eco:'A50',name:'Indian Game', moves:{
+          g6:{w:51,d:26,b:23,games:5,eco:'E60',name:"King's Indian Defense"},
+          e6:{w:52,d:29,b:19,games:5,eco:'E20',name:'Nimzo/Queen\'s Indian complex'}
+        }}
+      }}
+    }},
+    Nf3:{w:52,d:28,b:20,games:8,eco:'A04',name:'Reti Opening'},
+    c4:{w:53,d:28,b:19,games:6,eco:'A10',name:'English Opening'}
+  }};
+
+  let path = []; // array of SAN moves from root
+
+  function standardSetup(){
+    const back=['R','N','B','Q','K','B','N','R']; const st={};
+    files.forEach((f,i)=>{
+      st[f+1]={color:'w',type:back[i]}; st[f+2]={color:'w',type:'P'};
+      st[f+7]={color:'b',type:'P'}; st[f+8]={color:'b',type:back[i]};
+    });
+    return st;
+  }
+  function canReach(from,to,piece,bs){
+    const f1=from.charCodeAt(0)-97, r1=+from[1], f2=to.charCodeAt(0)-97, r2=+to[1];
+    const df=f2-f1, dr=r2-r1;
+    if(piece==='N') return (Math.abs(df)===1&&Math.abs(dr)===2)||(Math.abs(df)===2&&Math.abs(dr)===1);
+    if(piece==='B'){
+      if(Math.abs(df)!==Math.abs(dr)) return false;
+      const sF=Math.sign(df), sR=Math.sign(dr);
+      for(let i=1;i<Math.abs(df);i++){ const sq=String.fromCharCode(97+f1+i*sF)+(r1+i*sR); if(bs[sq]) return false; }
+      return true;
+    }
+    return true;
+  }
+  function applyMove(bs, san, color){
+    san = san.replace(/[+#]/,'');
+    if(/^[a-h][1-8]$/.test(san)){
+      const destFile=san[0], destRank=+san[1];
+      const dir = color==='w'?1:-1;
+      let srcRank = destRank - dir;
+      if(!(bs[destFile+srcRank] && bs[destFile+srcRank].type==='P' && bs[destFile+srcRank].color===color)) srcRank = destRank - 2*dir;
+      const from = destFile+srcRank;
+      bs[destFile+destRank]=bs[from]; delete bs[from];
+    } else {
+      const piece=san[0]; const dest=san.slice(-2);
+      for(const sq in bs){
+        const p=bs[sq];
+        if(p.color===color && p.type===piece && canReach(sq,dest,piece,bs)){ bs[dest]=p; delete bs[sq]; break; }
+      }
+    }
+  }
+  function boardFromPath(){
+    const bs = standardSetup();
+    path.forEach((san,i)=> applyMove(bs, san, i%2===0?'w':'b'));
+    return bs;
+  }
+  function isLightSquare(file, rank){ return (files.indexOf(file) + rank) % 2 === 0; }
+
+  function renderBoard(){
+    const bs = boardFromPath();
+    board.innerHTML='';
+    for(let rank=8; rank>=1; rank--){
+      files.forEach(file=>{
+        const div=document.createElement('div');
+        div.className='sq '+(isLightSquare(file,rank)?'light':'dark');
+        const p=bs[file+''+rank];
+        if(p) div.innerHTML='<svg class="piece-svg piece-'+p.color+'" viewBox="0 0 45 45"><use href="#p-'+p.type+'"/></svg>';
+        board.appendChild(div);
+      });
+    }
+  }
+
+  function currentNode(){
+    let node = tree;
+    for(const san of path){ if(!node.moves || !node.moves[san]) return node; node = node.moves[san]; }
+    return node;
+  }
+
+  function render(){
+    renderBoard();
+    const node = currentNode();
+    movebar.textContent = path.length ? formatMoves(path) : 'Starting position';
+    openingName.textContent = node.name || 'Starting Position';
+    openingEco.textContent = node.eco ? (node.eco+' · sample games share '+(node.games||0)+'%') : 'Choose a move to begin';
+    lichessLink.href = path.length ? 'https://lichess.org/analysis/pgn/'+path.join('_') : 'https://lichess.org/analysis';
+
+    movelist.innerHTML='';
+    const kids = node.moves;
+    if(!kids){
+      const div=document.createElement('div'); div.className='empty-msg';
+      div.textContent='This line goes beyond our sample book — follow the live link below to see current master and lichess-database theory from here.';
+      movelist.appendChild(div);
+      return;
+    }
+    Object.keys(kids).forEach(san=>{
+      const m = kids[san];
+      const row=document.createElement('div'); row.className='move-row';
+      row.innerHTML = '<span class="move-san">'+san+'</span>'+
+        '<span class="move-freq">'+m.games+'%</span>'+
+        '<span class="move-bar"><span style="width:'+m.w+'%;background:var(--wbar)"></span><span style="width:'+m.d+'%;background:var(--dbar)"></span><span style="width:'+m.b+'%;background:var(--bbar)"></span></span>';
+      row.addEventListener('click', ()=>{ path.push(san); render(); });
+      movelist.appendChild(row);
+    });
+  }
+
+  function formatMoves(p){
+    let s='';
+    for(let i=0;i<p.length;i++){ if(i%2===0) s += (i/2+1)+'. '; s += p[i]+' '; }
+    return s.trim();
+  }
+
+  backBtn.addEventListener('click', ()=>{ path.pop(); render(); });
+  resetBtn.addEventListener('click', ()=>{ path=[]; render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>
