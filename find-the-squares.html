@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#171717">
+<title>Square Sense — Identify the Squares</title>
+
+<style>
+
+*{box-sizing:border-box}
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --surface2:#f6f7f9; --border:#dfe3e8;
+  --text:#17191c; --muted:#6f7782; --accent:#b58863; --accent2:#f0d9b5;
+  --shadow:0 10px 30px rgba(20,30,40,.08);
+  --board-light:#f0d9b5; --board-dark:#b58863;
+}
+body.dark{
+  --bg:#0f1114; --surface:#181b20; --surface2:#20242a; --border:#30353d;
+  --text:#f2f4f7; --muted:#9aa3ad; --accent:#d3a276; --accent2:#f0d9b5;
+  --shadow:0 12px 34px rgba(0,0,0,.28);
+}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+body{display:flex;justify-content:center;transition:background .2s,color .2s}
+button{font:inherit}
+.app{width:100%;max-width:1500px;min-height:100vh;padding:18px;display:flex;flex-direction:column;gap:16px}
+
+/* Header */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px 16px;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;box-shadow:var(--shadow)
+}
+.brand{font-weight:900;letter-spacing:.5px;font-size:20px}
+.brand span{font-weight:600;color:var(--muted);font-size:12px;margin-left:8px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.btn{
+  border:1px solid var(--border);background:var(--surface2);color:var(--text);
+  border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:800;transition:.15s
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(.98)}
+.btn.primary{background:var(--accent2);color:#171717;border-color:var(--accent2)}
+.btn.icon{width:42px;padding:9px 0;text-align:center}
+
+/* Main */
+.main{display:flex;gap:16px;align-items:stretch;flex:1;min-height:0}
+.board-area{
+  flex:1;min-width:0;display:flex;align-items:center;justify-content:center;
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px;box-shadow:var(--shadow)
+}
+.board-wrap{position:relative;width:min(78vh,calc(100vw - 430px),820px);min-width:320px;aspect-ratio:1/1}
+.board{
+  position:absolute;inset:0;overflow:hidden;border-radius:6px;
+  box-shadow:0 12px 30px rgba(0,0,0,.20);user-select:none;touch-action:none
+}
+.sq{
+  position:absolute;width:12.5%;height:12.5%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:filter .08s,transform .08s
+}
+.sq.light{background:var(--board-light)}
+.sq.dark{background:var(--board-dark)}
+.sq:hover{filter:brightness(1.06)}
+.sq:active{transform:scale(.985)}
+.sq.correct{box-shadow:inset 0 0 0 7px rgba(35,150,75,.78)}
+.sq.wrong{box-shadow:inset 0 0 0 7px rgba(190,45,45,.85)}
+.coord{position:absolute;font-size:clamp(10px,1.4vw,16px);font-weight:900;pointer-events:none;line-height:1}
+.file{right:5px;bottom:4px}.rank{left:5px;top:4px}
+.light .coord{color:#b58863}.dark .coord{color:#f0d9b5}
+
+/* Target reveal */
+.target-overlay{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:20;pointer-events:none;text-align:center;color:#fff;
+  background:rgba(0,0,0,.80);border:2px solid rgba(255,255,255,.85);
+  border-radius:18px;padding:18px 30px;min-width:180px;
+  box-shadow:0 12px 40px rgba(0,0,0,.45)
+}
+.target-overlay .small{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#ccc}
+.target-overlay .square-name{font-size:clamp(42px,7vw,78px);font-weight:900;line-height:1;margin-top:5px}
+.target-overlay.show{animation:targetIn .22s ease-out}
+@keyframes targetIn{from{opacity:0;transform:translate(-50%,-50%) scale(.84)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+
+/* Feedback stays hidden visually in this version */
+.feedback{display:none!important}
+
+/* Right panel */
+.panel{
+  width:350px;flex:0 0 350px;background:var(--surface);
+  border:1px solid var(--border);border-radius:14px;padding:16px;
+  display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.panel h2{font-size:19px;margin:0}
+.panel-tag{
+  font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);padding:6px 8px;border:1px solid var(--border);border-radius:7px
+}
+.instruction{
+  display:flex;align-items:center;justify-content:center;min-height:100px;
+  border-radius:12px;background:var(--surface2);border:1px solid var(--border)
+}
+.instruction .value{
+  font-size:44px;font-weight:950;letter-spacing:1px;color:var(--accent);
+  text-shadow:0 1px 10px rgba(181,136,99,.12)
+}
+.status{
+  min-height:38px;display:flex;align-items:center;justify-content:center;
+  border-radius:9px;background:var(--surface2);border:1px solid var(--border);
+  font-weight:800;color:var(--muted);text-align:center;padding:8px
+}
+
+/* Stats */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:7px;
+  padding:2px
+}
+.stat{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:10px 5px;text-align:center
+}
+.stat .n{font-size:21px;font-weight:950;color:var(--text)}
+.stat .l{font-size:9px;color:var(--muted);text-transform:uppercase;margin-top:4px;letter-spacing:.6px}
+
+/* Settings */
+.section{border-top:1px solid var(--border);padding-top:13px}
+.section-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;font-weight:900}
+.choice-row{display:flex;gap:7px}
+.choice{
+  flex:1;padding:9px 7px;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);cursor:pointer;font-weight:800
+}
+.choice.active{background:var(--accent2);color:#171717;border-color:var(--accent2)}
+.bottom-actions{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wide{grid-column:1/-1}
+.mobile-note{display:none}
+
+@media(max-width:900px){
+  .app{padding:8px;gap:10px}
+  .topbar{padding:9px}
+  .brand{font-size:17px}.brand span{display:none}
+  .main{flex-direction:column}
+  .board-area{padding:7px}
+  .board-wrap{width:min(94vw,calc(100vh - 220px),720px);min-width:0}
+  .panel{width:100%;flex:auto}
+  .mobile-note{display:block;color:var(--muted);font-size:12px;text-align:center}
+}
+@media(max-width:520px){
+  .topbar{align-items:center}
+  .top-actions{gap:5px}
+  .board-area{border-radius:9px}
+  .panel{padding:12px}
+  .board-wrap{width:96vw}
+  .stats{gap:5px}
+  .stat{padding:9px 3px}
+  .stat .n{font-size:18px}
+  .instruction{min-height:92px}
+  .instruction .value{font-size:42px}
+}
+
+</style>
+
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">SQUARE SENSE <span>Identify the Squares</span></div>
+    <div class="top-actions">
+      <button class="btn icon" id="themeBtn" type="button" aria-label="Toggle dark and light mode" title="Switch theme">☾</button>
+      <button class="btn" id="flipBtn" type="button">Flip Board</button>
+      <button class="btn primary" id="restartBtn" type="button">Restart</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="board-area">
+      <div class="board-wrap" id="boardWrap">
+        <div class="board" id="board" aria-label="Chess board"></div>
+
+        <div class="target-overlay" id="targetOverlay" hidden>
+          <div class="small">Find this square</div>
+          <div class="square-name" id="targetName">e4</div>
+        </div>
+
+        <div class="feedback" id="feedback" hidden>
+          <div class="feedback-card">
+            <div class="feedback-icon" id="feedbackIcon">👍</div>
+            <div class="feedback-title" id="feedbackTitle">CORRECT</div>
+            <div class="feedback-sub" id="feedbackSub">Next square</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Identify the Square</h2>
+        <div class="panel-tag">VISION TRAINER</div>
+      </div>
+
+      <div class="instruction square-display" aria-live="polite">
+        <div class="value" id="panelTarget">READY</div>
+      </div>
+
+      <div class="status" id="status">Ready to train</div>
+
+      <div class="stats">
+        <div class="stat"><div class="n" id="attempts">0</div><div class="l">Attempt</div></div>
+        <div class="stat"><div class="n" id="correct">0</div><div class="l">Correct</div></div>
+        <div class="stat"><div class="n" id="wrong">0</div><div class="l">Incorrect</div></div>
+        <div class="stat"><div class="n" id="resultPct">0%</div><div class="l">Result %</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Board Orientation</div>
+        <div class="choice-row">
+          <button class="choice active" id="whiteBtn" type="button">White</button>
+          <button class="choice" id="blackBtn" type="button">Black</button>
+          <button class="choice" id="randomBtn" type="button">Random</button>
+        </div>
+      </div>
+
+      <div class="mobile-note">Tap a square to answer.</div>
+
+      <div class="bottom-actions">
+        <button class="btn" id="nextBtn" type="button">Next Square</button>
+        <button class="btn" id="resetStatsBtn" type="button">Reset Score</button>
+        <button class="btn primary wide" id="startBtn" type="button">Start Training</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const files = ['a','b','c','d','e','f','g','h'];
+  const ranks = ['1','2','3','4','5','6','7','8'];
+
+  const state = {
+    target: null,
+    orientation: 'white',
+    phase: 'idle',       // idle | showing | waiting | feedback
+    correct: 0,
+    wrong: 0,
+    attempts: 0,
+    streak: 0,
+    best: 0,
+    revealTimer: null,
+    feedbackTimer: null,
+    answerLocked: true
+  };
+
+  const $ = id => document.getElementById(id);
+
+  function clearTimers(){
+    if(state.revealTimer) clearTimeout(state.revealTimer);
+    if(state.feedbackTimer) clearTimeout(state.feedbackTimer);
+    state.revealTimer = null;
+    state.feedbackTimer = null;
+  }
+
+  function hideFeedback(){
+    $('feedback').hidden = true;
+  }
+
+  function hideTarget(){
+    $('targetOverlay').hidden = true;
+  }
+
+  function randomSquare(){
+    return files[Math.floor(Math.random()*8)] + ranks[Math.floor(Math.random()*8)];
+  }
+
+  function getFlip(){
+    return state.orientation === 'black';
+  }
+
+  function squareToDisplay(square){
+    const f = files.indexOf(square[0]);
+    const r = ranks.indexOf(square[1]);
+    const flip = getFlip();
+    return {
+      f: flip ? 7-f : f,
+      r: flip ? r : 7-r
+    };
+  }
+
+  function renderBoard(){
+    const board = $('board');
+    board.innerHTML = '';
+
+    for(let r=0;r<8;r++){
+      for(let f=0;f<8;f++){
+        const squareName = files[f] + ranks[r];
+        const pos = squareToDisplay(squareName);
+
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'sq ' + (((f+r)%2===1) ? 'light' : 'dark');
+        el.style.left = (pos.f*12.5) + '%';
+        el.style.top = (pos.r*12.5) + '%';
+        el.dataset.square = squareName;
+        el.setAttribute('aria-label', squareName);
+
+        // Files shown along the bottom edge.
+        if(pos.r === 7){
+          const file = document.createElement('span');
+          file.className = 'coord file';
+          file.textContent = squareName[0];
+          el.appendChild(file);
+        }
+
+        // Ranks shown along the left edge.
+        if(pos.f === 0){
+          const rank = document.createElement('span');
+          rank.className = 'coord rank';
+          rank.textContent = squareName[1];
+          el.appendChild(rank);
+        }
+
+        el.addEventListener('pointerdown', function(e){
+          e.preventDefault();
+          answer(squareName, el);
+        });
+
+        board.appendChild(el);
+      }
+    }
+  }
+
+  function updatePanel(){
+    $('attempts').textContent = state.attempts;
+    $('correct').textContent = state.correct;
+    $('wrong').textContent = state.wrong;
+    $('resultPct').textContent = state.attempts
+      ? Math.round((state.correct / state.attempts) * 100) + '%'
+      : '0%';
+
+    if(state.phase === 'showing'){
+      $('panelTarget').textContent = state.target.toUpperCase();
+      $('status').textContent = 'Remember the square';
+    }else if(state.phase === 'waiting'){
+      $('panelTarget').textContent = state.target ? state.target.toUpperCase() : 'READY';
+      $('status').textContent = 'Your turn — find the square';
+    }else if(state.phase === 'feedback'){
+      $('panelTarget').textContent = state.target ? state.target.toUpperCase() : 'READY';
+    }else{
+      $('panelTarget').textContent = 'READY';
+      $('status').textContent = 'Ready to train';
+    }
+
+    $('whiteBtn').classList.toggle('active', state.orientation === 'white');
+    $('blackBtn').classList.toggle('active', state.orientation === 'black');
+    $('randomBtn').classList.toggle('active', state.orientation === 'random');
+  }
+
+  function setOrientation(value){
+    state.orientation = value;
+    if(value === 'random'){
+      // Resolve the current board immediately to a random view.
+      state._resolvedRandom = Math.random() < 0.5 ? 'white' : 'black';
+    }
+    renderBoard();
+    updatePanel();
+  }
+
+  function effectiveOrientation(){
+    return state.orientation === 'random'
+      ? (state._resolvedRandom || 'white')
+      : state.orientation;
+  }
+
+  // The board renderer needs the resolved orientation for Random mode.
+  // Keep the public orientation setting unchanged.
+  const originalGetFlip = getFlip;
+  // Replace function behavior through a helper used by squareToDisplay.
+  // (Function declarations are immutable bindings, so use this helper directly below.)
+  function displayFlip(){
+    const o = effectiveOrientation();
+    return o === 'black';
+  }
+
+  // Override squareToDisplay with the resolved orientation.
+  function squareToDisplayResolved(square){
+    const f = files.indexOf(square[0]);
+    const r = ranks.indexOf(square[1]);
+    const flip = displayFlip();
+    return {
+      f: flip ? 7-f : f,
+      r: flip ? r : 7-r
+    };
+  }
+
+  // Rebind rendering to resolved orientation.
+  const originalRenderBoard = renderBoard;
+  function render(){
+    const board = $('board');
+    board.innerHTML = '';
+
+    for(let r=0;r<8;r++){
+      for(let f=0;f<8;f++){
+        const squareName = files[f] + ranks[r];
+        const pos = squareToDisplayResolved(squareName);
+
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'sq ' + (((f+r)%2===1) ? 'light' : 'dark');
+        el.style.left = (pos.f*12.5) + '%';
+        el.style.top = (pos.r*12.5) + '%';
+        el.dataset.square = squareName;
+        el.setAttribute('aria-label', squareName);
+
+        if(pos.r === 7){
+          const file = document.createElement('span');
+          file.className = 'coord file';
+          file.textContent = squareName[0];
+          el.appendChild(file);
+        }
+
+        if(pos.f === 0){
+          const rank = document.createElement('span');
+          rank.className = 'coord rank';
+          rank.textContent = squareName[1];
+          el.appendChild(rank);
+        }
+
+        el.addEventListener('pointerdown', function(e){
+          e.preventDefault();
+          answer(squareName, el);
+        });
+
+        board.appendChild(el);
+      }
+    }
+  }
+
+  function startRound(){
+    clearTimers();
+    hideFeedback();
+    hideTarget();
+
+    if(state.orientation === 'random'){
+      state._resolvedRandom = Math.random() < 0.5 ? 'white' : 'black';
+    }
+
+    state.target = randomSquare();
+    state.phase = 'showing';
+    state.answerLocked = true;
+
+    // Feedback is only allowed after a board click.
+    hideFeedback();
+
+    render();
+    updatePanel();
+
+    $('targetName').textContent = state.target.toUpperCase();
+    $('targetOverlay').hidden = false;
+    $('targetOverlay').classList.remove('show');
+    void $('targetOverlay').offsetWidth;
+    $('targetOverlay').classList.add('show');
+
+    state.revealTimer = setTimeout(function(){
+      hideTarget();
+      state.phase = 'waiting';
+      state.answerLocked = false;
+      updatePanel();
+    }, 1000);
+  }
+
+  function showFeedback(ok){
+    clearTimers();
+    hideTarget();
+
+    state.phase = 'feedback';
+    state.answerLocked = true;
+
+    const fb = $('feedback');
+    fb.className = 'feedback ' + (ok ? 'good' : 'bad');
+    $('feedbackIcon').textContent = ok ? '👍' : '✕';
+    $('feedbackTitle').textContent = ok ? 'CORRECT' : 'INCORRECT';
+    $('feedbackSub').textContent = ok ? 'Next square' : 'Try the same square again';
+    fb.hidden = false;
+
+    state.feedbackTimer = setTimeout(function(){
+      hideFeedback();
+
+      if(ok){
+        startRound();
+      }else{
+        state.phase = 'waiting';
+        state.answerLocked = false;
+        updatePanel();
+      }
+    }, 1000);
+  }
+
+  function answer(square, el){
+    if(state.phase !== 'waiting' || state.answerLocked) return;
+
+    state.attempts++;
+
+    if(square === state.target){
+      state.correct++;
+      state.streak++;
+      state.best = Math.max(state.best, state.streak);
+      if(el) el.classList.add('correct');
+      updatePanel();
+      showFeedback(true);
+    }else{
+      state.wrong++;
+      state.streak = 0;
+      if(el) el.classList.add('wrong');
+      updatePanel();
+      showFeedback(false);
+    }
+  }
+
+  function resetScore(){
+    state.correct = 0;
+    state.wrong = 0;
+    state.attempts = 0;
+    state.streak = 0;
+    state.best = 0;
+    updatePanel();
+  }
+
+  $('startBtn').addEventListener('click', startRound);
+  $('restartBtn').addEventListener('click', function(){
+    resetScore();
+    startRound();
+  });
+  $('nextBtn').addEventListener('click', startRound);
+  $('resetStatsBtn').addEventListener('click', resetScore);
+
+  $('flipBtn').addEventListener('click', function(){
+    if(state.orientation === 'white'){
+      state.orientation = 'black';
+    }else if(state.orientation === 'black'){
+      state.orientation = 'white';
+    }else{
+      state._resolvedRandom = state._resolvedRandom === 'white' ? 'black' : 'white';
+    }
+    render();
+    updatePanel();
+  });
+
+  $('whiteBtn').addEventListener('click', function(){ setOrientation('white'); });
+  $('blackBtn').addEventListener('click', function(){ setOrientation('black'); });
+  $('randomBtn').addEventListener('click', function(){ setOrientation('random'); });
+
+  // Dark / Light mode — visual only.
+  const savedTheme = localStorage.getItem('squareSenseTheme');
+  if(savedTheme === 'dark'){
+    document.body.classList.add('dark');
+  }
+  $('themeBtn').textContent = document.body.classList.contains('dark') ? '☀' : '☾';
+  $('themeBtn').setAttribute('aria-label',
+    document.body.classList.contains('dark') ? 'Switch to light mode' : 'Switch to dark mode');
+
+  $('themeBtn').addEventListener('click', function(){
+    document.body.classList.toggle('dark');
+    const dark = document.body.classList.contains('dark');
+    localStorage.setItem('squareSenseTheme', dark ? 'dark' : 'light');
+    $('themeBtn').textContent = dark ? '☀' : '☾';
+    $('themeBtn').setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  });
+
+  // Initial board: FIDE geometry/orientation, no exercise active.
+  render();
+  updatePanel();
+})();
+</script>
+</body>
+</html>
