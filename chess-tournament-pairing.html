@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MyChess64 Tournament Manager</title>
+<style>
+:root{--nav:#18202b;--nav2:#202b39;--blue:#2f6fed;--bg:#f4f6f8;--card:#fff;--line:#e1e5ea;--text:#20252d;--muted:#6b7480;--green:#16834b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+.app{display:flex;min-height:100vh}.sidebar{width:245px;background:var(--nav);color:#fff;padding:18px 12px;position:fixed;inset:0 auto 0 0;overflow:auto}
+.logo{font-size:20px;font-weight:800;padding:8px 10px 20px}.logo small{display:block;font-size:11px;color:#9da8b6;font-weight:500;margin-top:4px}
+.nav{display:flex;flex-direction:column;gap:5px}.nav button{border:0;background:transparent;color:#cbd2db;text-align:left;padding:11px 12px;border-radius:8px;cursor:pointer;font-size:14px}.nav button:hover,.nav button.active{background:var(--nav2);color:#fff}.nav .num{display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center;background:#2c3948;margin-right:8px;font-size:11px}
+.main{margin-left:245px;width:calc(100% - 245px);padding:22px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.top h1{margin:0;font-size:25px}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}input,select{width:100%;padding:10px;border:1px solid #d8dde4;border-radius:7px;background:#fff;font-size:14px}
+button{border:0;border-radius:7px;padding:10px 14px;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#edf0f3;color:#29303a}.danger{background:#fff0f0;color:#bd3333}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.hidden{display:none!important}
+.systems{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.system{border:1px solid var(--line);background:#fff;border-radius:12px;padding:22px;text-align:left;cursor:pointer}.system:hover{border-color:var(--blue);background:#f2f6ff}.system b{display:block;font-size:17px;margin-bottom:8px}.system span{font-size:13px;color:var(--muted)}
+.badge{display:inline-block;border-radius:20px;padding:5px 9px;background:#eaf1ff;color:var(--blue);font-size:11px;font-weight:800}.flow{display:flex;gap:6px;overflow:auto;padding-bottom:4px;margin-bottom:16px}.flow span{white-space:nowrap;padding:7px 10px;border-radius:20px;background:#e9edf1;color:#68717d;font-size:11px}.flow span.on{background:var(--blue);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}.stat b{display:block;font-size:24px}.stat small{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left}th{background:#f7f8fa;font-size:10px;text-transform:uppercase;color:#667}
+.pair{border:1px solid var(--line);border-radius:9px;padding:12px;margin:9px 0}.pairline{display:grid;grid-template-columns:1fr 50px 1fr}.black{text-align:right}.vs{text-align:center;color:#777;font-size:11px}.results{text-align:center;margin-top:8px}.results button{padding:7px 10px;margin:2px}.selected{outline:2px solid var(--blue)}
+.notice{background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:11px;font-size:13px}.success{color:var(--green)}
+@media(max-width:850px){.sidebar{width:72px}.logo{font-size:0}.logo:first-letter{font-size:24px}.logo small,.nav button span.txt{display:none}.nav button{text-align:center}.nav .num{margin:0}.main{margin-left:72px;width:calc(100% - 72px);padding:14px}.systems,.stats,.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.systems,.stats,.grid,.grid3{grid-template-columns:1fr}.main{padding:10px}.top h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="logo">♟ MyChess64<small>Tournament Manager</small></div>
+<div class="nav">
+<button class="active" onclick="page('dashboard',this)"><span class="num">1</span><span class="txt">Dashboard</span></button>
+<button onclick="page('create',this)"><span class="num">2</span><span class="txt">Create Tournament</span></button>
+<button onclick="page('players',this)"><span class="num">3</span><span class="txt">Player Entry</span></button>
+<button onclick="page('pairing',this)"><span class="num">4</span><span class="txt">Pairing & Rounds</span></button>
+<button onclick="page('results',this)"><span class="num">5</span><span class="txt">Results</span></button>
+<button onclick="page('standings',this)"><span class="num">6</span><span class="txt">Standings</span></button>
+<button onclick="page('cross',this)"><span class="num">7</span><span class="txt">Cross Table</span></button>
+<button onclick="page('publish',this)"><span class="num">8</span><span class="txt">Publish</span></button>
+</div>
+</aside>
+
+<main class="main">
+<div class="top"><div><h1 id="title">Dashboard</h1><p id="subtitle">Tournament organiser workspace</p></div><span class="badge" id="status">DRAFT</span></div>
+
+<section id="dashboard" class="screen">
+<div class="stats">
+<div class="stat"><b id="dPlayers">0</b><small>Players</small></div><div class="stat"><b id="dRound">—</b><small>Current Round</small></div><div class="stat"><b id="dSystem">—</b><small>System</small></div><div class="stat"><b id="dStatus">Draft</b><small>Status</small></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Start a Tournament</h2><p style="color:var(--muted);font-size:13px">Follow the organiser workflow from tournament creation to publication.</p><button class="primary" onclick="page('create')">+ Create Tournament</button></div>
+<div class="card"><h3>Workflow</h3><div class="flow"><span class="on">Dashboard</span><span>Create Tournament</span><span>Select System</span><span>Tournament Entry</span><span>Player Entry</span><span>Pairing & Rounds</span><span>Results</span><span>Standings</span><span>Cross Table</span><span>Publish</span></div></div>
+</section>
+
+<section id="create" class="screen hidden">
+<div class="card"><h2>Create Tournament</h2><p class="muted">First select the tournament system.</p>
+<div class="systems">
+<button class="system" onclick="choose('Swiss League')"><b>♛ Swiss League</b><span>FIDE Dutch pairing</span></button>
+<button class="system" onclick="choose('Round Robin')"><b>♞ Round Robin</b><span>Berger scheduling</span></button>
+<button class="system" onclick="choose('Knock-Out')"><b>♜ Knock-Out</b><span>Elimination bracket</span></button>
+</div></div>
+<div class="card hidden" id="settings"><h2 id="settingsTitle">System Settings</h2><div id="settingsBody"></div></div>
+<div class="card hidden" id="entry"><h2>Tournament Entry</h2><div class="grid">
+<div><label>Tournament Name *</label><input id="tn"></div><div><label>Start Date *</label><input id="sd" type="date"></div>
+<div><label>End Date *</label><input id="ed" type="date"></div><div><label>Organiser Name *</label><input id="org"></div>
+<div><label>Arbiter Name *</label><input id="arb"></div><div><label>Number of Rounds</label><input id="nr" type="number" min="1" value="5"></div>
+</div><div class="actions"><button class="primary" onclick="saveTournament()">Save Tournament & Continue →</button></div></div>
+</section>
+
+<section id="players" class="screen hidden">
+<div class="card"><h2>Player Entry</h2><p class="muted">Add players before starting the first round.</p>
+<div class="grid3"><div><label>Name *</label><input id="pn"></div><div><label>FIDE Rating</label><input id="pr" type="number"></div><div><label>Club / Unit</label><input id="pc"></div></div>
+<div class="grid" style="margin-top:12px"><div><label>Date of Birth</label><input id="pd" type="date"></div><div><label>Age (automatic)</label><input id="pa" readonly></div></div>
+<div class="actions"><button class="primary" onclick="addPlayer()">+ Add Player</button></div>
+<div style="overflow:auto;margin-top:16px"><table><thead><tr><th>TPN</th><th>Player</th><th>Rating</th><th>Club/Unit</th><th>DOB</th><th>Age</th><th></th></tr></thead><tbody id="pt"></tbody></table></div>
+<div class="actions"><button class="primary" onclick="goPairing()">Make Round 1 Pairing →</button></div></div>
+</section>
+
+<section id="pairing" class="screen hidden">
+<div class="card"><h2>Pairing & Rounds</h2><p class="muted" id="pairInfo"></p><div id="pairings"></div><div class="actions"><button class="primary" id="nextBtn" disabled onclick="completeRound()">Save Results & Continue →</button></div></div>
+</section>
+
+<section id="results" class="screen hidden">
+<div class="card"><h2>Results</h2><p class="muted">Results are entered from the Pairing & Rounds screen.</p><div id="resultSummary" class="notice">No round completed yet.</div></div>
+</section>
+
+<section id="standings" class="screen hidden">
+<div class="card"><h2>Standings</h2><div style="overflow:auto"><table><thead><tr><th>Rank</th><th>TPN</th><th>Player</th><th>Rating</th><th>Points</th></tr></thead><tbody id="stand"></tbody></table></div></div>
+</section>
+
+<section id="cross" class="screen hidden">
+<div class="card"><h2>Cross Table</h2><div style="overflow:auto"><table><thead><tr><th>Rank</th><th>Player</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>R5</th><th>Total</th></tr></thead><tbody id="crossBody"></tbody></table></div></div>
+</section>
+
+<section id="publish" class="screen hidden">
+<div class="card"><h2>Publish Tournament</h2><div class="notice"><b id="pubName">No tournament</b><br><span id="pubMeta"></span></div>
+<div class="actions"><button class="primary" onclick="publish()">Publish Tournament</button></div><p id="pubMsg" class="success"></p></div>
+</section>
+</main></div>
+
+<script>
+let T={system:'',rounds:5,name:'',org:'',arb:'',start:'',end:'',status:'DRAFT'},P=[],round=0,pairs=[];
+const $=id=>document.getElementById(id);
+function page(id,btn){document.querySelectorAll('.screen').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');else{let b=[...document.querySelectorAll('.nav button')].find(x=>x.innerText.toLowerCase().includes(id.replace('cross','cross table').replace('create','create tournament')));if(b)b.classList.add('active')}let titles={dashboard:['Dashboard','Tournament organiser workspace'],create:['Create Tournament','Select system and enter tournament details'],players:['Player Entry','Register tournament players'],pairing:['Pairing & Rounds','Generate and complete tournament rounds'],results:['Results','Round results'],standings:['Standings','Current tournament ranking'],cross:['Cross Table','Player-by-player round results'],publish:['Publish','Make tournament information public']};$('title').textContent=titles[id][0];$('subtitle').textContent=titles[id][1];updateDashboard()}
+function choose(s){T.system=s;$('settings').classList.remove('hidden');$('entry').classList.remove('hidden');let body='';if(s==='Swiss League')body='<div class="notice"><b>Swiss League → FIDE Dutch</b><br>Advanced Dutch pairing rules will be connected in the next phase.</div><div class="grid" style="margin-top:12px"><div><label>Swiss System</label><select><option>FIDE Dutch</option><option>Dubov</option><option>Burstein</option><option>Lim</option></select></div><div><label>Scoring</label><select><option>1 - ½ - 0</option></select></div></div>';if(s==='Round Robin')body='<div class="notice"><b>Round Robin → Berger</b><br>Berger scheduling will be connected in the next phase.</div><div class="grid" style="margin-top:12px"><div><label>Format</label><select><option>Single Round Robin</option><option>Double Round Robin</option></select></div><div><label>Scoring</label><select><option>1 - ½ - 0</option></select></div></div>';if(s==='Knock-Out')body='<div class="notice"><b>Knock-Out → Bracket</b><br>Elimination bracket will be connected in the next phase.</div><div class="grid" style="margin-top:12px"><div><label>Seeding</label><select><option>Rating / TPN</option><option>Manual</option></select></div><div><label>Match Format</label><select><option>Single Game</option><option>Best of 2</option><option>Best of 4</option></select></div></div>';$('settingsBody').innerHTML=body;$('settingsTitle').textContent=s+' Settings';updateDashboard()}
+function saveTournament(){T.name=$('tn').value.trim();T.start=$('sd').value;T.end=$('ed').value;T.org=$('org').value.trim();T.arb=$('arb').value.trim();T.rounds=Math.max(1,+$('nr').value||5);if(!T.name||!T.start||!T.end||!T.org||!T.arb)return alert('Please fill all required fields.');T.status='REGISTRATION';page('players')}
+$('pd').addEventListener('change',()=>{$('pa').value=calcAge($('pd').value)})
+function calcAge(d){if(!d)return'';let b=new Date(d),n=new Date(),a=n.getFullYear()-b.getFullYear();if(n.getMonth()<b.getMonth()||(n.getMonth()==b.getMonth()&&n.getDate()<b.getDate()))a--;return a}
+function addPlayer(){let n=$('pn').value.trim();if(!n)return alert('Enter player name.');P.push({tpn:P.length+1,name:n,rating:+$('pr').value||0,club:$('pc').value.trim(),dob:$('pd').value,age:calcAge($('pd').value),score:0,results:[]});renderPlayers();['pn','pr','pc','pd','pa'].forEach(x=>$(x).value='');updateDashboard()}
+function renderPlayers(){$('pt').innerHTML=P.map((p,i)=>'<tr><td>'+p.tpn+'</td><td><b>'+esc(p.name)+'</b></td><td>'+p.rating+'</td><td>'+esc(p.club)+'</td><td>'+(p.dob||'—')+'</td><td>'+(p.age||'—')+'</td><td><button class="danger" onclick="P.splice('+i+',1);P.forEach((x,j)=>x.tpn=j+1);renderPlayers();updateDashboard()">Delete</button></td></tr>').join('')}
+function goPairing(){if(P.length<2)return alert('Add at least 2 players.');round=1;T.status='LIVE';makePairs();page('pairing');renderPairs()}
+function makePairs(){let a=[...P].sort((x,y)=>y.score-x.score||x.tpn-y.tpn);pairs=[];for(let i=0;i<a.length;i+=2)pairs.push({w:a[i],b:a[i+1]||null,r:a[i+1]?null:'BYE'})}
+function renderPairs(){$('pairInfo').textContent=T.name+' • '+T.system+' • Round '+round+' of '+T.rounds;$('pairings').innerHTML=pairs.map((g,i)=>{if(!g.b)return'<div class="pair"><div class="pairline"><b>'+esc(g.w.name)+'</b><span class="vs">BYE</span><span></span></div><p class="success">Bye — 1 point</p></div>';return'<div class="pair"><div class="pairline"><b>'+esc(g.w.name)+'</b><span class="vs">VS</span><b class="black">'+esc(g.b.name)+'</b></div><div class="results"><button class="secondary" onclick="result('+i+',\\'1-0\\',this)">1-0</button><button class="secondary" onclick="result('+i+',\\'½-½\\',this)">½-½</button><button class="secondary" onclick="result('+i+',\\'0-1\\',this)">0-1</button></div></div>'}).join('');$('nextBtn').disabled=!ready()}
+function result(i,r,b){pairs[i].r=r;[...b.parentNode.children].forEach(x=>x.classList.remove('selected'));b.classList.add('selected');$('nextBtn').disabled=!ready()}
+function ready(){return pairs.every(x=>x.r!==null)}
+function completeRound(){if(!ready())return alert('Enter every result first.');pairs.forEach(g=>{if(!g.b){g.w.score++;g.w.results[round]='BYE';return}if(g.r==='1-0'){g.w.score++;g.w.results[round]='1';g.b.results[round]='0'}else if(g.r==='0-1'){g.b.score++;g.w.results[round]='0';g.b.results[round]='1'}else{g.w.score+=.5;g.b.score+=.5;g.w.results[round]='½';g.b.results[round]='½'}});$('resultSummary').innerHTML='<b>Round '+round+' completed.</b> Results saved successfully.';updateStandings();updateCross();if(round>=T.rounds){T.status='COMPLETED';showFinal()}else{round++;makePairs();renderPairs();page('pairing')}updateDashboard()}
+function showFinal(){page('standings');updateStandings()}
+function updateStandings(){let a=[...P].sort((x,y)=>y.score-x.score||y.rating-x.rating||x.tpn-y.tpn);$('stand').innerHTML=a.map((p,i)=>'<tr><td><b>'+(i+1)+'</b></td><td>'+p.tpn+'</td><td>'+esc(p.name)+'</td><td>'+p.rating+'</td><td><b>'+p.score+'</b></td></tr>').join('')}
+function updateCross(){let a=[...P].sort((x,y)=>y.score-x.score||x.tpn-y.tpn);$('crossBody').innerHTML=a.map((p,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(p.name)+'</td>'+[1,2,3,4,5].map(r=>'<td>'+(p.results[r]||'—')+'</td>').join('')+'<td><b>'+p.score+'</b></td></tr>').join('')}
+function publish(){if(!T.name)return alert('Create a tournament first.');T.status='PUBLISHED';$('pubName').textContent=T.name;$('pubMeta').textContent=T.system+' • '+P.length+' players • '+round+' round(s)';$('pubMsg').textContent='Tournament published successfully in this prototype.';updateDashboard()}
+function updateDashboard(){$('dPlayers').textContent=P.length;$('dRound').textContent=round||'—';$('dSystem').textContent=T.system||'—';$('dStatus').textContent=T.status||'DRAFT';$('status').textContent=T.status||'DRAFT';$('pubName').textContent=T.name||'No tournament';$('pubMeta').textContent=T.system?T.system+' • '+P.length+' players':'Create a tournament first'}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+</script>
+</body>
+</html>
