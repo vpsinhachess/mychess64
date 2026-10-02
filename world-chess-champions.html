@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>World Chess Champions — MyChess64</title>
+<style>
+:root{
+  --bg:#080a0f; --panel:#10141c; --panel2:#151a24; --gold:#d7aa55;
+  --gold2:#f3d38b; --cream:#f6f0e4; --muted:#9da6b5; --line:rgba(255,255,255,.09);
+  --green:#79c69a; --blue:#7eb6e8; --red:#e58a8a;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; color:var(--cream); background:
+  radial-gradient(circle at 10% 0%,rgba(215,170,85,.10),transparent 28%),
+  radial-gradient(circle at 90% 10%,rgba(88,126,180,.10),transparent 30%),
+  var(--bg);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
+body:before{
+  content:"♔  ♕  ♖  ♗  ♘  ♙  ♟  ♞  ♝  ♜  ♛  ♚";
+  position:fixed; inset:0; pointer-events:none; opacity:.018; font-size:9vw;
+  letter-spacing:2vw; line-height:1.8; transform:rotate(-12deg); z-index:0;
+}
+.container{width:min(1320px,92%);margin:auto;position:relative;z-index:1}
+header{padding:38px 0 24px;text-align:center}
+.brand{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold2);font-weight:800}
+h1{font-family:Georgia,serif;font-size:clamp(38px,6vw,76px);line-height:.98;margin:12px 0 14px;
+  background:linear-gradient(100deg,#fff,#f3d38b 50%,#fff);-webkit-background-clip:text;color:transparent}
+.subtitle{max-width:760px;margin:auto;color:var(--muted);font-size:15px;line-height:1.7}
+.hero-badge{display:inline-flex;gap:8px;align-items:center;margin-top:18px;padding:9px 14px;border:1px solid rgba(215,170,85,.28);
+  border-radius:999px;background:rgba(215,170,85,.06);color:var(--gold2);font-size:12px;font-weight:700}
+.toolbar{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  margin:24px 0 18px;padding:14px;border:1px solid var(--line);background:rgba(16,20,28,.76);
+  backdrop-filter:blur(16px);border-radius:18px;position:sticky;top:10px;z-index:10
+}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;background:#0b0e14;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 40px;color:#fff;outline:none}
+.search span{position:absolute;left:14px;top:10px;color:var(--muted)}
+.filters{display:flex;gap:7px;flex-wrap:wrap}
+.filter{border:1px solid var(--line);background:#0b0e14;color:var(--muted);padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:700;font-size:12px}
+.filter.active,.filter:hover{border-color:rgba(215,170,85,.5);color:var(--gold2);background:rgba(215,170,85,.08)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 28px}
+.stat{background:linear-gradient(145deg,#131821,#0e1118);border:1px solid var(--line);border-radius:16px;padding:16px}
+.stat b{display:block;font-family:Georgia,serif;font-size:27px;color:#fff}.stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:30px 0 14px}
+.section-head h2{margin:0;font-family:Georgia,serif;font-size:27px}.section-head p{margin:0;color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{
+  border:1px solid var(--line);border-radius:20px;overflow:hidden;background:linear-gradient(145deg,rgba(23,28,38,.98),rgba(12,15,21,.98));
+  box-shadow:0 14px 35px rgba(0,0,0,.18);transition:.25s;cursor:pointer
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(215,170,85,.35);box-shadow:0 18px 50px rgba(0,0,0,.3)}
+.card.open{border-color:rgba(215,170,85,.55)}
+.photo{height:235px;position:relative;background:linear-gradient(135deg,#202633,#0c0f15);overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.88) contrast(1.03);transition:.35s}
+.card:hover .photo img{transform:scale(1.035)}
+.photo:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 52%,rgba(7,9,13,.9))}
+.rank{position:absolute;left:12px;top:12px;z-index:2;width:36px;height:36px;border-radius:11px;
+  display:grid;place-items:center;background:rgba(8,10,15,.78);border:1px solid rgba(255,255,255,.13);font-weight:900;color:var(--gold2)}
+.live{position:absolute;right:12px;top:12px;z-index:2;padding:6px 9px;border-radius:999px;background:#193d2b;color:#9de3b8;font-size:10px;font-weight:900;letter-spacing:.08em}
+.photo-title{position:absolute;z-index:2;left:15px;right:15px;bottom:13px}
+.name{font-family:Georgia,serif;font-size:22px;font-weight:700}.country{color:#c8ced8;font-size:11px;margin-top:4px}
+.card-body{padding:15px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.meta-item{background:#0b0f15;border:1px solid var(--line);border-radius:11px;padding:10px}
+.meta-item small{display:block;color:#737d8d;font-size:9px;text-transform:uppercase;letter-spacing:.12em}
+.meta-item strong{display:block;margin-top:4px;font-size:12px;color:#e9edf4}
+.tagline{font-size:12px;line-height:1.55;color:#b2bac7;margin:12px 0 0}
+.more{display:flex;align-items:center;justify-content:space-between;margin-top:13px;color:var(--gold2);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em}
+.chev{width:25px;height:25px;border:1px solid rgba(215,170,85,.3);border-radius:50%;display:grid;place-items:center;transition:.25s}
+.card.open .chev{transform:rotate(180deg);background:rgba(215,170,85,.1)}
+.details{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.details-inner{overflow:hidden}
+.card.open .details{grid-template-rows:1fr}
+.detail-content{border-top:1px solid var(--line);padding:15px;background:rgba(0,0,0,.16)}
+.detail-content p{font-size:12px;line-height:1.75;color:#c2c8d2;margin:0 0 12px}
+.fact-list{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.fact-list li{font-size:11px;color:#aeb6c4;padding-left:15px;position:relative;line-height:1.45}
+.fact-list li:before{content:"♟";position:absolute;left:0;color:var(--gold)}
+.timeline{margin:34px 0 45px;padding:20px;border:1px solid var(--line);border-radius:20px;background:rgba(16,20,28,.6);overflow:hidden}
+.timeline-track{display:flex;gap:5px;align-items:stretch;min-width:920px}
+.t-item{position:relative;flex:1;min-width:45px;height:74px;border-radius:9px;background:linear-gradient(#262c38,#171b24);border:1px solid var(--line);cursor:pointer;overflow:hidden}
+.t-item:hover{border-color:rgba(215,170,85,.45)}.t-item span{position:absolute;left:6px;bottom:6px;font-size:9px;color:#c5cbd4}.t-item b{position:absolute;left:6px;top:6px;font-size:10px;color:var(--gold2)}
+footer{border-top:1px solid var(--line);margin-top:50px;padding:28px 0 42px;text-align:center;color:#697382;font-size:11px;line-height:1.7}
+.no-results{display:none;padding:50px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.toolbar{position:relative;top:0}.photo{height:220px}}
+@media(max-width:540px){.container{width:min(94%,1320px)}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:43px}.photo{height:250px}.toolbar{padding:10px}.search{min-width:100%}}
+
+.detail-kicker{font-size:9px;letter-spacing:.18em;color:var(--gold2);font-weight:900;margin-bottom:8px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.detail-grid>div{border:1px solid var(--line);background:#0b0f15;border-radius:10px;padding:9px}
+.detail-grid small{display:block;font-size:8px;letter-spacing:.1em;color:#687383}
+.detail-grid b{display:block;margin-top:4px;font-size:10px;color:#e6ebf2}
+.photo-credit{margin-top:12px;padding-top:9px;border-top:1px solid var(--line);font-size:9px;color:#697484}
+.photo-missing{background:radial-gradient(circle at 50% 30%,rgba(215,170,85,.16),transparent 38%),linear-gradient(135deg,#202633,#0c0f15)}
+.photo-missing:before{content:"♔";position:absolute;inset:0;display:grid;place-items:center;font-size:72px;color:rgba(215,170,85,.3)}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div class="brand">♔ MyChess64 · World Chess History</div>
+  <h1>The World Champions</h1>
+  <div class="subtitle">From Wilhelm Steinitz to Gukesh D — explore the classical line of World Chess Champions. Each card keeps the essential facts visible and reveals the deeper story when you open it.</div>
+  <div class="hero-badge">✦ 18 Champions · 1886 → Present</div>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>18</b><span>Champions</span></div>
+  <div class="stat"><b>1886</b><span>First title match era</span></div>
+  <div class="stat"><b>140+</b><span>Years of history</span></div>
+  <div class="stat"><b>2024</b><span>Current reign began</span></div>
+</div>
+
+<div class="toolbar">
+  <div class="search"><span>⌕</span><input id="search" placeholder="Search champion, country, era, fact…"></div>
+  <div class="filters">
+    <button class="filter active" data-filter="all">All</button>
+    <button class="filter" data-filter="pre">1886–1946</button>
+    <button class="filter" data-filter="fide">1948–1993</button>
+    <button class="filter" data-filter="modern">1993–Present</button>
+  </div>
+</div>
+
+<div class="section-head">
+  <div><h2>Champion Gallery</h2><p>Tap / click a champion to reveal the full story.</p></div>
+  <p id="count"></p>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="no-results" id="none">No champion matches your search.</div>
+
+<div class="section-head"><div><h2>Championship Timeline</h2><p>A compact visual journey through the title eras.</p></div></div>
+<div class="timeline"><div class="timeline-track" id="timeline"></div></div>
+
+<footer>
+  <b style="color:#c7ced9">MYCHESS64</b><br>
+  Learn · Play · Improve · Anytime, Anywhere<br><br>
+  Historical champion line follows the classical World Chess Championship lineage. Portraits are requested dynamically from Wikimedia/Wikipedia where available.
+</footer>
+</div>
+
+<script>
+const champions = [
+{id:1,name:"Wilhelm Steinitz",birth:1836,country:"Austria-Hungary / USA",years:"1886–1894",era:"pre",yearsNum:8,photo:"Steinitz1886.jpg",tag:"The first officially recognized World Champion.",
+bio:"Wilhelm Steinitz became the first officially recognized World Chess Champion after defeating Johannes Zukertort in the 1886 match. He transformed chess thinking by developing positional principles that became foundations of modern chess strategy.",
+facts:["Born in Prague in 1836.","Won the 1886 match against Zukertort.","Pioneered systematic positional chess.","Held the title until 1894.","Full name: Wilhelm Steinitz","Died: 1900","Style: Positional strategy, accumulation of small advantages","Title path: Defeated Johannes Zukertort in the 1886 match","Legacy: Helped establish systematic positional chess."]},
+{id:2,name:"Emanuel Lasker",birth:1868,country:"Germany",years:"1894–1921",era:"pre",yearsNum:27,photo:"Emanuel Lasker.jpg",tag:"Longest continuous reign in the classical lineage.",
+bio:"Emanuel Lasker held the world title for 27 years, longer than any other champion in the classical lineage. A mathematician and philosopher as well as a chess master, he was famous for practical, fighting play and psychological resilience.",
+facts:["Born in Neumark, Prussia, in 1868.","Defeated Steinitz in 1894.","Retained the title through several major challenges.","World champion for 27 years.","Full name: Emanuel Lasker","Died: 1941","Style: Practical, flexible and psychologically resilient","Title path: Defeated Steinitz in 1894","Legacy: His 27-year reign remains the longest continuous classical reign."]},
+{id:3,name:"José Raúl Capablanca",birth:1888,country:"Cuba",years:"1921–1927",era:"pre",yearsNum:6,photo:"José Raúl Capablanca 1921.jpg",tag:"The Cuban genius renowned for effortless technique.",
+bio:"José Raúl Capablanca defeated Lasker in 1921 to become champion. He was celebrated for exceptional endgame technique, clarity and accuracy, and became one of the most influential figures in chess history.",
+facts:["Born in Havana in 1888.","Defeated Lasker in 1921.","Famous for endgame mastery and positional clarity.","Lost the title to Alekhine in 1927.","Full name: José Raúl Capablanca y Graupera","Died: 1942","Style: Clarity, calculation and exceptional endgame technique","Title path: Defeated Lasker in Havana in 1921","Legacy: His endgame play remains a model for generations."]},
+{id:4,name:"Alexander Alekhine",birth:1892,country:"Russia / France",years:"1927–1935, 1937–1946",era:"pre",yearsNum:17,photo:"Alexander Alekhine.jpg",tag:"A tactical attacker who won the title twice.",
+bio:"Alexander Alekhine defeated Capablanca in 1927 and became the fourth champion. Max Euwe took the title from him in 1935, but Alekhine regained it in 1937 and remained champion until his death in 1946.",
+facts:["Born in Moscow in 1892.","Won the 1927 title match against Capablanca.","Lost the title to Max Euwe in 1935.","Regained it in 1937 and held it until 1946.","Full name: Alexander Alexandrovich Alekhine","Died: 1946","Style: Dynamic calculation, initiative and complex tactical play","Title path: Defeated Capablanca in Buenos Aires in 1927","Legacy: One of the greatest attacking players in chess history."]},
+{id:5,name:"Max Euwe",birth:1901,country:"Netherlands",years:"1935–1937",era:"pre",yearsNum:2,photo:"Wereldschaakkampioenschappen in Amsterdam, Euwe, kop, Bestanddeelnr 925-3517.jpg",tag:"The mathematician who became World Champion.",
+bio:"Max Euwe, a Dutch mathematician and chess grandmaster, defeated Alekhine in 1935. His reign lasted two years before Alekhine regained the championship in 1937. Euwe later became a major administrator and served as FIDE president.",
+facts:["Born in Watergraafsmeer in 1901.","Defeated Alekhine in 1935.","World champion from 1935 to 1937.","Later served as FIDE President.","Full name: Machgielis Euwe","Died: 1981","Style: Classical technique, preparation and sound calculation","Title path: Defeated Alekhine in 1935","Legacy: Combined elite chess with mathematics, teaching and chess administration."]},
+{id:6,name:"Mikhail Botvinnik",birth:1911,country:"Soviet Union",years:"1948–1957, 1958–1960, 1961–1963",era:"fide",yearsNum:11,photo:"Botvinnik 1936.jpg",tag:"The patriarch of the Soviet chess school.",
+bio:"Mikhail Botvinnik became champion in the 1948 tournament that followed Alekhine's death. He lost the title to Smyslov and Tal, but regained it under the rematch rules of the era. His analytical approach strongly influenced Soviet chess training.",
+facts:["Born near Saint Petersburg in 1911.","Won the 1948 World Championship tournament.","Held the title across three separate reigns.","Mentored future champions including Karpov and Kasparov.","Full name: Mikhail Moiseyevich Botvinnik","Died: 1995","Style: Deep preparation, strategic planning and scientific analysis","Title path: Won the 1948 championship tournament","Legacy: His training methods strongly influenced the Soviet chess school."]},
+{id:7,name:"Vasily Smyslov",birth:1921,country:"Soviet Union",years:"1957–1958",era:"fide",yearsNum:1,photo:"Vasily Smyslov 1964.jpg",tag:"A champion celebrated for harmony and endgame skill.",
+bio:"Vasily Smyslov defeated Botvinnik in 1957 and became the seventh champion. His reign was brief, but his influence was lasting: he was admired for harmonious piece play, endgame technique and a deep understanding of chess harmony.",
+facts:["Born in Moscow in 1921.","Defeated Botvinnik in 1957.","Known for positional and endgame excellence.","Returned to the championship match in 1958.","Full name: Vasily Vasilyevich Smyslov","Died: 2010","Style: Harmonious piece play, positional understanding and endgames","Title path: Defeated Botvinnik in 1957","Legacy: His endgame and piece-coordination ideas remain widely studied."]},
+{id:8,name:"Mikhail Tal",birth:1936,country:"Soviet Union",years:"1960–1961",era:"fide",yearsNum:1,photo:"Mikhail Tal 1962.jpg",tag:"The Magician of Riga — master of dynamic attack.",
+bio:"Mikhail Tal defeated Botvinnik in 1960 at the age of 23. Famous for imaginative sacrifices and attacking play, he became the youngest world champion at that time. His creative games remain among the most studied in chess history.",
+facts:["Born in Riga in 1936.","Defeated Botvinnik in 1960.","Known for spectacular attacking combinations.","Became champion at age 23.","Full name: Mikhail Nekhemievich Tal","Died: 1992","Style: Imagination, initiative, sacrifices and tactical complications","Title path: Defeated Botvinnik in 1960","Legacy: His attacking games made him one of chess's most admired creative players."]},
+{id:9,name:"Tigran Petrosian",birth:1929,country:"Soviet Union",years:"1963–1969",era:"fide",yearsNum:6,photo:"Tigran Petrosian World Chess Champion.jpg",tag:"The Iron Tiger — a master of prophylaxis and defense.",
+bio:"Tigran Petrosian won the title from Botvinnik in 1963. His chess emphasized prevention, structural understanding and extraordinary defensive technique. He successfully defended the title against Boris Spassky in 1966.",
+facts:["Born in Tbilisi in 1929.","Won the title in 1963.","Renowned for prophylaxis and defensive skill.","Successfully defended against Spassky in 1966.","Full name: Tigran Vartanovich Petrosian","Died: 1984","Style: Prophylaxis, defense, exchange sacrifices and positional control","Title path: Defeated Botvinnik in 1963","Legacy: Famous for preventing opponents' plans before they became dangerous."]},
+{id:10,name:"Boris Spassky",birth:1937,country:"Soviet Union / France",years:"1969–1972",era:"fide",yearsNum:3,photo:"Boris Spasski (1956).jpg",tag:"The universal player who became champion in 1969.",
+bio:"Boris Spassky defeated Petrosian in their 1969 match to become champion. He was admired for his universal style and ability to handle many types of positions. In 1972 he faced Bobby Fischer in the famous Reykjavík match.",
+facts:["Born in Leningrad in 1937.","Defeated Petrosian in 1969.","Known for an adaptable, universal style.","Lost the title to Fischer in 1972.","Full name: Boris Vasilievich Spassky","Died: 2025","Style: Universal play, adaptability and broad opening knowledge","Title path: Defeated Petrosian in 1969","Legacy: His 1972 match with Fischer became one of chess's most famous matches."]},
+{id:11,name:"Bobby Fischer",birth:1943,country:"United States",years:"1972–1975",era:"fide",yearsNum:3,photo:"Bobby Fischer 1966 portrait.jpg",tag:"The American who broke Soviet dominance.",
+bio:"Robert James Fischer defeated Spassky in Reykjavík in 1972, becoming the first American-born World Champion in the classical lineage. His rise transformed chess in the United States and made the 1972 match one of the most famous sporting events of the Cold War era.",
+facts:["Born in Chicago in 1943.","Won the 1972 match against Spassky.","Became the first U.S. champion in the classical lineage.","Did not defend the title in 1975.","Full name: Robert James Fischer","Died: 2008","Style: Precise calculation, opening preparation and direct attacking play","Title path: Defeated Spassky in Reykjavík in 1972","Legacy: His rise dramatically increased public interest in chess in the United States."]},
+{id:12,name:"Anatoly Karpov",birth:1951,country:"Soviet Union / Russia",years:"1975–1985",era:"modern",yearsNum:10,photo:"Anatoly Karpov in 1993.jpg",tag:"A positional virtuoso with exceptional strategic control.",
+bio:"Anatoly Karpov became World Champion in 1975 after Fischer did not defend the title. He retained it through successful matches and became known for precise positional play, strategic pressure and technical conversion of small advantages.",
+facts:["Born in Zlatoust in 1951.","Became champion in 1975.","Held the title for a decade.","Played multiple historic championship matches with Kasparov.","Full name: Anatoly Yevgenyevich Karpov","Born: 1951","Style: Prophylaxis, maneuvering, pressure and technical conversion","Title path: Became champion in 1975 after Fischer did not defend","Legacy: One of the most successful tournament players of his generation."]},
+{id:13,name:"Garry Kasparov",birth:1963,country:"Soviet Union / Russia",years:"1985–2000",era:"modern",yearsNum:15,photo:"Kasparov-1.jpg",tag:"A dominant champion who reshaped modern competitive chess.",
+bio:"Garry Kasparov defeated Karpov in their 1985 rematch and became the youngest world champion at the time. He defended the title repeatedly and remained a central figure in elite chess for many years, combining deep preparation with dynamic play.",
+facts:["Born in Baku in 1963.","Won the 1985 rematch against Karpov.","Held the classical title until 2000.","Was a dominant force at the top of world chess for many years.","Full name: Garry Kimovich Kasparov","Born: 1963","Style: Dynamic initiative, deep opening preparation and tactical energy","Title path: Defeated Karpov in their 1985 rematch","Legacy: A defining figure of modern competitive chess."]},
+{id:14,name:"Vladimir Kramnik",birth:1975,country:"Russia",years:"2000–2007",era:"modern",yearsNum:7,photo:"Wladimir Kramnik.jpg",tag:"The positional specialist who ended Kasparov's reign.",
+bio:"Vladimir Kramnik defeated Kasparov in the 2000 London match and became classical World Champion. He successfully defended the title against Peter Leko in 2004 and unified the classical and FIDE championship titles in 2006.",
+facts:["Born in Tuapse in 1975.","Defeated Kasparov in 2000.","Defended the title against Leko in 2004.","Won the reunification match against Topalov in 2006.","Full name: Vladimir Borisovich Kramnik","Born: 1975","Style: Deep positional understanding, defensive accuracy and opening innovation","Title path: Defeated Kasparov in London in 2000","Legacy: Later unified the classical and FIDE championship titles in 2006."]},
+{id:15,name:"Viswanathan Anand",birth:1969,country:"India",years:"2007–2013",era:"modern",yearsNum:6,photo:"Viswanathan Anand.jpg",tag:"The first Indian classical World Champion.",
+bio:"Viswanathan Anand became World Champion in 2007 and then successfully defended the title in match play against Kramnik, Topalov and Gelfand. Known as the 'Tiger of Madras', Anand helped inspire generations of Indian chess players.",
+facts:["Born in Chennai in 1969.","Won the 2007 championship tournament.","Defended the title in 2008, 2010 and 2012.","First Indian champion in the classical lineage.","Full name: Viswanathan Anand","Born: 1969","Style: Fast calculation, versatility and strong opening preparation","Title path: Won the 2007 championship tournament","Legacy: India's first classical World Champion and a major inspiration for Indian chess."]},
+{id:16,name:"Magnus Carlsen",birth:1990,country:"Norway",years:"2013–2023",era:"modern",yearsNum:10,photo:"MagnusCarlsen.jpg",tag:"The Norwegian champion renowned for universal strength.",
+bio:"Magnus Carlsen defeated Anand in 2013 and defended the title four times. He became known for exceptional endgame technique, practical pressure and strength across classical, rapid and blitz chess. He chose not to defend the classical title in 2023.",
+facts:["Born in Tønsberg in 1990.","Won the title against Anand in 2013.","Defended successfully in 2014, 2016, 2018 and 2021.","Declined to defend the title in the 2023 cycle.","Full name: Sven Magnus Øen Carlsen","Born: 1990","Style: Universal play, endgame technique, practical pressure and resourcefulness","Title path: Defeated Anand in Chennai in 2013","Legacy: Defended the title four times and dominated across multiple chess formats."]},
+{id:17,name:"Ding Liren",birth:1992,country:"China",years:"2023–2024",era:"modern",yearsNum:1,photo:"World Chess Championship 2023, game 01, Ding Liren.jpg",tag:"China's first classical World Champion.",
+bio:"Ding Liren became the 17th champion after defeating Ian Nepomniachtchi in the 2023 championship match, decided by rapid tiebreaks after a 7–7 classical score. He became the first Chinese player to hold the classical world title.",
+facts:["Born in Wenzhou in 1992.","Won the 2023 match against Nepomniachtchi.","First Chinese classical World Champion.","Lost the title to Gukesh in 2024.","Full name: Ding Liren","Born: 1992","Style: Solid calculation, resilience, positional play and tactical defense","Title path: Defeated Ian Nepomniachtchi in the 2023 match tiebreaks","Legacy: China's first classical World Champion."]},
+{id:18,name:"Gukesh D",birth:2006,country:"India",years:"2024–present",era:"modern",yearsNum:2,photo:"Dommaraju Gukesh in 2023.jpg",tag:"The 18th champion — youngest undisputed classical champion.",
+bio:"Dommaraju Gukesh defeated defending champion Ding Liren 7½–6½ in Singapore in December 2024. At 18, he became the youngest undisputed World Chess Champion and the second Indian player to win the classical title.",
+facts:["Born in Chennai in 2006.","Won the 2024 Candidates Tournament.","Defeated Ding Liren 7½–6½ in Game 14 of the match.","Became the 18th champion and youngest undisputed champion at 18.","Full name: Dommaraju Gukesh","Born: 2006","Style: Dynamic calculation, opening preparation, ambition and accurate tactical play","Title path: Won the 2024 Candidates Tournament and defeated Ding Liren 7½–6½","Legacy: India's second classical World Champion and youngest undisputed classical champion at age 18."]}
+];
+
+const grid=document.getElementById('grid'), count=document.getElementById('count'), none=document.getElementById('none');
+let active="all";
+
+function photoUrl(name){
+  return "https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(name)+"?width=900";
+}
+function fallbackPhoto(name){
+  return "https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(name)+"?width=500";
+}
+function card(c){
+ return `<article class="card" data-era="${c.era}" data-search="${(c.name+' '+c.country+' '+c.years+' '+c.tag+' '+c.bio+' '+c.facts.join(' ')).toLowerCase()}">
+  <div class="photo">
+    <img loading="lazy" src="${photoUrl(c.photo)}" alt="${c.name}"
+      onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src=fallbackPhoto(c.photo)}else{this.parentElement.classList.add('photo-missing');this.remove()}">
+    <div class="rank">${c.id}</div>${c.id===18?'<div class="live">CURRENT</div>':''}
+    <div class="photo-title"><div class="name">${c.name}</div><div class="country">🌍 ${c.country}</div></div>
+  </div>
+  <div class="card-body">
+    <div class="meta">
+      <div class="meta-item"><small>Born</small><strong>${c.birth}</strong></div>
+      <div class="meta-item"><small>Champion</small><strong>${c.years}</strong></div>
+    </div>
+    <div class="tagline">${c.tag}</div>
+    <div class="more"><span>Read biography & facts</span><span class="chev">⌄</span></div>
+  </div>
+  <div class="details"><div class="details-inner"><div class="detail-content">
+    <div class="detail-kicker">THE CHAMPION'S STORY</div>
+    <p>${c.bio}</p>
+    <div class="detail-grid">
+      <div><small>WORLD CHAMPIONSHIP ERA</small><b>${c.years}</b></div>
+      <div><small>COUNTRY / CHESS NATION</small><b>${c.country}</b></div>
+    </div>
+    <ul class="fact-list">${c.facts.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="photo-credit">Portrait source: Wikimedia Commons · selected champion portrait</div>
+  </div></div></div>
+ </article>`;
+}
+function render(){
+ const q=document.getElementById('search').value.trim().toLowerCase();
+ const filtered=champions.filter(c=>(active==="all"||c.era===active)&&(!q||(`${c.name} ${c.country} ${c.years} ${c.tag} ${c.bio} ${c.facts.join(' ')}`).toLowerCase().includes(q)));
+ grid.innerHTML=filtered.map(card).join('');
+ count.textContent=`${filtered.length} of ${champions.length} shown`;
+ none.style.display=filtered.length?'none':'block';
+ document.querySelectorAll('.card').forEach(el=>el.addEventListener('click',()=>el.classList.toggle('open')));
+}
+document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));btn.classList.add('active');active=btn.dataset.filter;render();
+}));
+document.getElementById('search').addEventListener('input',render);
+
+document.getElementById('timeline').innerHTML=champions.map(c=>`
+<div class="t-item" title="${c.name} · ${c.years}" onclick="document.querySelectorAll('.card')[${c.id-1}]?.scrollIntoView({behavior:'smooth',block:'center'})">
+<b>${c.id}</b><span>${c.birth}</span>
+</div>`).join('');
+
+render();
+</script>
+</body>
+</html>
