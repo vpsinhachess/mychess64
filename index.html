@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MyChess64 – Learn. Play. Improve. Anytime, Anywhere.</title>
 <meta name="description" content="MyChess64: 21 chess tools in one place for training, live play, analysis, tournaments, books and news.">
-<link rel="icon" href="logo.png"><text y='.9em' font-size='90'>♞</text></svg>">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0060d6">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><text y='.9em' font-size='90'>♞</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
@@ -31,6 +34,7 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .search input{width:100%;padding:10px 44px 10px 38px;background:var(--panel);border:1px solid var(--line);border-radius:999px;color:var(--text);font:inherit;font-size:.94rem}
 .search svg{position:absolute;left:13px;top:50%;translate:0 -50%;width:16px;opacity:.6}
 .search kbd{position:absolute;right:12px;top:50%;translate:0 -50%;font:500 .75rem var(--sans);border:1px solid var(--line);border-radius:5px;padding:0 6px;color:var(--mute)}
+.install{height:40px;padding:0 16px;border-radius:999px;border:0;background:var(--accent);color:var(--onaccent);font-weight:600;font-size:.9rem;white-space:nowrap}.install:hover{filter:brightness(1.1)}
 .icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel);font-size:1.1rem}
 .icon-btn:hover{border-color:var(--accent)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
@@ -88,7 +92,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
  .search kbd{display:none}.search{flex-basis:200px}
  .brand{font-size:1.35rem}
 }
-@media(max-width:520px){.paths{grid-template-columns:1fr}.search{flex-basis:140px}}
+@media(max-width:520px){.install{padding:0 12px;font-size:.82rem}.paths{grid-template-columns:1fr}.search{flex-basis:140px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -102,6 +106,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
     <input id="q" type="search" placeholder="Search 21 tools" aria-label="Search tools" autocomplete="off">
     <kbd>/</kbd>
    </div>
+   <button class="install hidden" id="install" type="button">⬇ Install app</button>
    <button class="icon-btn" id="theme" aria-label="Switch light or dark theme" title="Switch theme">☾</button>
   </div>
   <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
@@ -265,6 +270,13 @@ async function play(){
 }
 board.onclick=play;board.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();play()}};
 play();
+
+/* app install (PWA) */
+let deferred=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('#install').classList.remove('hidden')});
+$('#install').onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;$('#install').classList.add('hidden')};
+addEventListener('appinstalled',()=>$('#install').classList.add('hidden'));
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
