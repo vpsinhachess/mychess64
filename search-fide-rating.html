@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>MyChess64 — FIDE Rating Explorer</title>
+<style>
+:root{
+  --bg:#0b1020;--panel:#121a2b;--panel2:#182238;--text:#f5f7fb;--muted:#9aa7bd;
+  --line:#29354d;--accent:#5eead4;--accent2:#60a5fa;--good:#34d399;--bad:#fb7185;
+  --light:#f0d9b5;--dark:#b58863;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 20% 0%,#17213b 0,#0b1020 42%,#080c17 100%);
+color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+a{color:inherit}
+.wrap{max-width:1180px;margin:auto;padding:22px 16px 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#f8fafc,#cbd5e1);color:#111827;display:grid;place-items:center;font-size:30px;font-weight:800;box-shadow:0 8px 30px #0005}
+h1{font-size:clamp(23px,4vw,34px);margin:0}.sub{color:var(--muted);margin-top:4px;font-size:14px}
+.source{font-size:12px;color:var(--muted);text-align:right}.source a{color:var(--accent)}
+.search{background:linear-gradient(180deg,#141e33,#10182a);border:1px solid var(--line);border-radius:18px;padding:15px;display:flex;gap:10px;align-items:center;box-shadow:0 16px 50px #0003}
+.search input{flex:1;min-width:0;background:#0b1221;border:1px solid #33415c;color:#fff;border-radius:12px;padding:13px 14px;font-size:17px;outline:none}
+.search input:focus{border-color:var(--accent)}
+button,.btn{border:0;border-radius:11px;padding:12px 15px;background:#22304a;color:#fff;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+button.primary{background:linear-gradient(135deg,#0f766e,#2563eb)}
+button:hover,.btn:hover{filter:brightness(1.12)}
+.note{margin:9px 2px 0;color:var(--muted);font-size:12px}
+#status{margin:15px 0;padding:11px 13px;border-radius:11px;display:none;background:#172238;border:1px solid var(--line);color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin-top:16px}
+.card{background:rgba(18,26,43,.92);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 15px 45px #0003}
+.profile{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.playername{font-size:27px;font-weight:800}.meta{color:var(--muted);font-size:14px;margin-top:5px}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.badge{background:#202c44;border:1px solid #34435e;border-radius:999px;padding:5px 9px;font-size:12px}
+.ratings{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:17px}
+.rating{background:#0d1525;border:1px solid #27344b;border-radius:13px;padding:12px}.rating b{font-size:24px;display:block;margin-top:3px}.rating span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+h2{font-size:17px;margin:0 0 13px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+select,input[type=date]{background:#0b1221;border:1px solid #33415c;color:#fff;border-radius:10px;padding:9px 10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:#0d1525;border:1px solid #27344b;border-radius:11px;padding:9px}.stat small{color:var(--muted);display:block;font-size:11px}.stat b{font-size:18px}
+.chartbox{height:330px;position:relative}.chartbox canvas{width:100%;height:100%}
+.tablewrap{overflow:auto;max-height:420px;border:1px solid #27344b;border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}th,td{padding:9px 10px;border-bottom:1px solid #253149;text-align:right}th:first-child,td:first-child{text-align:left}th{position:sticky;top:0;background:#182238;color:#cbd5e1}
+.gamebox{display:grid;grid-template-columns:1fr 1fr;gap:10px}.gamebox .g{background:#0d1525;border:1px solid #27344b;border-radius:13px;padding:14px}.g strong{display:block}.g span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+.empty{text-align:center;color:var(--muted);padding:45px 15px}
+.hidden{display:none}
+footer{text-align:center;color:#66738a;font-size:12px;margin-top:22px}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.profile{flex-direction:column}.source{text-align:left}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.wrap{padding:14px 10px 28px}.search{flex-direction:column;align-items:stretch}.search button{width:100%}.ratings{grid-template-columns:1fr}.gamebox{grid-template-columns:1fr}.card{padding:14px}.playername{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">♞</div><div><h1>FIDE Rating Explorer</h1><div class="sub">MyChess64 · Learn. Play. Improve.</div></div></div>
+  <div class="source">Rating source<br><a href="https://ratings.fide.com/" target="_blank" rel="noopener">FIDE Ratings</a></div>
+</header>
+
+<section class="search">
+  <input id="fideId" inputmode="numeric" placeholder="Enter FIDE ID — e.g. 1503014" aria-label="FIDE ID">
+  <button class="primary" id="searchBtn">Search Player</button>
+</section>
+<div class="note">Enter the numeric FIDE ID. The page retrieves player data and rating history from the public FIDE dataset through Lichess's FIDE API.</div>
+<div id="status"></div>
+
+<section id="content" class="hidden">
+  <div class="card" id="profileCard"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Rating Progress</h2>
+      <div class="controls">
+        <select id="ratingType"><option value="standard">Standard</option><option value="rapid">Rapid</option><option value="blitz">Blitz</option></select>
+        <select id="period"><option value="12">Last 1 Year</option><option value="24">Last 2 Years</option><option value="36">Last 3 Years</option><option value="60">Last 5 Years</option><option value="all">All Available</option><option value="custom">Custom</option></select>
+        <input type="date" id="fromDate" class="hidden"><input type="date" id="toDate" class="hidden">
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Change</small><b id="change">—</b></div>
+        <div class="stat"><small>Highest</small><b id="highest">—</b></div>
+        <div class="stat"><small>Lowest</small><b id="lowest">—</b></div>
+        <div class="stat"><small>Rated Games*</small><b id="games">—</b></div>
+      </div>
+      <div class="chartbox"><canvas id="chart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2>Rating History</h2>
+      <div class="tablewrap"><table><thead><tr><th>Period</th><th>Rating</th><th>Games</th><th>Change</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Games & PGN</h2>
+    <div class="gamebox">
+      <div class="g"><strong>Chess-Results</strong><span>Find tournament results and, where published, available game/PGN material.</span><div class="actions"><a class="btn" id="crLink" target="_blank" rel="noopener">Search by FIDE ID ↗</a></div></div>
+      <div class="g"><strong>FIDE Profile</strong><span>Open the official player profile, calculations and available tournament information.</span><div class="actions"><a class="btn" id="fideLink" target="_blank" rel="noopener">Open FIDE Profile ↗</a></div></div>
+      <div class="g"><strong>Lichess FIDE</strong><span>If the player has a Lichess account linked to their FIDE identity, games can be explored separately.</span><div class="actions"><a class="btn" id="lichessLink" target="_blank" rel="noopener">Open Lichess FIDE ↗</a></div></div>
+      <div class="g"><strong>Game extraction</strong><span>*The FIDE rating-history API gives rating points, not a game-by-game PGN list. PGNs must be obtained from tournament/game databases.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="welcome" class="card" style="margin-top:16px"><div class="empty">Enter a FIDE ID to begin.</div></section>
+<footer>MyChess64 FIDE Rating Explorer · Data displayed from public chess-rating services. Verify critical information at FIDE.</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let player=null, history=[];
+
+function showStatus(msg, error=false){const s=$('status');s.textContent=msg;s.style.display='block';s.style.borderColor=error?'#7f1d1d':'#29354d';s.style.color=error?'#fda4af':'#9aa7bd'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+async function loadPlayer(){
+  const id=$('fideId').value.trim();
+  if(!/^\d+$/.test(id)){showStatus('Please enter a valid numeric FIDE ID.',true);return}
+  showStatus('Loading player and rating history…');
+  $('content').classList.add('hidden');$('welcome').classList.remove('hidden');
+  try{
+    const [pRes,hRes]=await Promise.all([
+      fetch('https://lichess.org/api/fide/player/'+encodeURIComponent(id),{headers:{Accept:'application/json'}}),
+      fetch('https://lichess.org/api/fide/player/'+encodeURIComponent(id)+'/ratings',{headers:{Accept:'application/json'}})
+    ]);
+    if(!pRes.ok||!hRes.ok) throw new Error('Player not found or the FIDE service is temporarily unavailable.');
+    player=await pRes.json();history=normalizeHistory(await hRes.json());
+    renderPlayer(id);renderAll();
+    $('content').classList.remove('hidden');$('welcome').classList.add('hidden');
+    showStatus('Player loaded successfully.');
+  }catch(e){
+    showStatus(e.message+' You can also open the official FIDE profile directly.',true);
+  }
+}
+
+function val(o,...keys){for(const k of keys){if(o&&o[k]!=null&&o[k]!==''&&o[k]!=='null')return o[k]}return '—'}
+function renderPlayer(id){
+  const std=val(player,'rating','standard','standard_elo'), rapid=val(player,'rapid','rapid_elo'), blitz=val(player,'blitz','blitz_elo');
+  const name=val(player,'name'), fed=val(player,'federation'), title=val(player,'title');
+  $('profileCard').innerHTML=`
+    <div class="profile"><div><div class="playername">${esc(name)}</div><div class="meta">FIDE ID ${esc(id)} · ${esc(fed)} · ${esc(val(player,'year'))}</div>
+    <div class="badges">${title!=='—'?'<span class="badge">'+esc(title)+'</span>':''}<span class="badge">${esc(val(player,'gender'))}</span><span class="badge">FIDE Profile</span></div></div>
+    <div class="meta">World active rank: <b>${esc(val(player,'id'))}</b></div></div>
+    <div class="ratings">
+      <div class="rating"><span>Standard</span><b>${esc(std)}</b></div>
+      <div class="rating"><span>Rapid</span><b>${esc(rapid)}</b></div>
+      <div class="rating"><span>Blitz</span><b>${esc(blitz)}</b></div>
+    </div>
+    <div class="actions"><a class="btn" href="https://ratings.fide.com/profile/${encodeURIComponent(id)}" target="_blank" rel="noopener">Official FIDE Profile ↗</a></div>`;
+  $('fideLink').href='https://ratings.fide.com/profile/'+encodeURIComponent(id);
+  $('crLink').href='https://chess-results.com/partieSuche.aspx?art=3';
+  $('lichessLink').href='https://lichess.org/fide/'+encodeURIComponent(id);
+}
+
+function decodePoint(point){
+  const n=Number(point);
+  if(!Number.isFinite(n)) return null;
+  const elo=n%10000;
+  const dateNum=Math.floor(n/10000);
+  const year=Math.floor(dateNum/100);
+  const month=dateNum%100;
+  if(!year || !month || !elo) return null;
+  return {
+    date:`${year}-${String(month).padStart(2,'0')}`,
+    n:year*100+month,
+    rating:elo
+  };
+}
+function normalizeHistory(data){
+  const out=[];
+  for(const type of ['standard','rapid','blitz']){
+    for(const point of (Array.isArray(data?.[type])?data[type]:[])){
+      const d=decodePoint(point);
+      if(d) out.push({...d,type});
+    }
+  }
+  return out;
+}
+function filtered(){
+  const type=$('ratingType').value;
+  let valid=history.filter(x=>x.type===type);
+  const months=$('period').value;
+  valid.sort((a,b)=>a.n-b.n);
+  if(months!=='all'&&months!=='custom') valid=valid.slice(-Number(months));
+  if(months==='custom'){
+    const f=$('fromDate').value.replaceAll('-','').slice(0,6), t=$('toDate').value.replaceAll('-','').slice(0,6);
+    if(f) valid=valid.filter(x=>String(x.n)>=f);
+    if(t) valid=valid.filter(x=>String(x.n)<=t);
+  }
+  return valid;
+}
+function renderAll(){renderChart();renderTable()}
+function renderTable(){
+  const type=$('ratingType').value,a=filtered();let prev=null;
+  const rows=[...a].reverse().map(x=>{const r=x.rating;const ch=prev==null?'—':(r-prev>0?'+':'')+(r-prev);prev=r;return `<tr><td>${esc(x.date)}</td><td>${r||'—'}</td><td>—</td><td>${ch}</td></tr>`}).join('');
+  $('historyBody').innerHTML=rows||'<tr><td colspan="4">No rating records in this period.</td></tr>';
+  const vals=a.map(x=>x.rating).filter(Number.isFinite);
+  if(vals.length){$('change').textContent=(vals.at(-1)-vals[0]>=0?'+':'')+(vals.at(-1)-vals[0]);$('highest').textContent=Math.max(...vals);$('lowest').textContent=Math.min(...vals);$('games').textContent='—'}
+  else{$('change').textContent=$('highest').textContent=$('lowest').textContent=$('games').textContent='—'}
+}
+function renderChart(){
+  const canvas=$('chart'),box=canvas.parentElement, dpr=devicePixelRatio||1,w=box.clientWidth,h=box.clientHeight;
+  canvas.width=w*dpr;canvas.height=h*dpr;const c=canvas.getContext('2d');c.scale(dpr,dpr);c.clearRect(0,0,w,h);
+  const type=$('ratingType').value,a=filtered();const vals=a.map(x=>x.rating).filter(Number.isFinite);
+  if(vals.length<1){c.fillStyle='#9aa7bd';c.font='14px system-ui';c.fillText('No data for this selection.',20,30);return}
+  const pad={l:48,r:15,t:20,b:38},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b,min=Math.floor(Math.min(...vals)/25)*25,max=Math.ceil(Math.max(...vals)/25)*25||min+100;
+  const range=Math.max(50,max-min), y=v=>pad.t+(max-v)/range*ch,x=i=>pad.l+(i/(Math.max(1,a.length-1)))*cw;
+  c.strokeStyle='#29354d';c.lineWidth=1;c.font='11px system-ui';c.fillStyle='#7f8ba0';
+  for(let i=0;i<=5;i++){const v=min+range*i/5,yy=y(v);c.beginPath();c.moveTo(pad.l,yy);c.lineTo(w-pad.r,yy);c.stroke();c.fillText(Math.round(v),8,yy+4)}
+  c.strokeStyle='#5eead4';c.lineWidth=3;c.beginPath();
+  a.forEach((p,i)=>{const yy=y(p.rating);i?c.lineTo(x(i),yy):c.moveTo(x(i),yy)});c.stroke();
+  c.fillStyle='#60a5fa';a.forEach((p,i)=>{if(i===0||i===a.length-1||a.length<24){c.beginPath();c.arc(x(i),y(p.rating),3.5,0,Math.PI*2);c.fill()}});
+  c.fillStyle='#7f8ba0';c.textAlign='center';const step=Math.max(1,Math.ceil(a.length/6));a.forEach((p,i)=>{if(i%step===0||i===a.length-1)c.fillText(p.date,x(i),h-12)});c.textAlign='start';
+}
+$('searchBtn').addEventListener('click',loadPlayer);$('fideId').addEventListener('keydown',e=>{if(e.key==='Enter')loadPlayer()});
+$('ratingType').addEventListener('change',renderAll);$('period').addEventListener('change',()=>{const custom=$('period').value==='custom';$('fromDate').classList.toggle('hidden',!custom);$('toDate').classList.toggle('hidden',!custom);renderAll()});$('fromDate').addEventListener('change',renderAll);$('toDate').addEventListener('change',renderAll);addEventListener('resize',()=>player&&renderChart());
+</script>
+</body>
+</html>
