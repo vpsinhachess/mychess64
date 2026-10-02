@@ -69,6 +69,17 @@ h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1;margin:10px 0 8px;letter-spaci
 footer{margin-top:56px;padding:28px 0 44px;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;line-height:1.7}footer strong{color:var(--text)}
 @media(max-width:900px){.featured{grid-template-columns:1fr;grid-template-rows:none}.feature:first-child{grid-row:auto;min-height:340px}}
 @media(max-width:620px){.hero-card{padding:24px}.stats{width:100%}.stat{flex:1;min-width:0}.nav-right span:not(.status-dot){display:none}.cards{grid-template-columns:1fr}}
+
+.thumb{display:block;position:relative}.thumb img{position:absolute;inset:0;z-index:1}.thumb.noimg{aspect-ratio:21/8}
+.ph{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:4px;overflow:hidden;background:radial-gradient(circle at 20% 15%,color-mix(in srgb,var(--c) 40%,transparent),transparent 62%),conic-gradient(#ffffff12 25%,transparent 0 50%,#ffffff12 0 75%,transparent 0) 0 0/34px 34px,linear-gradient(135deg,#16233b,#0b1322)}
+.ph i{font-style:normal;font-weight:900;font-size:3rem;line-height:1;color:var(--c)}
+.ph em{font-style:normal;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:#cbd5e6;max-width:88%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feature .ph{align-content:start;padding-top:12%}.feature .ph i{font-size:4.5rem}.feature:first-child .ph i{font-size:7.5rem}
+.card{border-top:3px solid var(--c)}.badge{background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
+.card .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.src{color:var(--muted);font-size:.72rem;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card h3{font-size:1.02rem}.card h3 a:hover{color:var(--gold2)}
+.feature .shade{z-index:2}.feature-content{z-index:3}
 </style>
 </head>
 <body>
@@ -198,7 +209,7 @@ function fromJSON(data,src){
 function build(o,src){
   let title=stripHTML(o.title), source=src.name;
   // Google News appends " - Publisher" to titles; use publisher as the source label
-  if(o.gsource){source=o.gsource.trim();title=title.replace(new RegExp("\\s*[-–|]\\s*"+o.gsource.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"$"),"");}
+  if(/news\.google\.com/.test(src.rss)){const m=/^(.*\S)\s+[-–—|]\s+([^-–—|]{2,45})$/.exec(title);if(m){title=m[1];source=o.gsource?o.gsource.trim():m[2].trim();}else if(o.gsource)source=o.gsource.trim();}
   let excerpt=stripHTML(o.desc).slice(0,220);
   if(!excerpt||excerpt.toLowerCase().startsWith(title.toLowerCase().slice(0,40))) excerpt="";
   let d=new Date(o.date); if(isNaN(d)||d>Date.now()+864e5) d=new Date();
@@ -254,16 +265,20 @@ function renderFilters(){
   $("filters").innerHTML=["All",...cats].map(c=>`<button class="filter ${c===active?"active":""}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
 }
 $("filters").addEventListener("click",e=>{const b=e.target.closest(".filter");if(b){active=b.dataset.c;shown=24;renderFilters();render();}});
+const CAT_COL={FIDE:"#f0b95a",India:"#ff9b6b","Online Chess":"#4ade80",World:"#7eb4ff",Tournaments:"#c69cff",Grandmasters:"#7dd3fc",Technology:"#5eead4"};
+const col=c=>CAT_COL[c]||"#f0b95a";
+const hasImg=x=>x.image&&x.image!=="#";
+function vis(x){
+  return `<div class="ph"><i>${esc((x.source||"C").trim().charAt(0).toUpperCase())}</i><em>${esc(x.source)}</em></div>`+(hasImg(x)?`<img loading="lazy" referrerpolicy="no-referrer" src="${esc(x.image)}" alt="" onerror="this.remove()">`:"");
+}
 function card(x){
- return `<article class="card">
-   <a class="thumb-link" target="_blank" rel="noopener" href="${esc(x.url)}" aria-label="Open ${esc(x.title)}">
-    <div class="thumb">${x.image&&x.image!=="#"?`<img loading="lazy" referrerpolicy="no-referrer" src="${esc(x.image)}" alt="" onerror="this.parentElement.innerHTML='<div class=placeholder>♞</div>'">`:`<div class="placeholder">♞</div>`}</div>
-   </a>
+ return `<article class="card" style="--c:${col(x.category)}">
+   <a class="thumb ${hasImg(x)?"":"noimg"}" target="_blank" rel="noopener" href="${esc(x.url)}" aria-label="Open story">${vis(x)}</a>
    <div class="card-body">
-    <span class="badge">${esc(x.category)}</span>
-    <h3>${esc(x.title)}</h3>
-    <p class="excerpt">${esc(x.excerpt||"Latest chess news and developments from the chess world.")}</p>
-    <div class="card-footer"><span>${esc(x.source)} · ${ago(x.date)}</span><a class="read" target="_blank" rel="noopener" href="${esc(x.url)}">MORE →</a></div>
+    <div class="row"><span class="badge">${esc(x.category)}</span><span class="src">${esc(x.source)}</span></div>
+    <h3><a target="_blank" rel="noopener" href="${esc(x.url)}">${esc(x.title)}</a></h3>
+    ${x.excerpt?`<p class="excerpt">${esc(x.excerpt)}</p>`:""}
+    <div class="card-footer"><span>${ago(x.date)}</span><a class="read" target="_blank" rel="noopener" href="${esc(x.url)}">READ →</a></div>
    </div>
  </article>`;
 }
@@ -271,14 +286,18 @@ function render(){
  const q=$("search").value.toLowerCase().trim();
  const list=allNews.filter(x=>(active==="All"||x.category===active)&&(!q||(x.title+" "+x.excerpt+" "+x.source).toLowerCase().includes(q)));
  $("resultInfo").textContent=list.length+" stories";
- const top=list.slice(0,3);
+ // Top Stories: prefer stories that have a photo, then fill with the newest
+ const top=list.filter(hasImg).slice(0,3);
+ for(const x of list){if(top.length>=3)break;if(!top.includes(x))top.push(x);}
+ top.sort((a,b)=>new Date(b.date)-new Date(a.date));
  $("featured").innerHTML=top.map(x=>`
-  <a class="feature" target="_blank" rel="noopener" href="${esc(x.url)}">
-   ${x.image&&x.image!=="#"?`<img loading="lazy" referrerpolicy="no-referrer" src="${esc(x.image)}" alt="" onerror="this.style.display='none'">`:`<div class="placeholder" style="font-size:7rem">♟</div>`}
-   <div class="shade"></div><div class="feature-content"><span class="badge">${esc(x.category)} · ${esc(x.source)}</span><h3>${esc(x.title)}</h3><div class="meta">${esc(x.source)} · ${ago(x.date)} · MORE →</div></div>
+  <a class="feature" style="--c:${col(x.category)}" target="_blank" rel="noopener" href="${esc(x.url)}">
+   ${vis(x)}
+   <div class="shade"></div><div class="feature-content"><span class="badge">${esc(x.category)} · ${esc(x.source)}</span><h3>${esc(x.title)}</h3><div class="meta">${ago(x.date)} · READ →</div></div>
   </a>`).join("");
- $("moreBtn").hidden=list.length<=3+shown;
- $("grid").innerHTML=list.length?list.slice(3,3+shown).map(card).join(""):`<div class="empty">No stories match your search/filter.</div>`;
+ const rest=list.filter(x=>!top.includes(x));
+ $("moreBtn").hidden=rest.length<=shown;
+ $("grid").innerHTML=rest.length?rest.slice(0,shown).map(card).join(""):`<div class="empty">No stories match your search/filter.</div>`;
 }
 $("search").addEventListener("input",()=>{shown=24;render();});
 $("refreshBtn").addEventListener("click",loadNews);
