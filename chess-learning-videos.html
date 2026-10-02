@@ -28,11 +28,24 @@ h3{font-size:17px;line-height:1.3;margin:7px 0 11px}.body a{color:#dfe5ea;text-d
 .load-more:hover{transform:translateY(-2px);box-shadow:0 11px 30px rgba(217,170,85,.3)}.load-more:active{transform:scale(.98)}.load-more[hidden]{display:none}
 .empty{display:none;text-align:center;padding:65px;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:22px;text-align:center;color:#69747f;font-size:11px}
+.keybtn{margin-left:auto;border:1px solid var(--line);background:#151b22;color:#cfd6dd;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer}.keybtn:hover{border-color:var(--gold);color:#fff}
+.search{display:flex;gap:8px;margin:0 0 14px}
+.search input{flex:1;min-width:0;background:#0f1419;border:1px solid var(--line);color:var(--text);border-radius:13px;padding:14px 16px;font-size:16px;outline:none}.search input:focus{border-color:var(--gold)}
+.search button{border:1px solid var(--gold);background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111;border-radius:13px;padding:0 22px;font-weight:900;cursor:pointer}.search button.ghost{background:#151b22;color:#cfd6dd;border-color:var(--line)}
+.hint{color:var(--muted);font-size:12px;margin:0 0 12px;min-height:16px}.hint b{color:var(--gold2)}
+.src{display:inline-block;margin-left:8px;color:#69747f;font-size:10px;font-weight:700}
+main:not(.live) #liveBox{display:none}
+main.live .filters,main.live .status,main.live #videoGrid,main.live #empty,main.live .load-wrap:not(.live-wrap){display:none}
+.live-wrap{display:none}main.live .live-wrap{display:flex}
 @media(max-width:800px){header{height:58px;padding:0 4vw}main{width:94vw;padding-top:22px}.filters{top:58px}.grid{grid-template-columns:1fr;gap:16px}h1{letter-spacing:-1.2px}.hero{align-items:start;display:block}.total{margin-top:8px}}
 </style></head>
-<body><header><div class="logo">MyChess<b>64</b></div></header>
-<main>
+<body><header><div class="logo">MyChess<b>64</b></div><button class="keybtn" id="keyBtn">⚙ YouTube API key</button></header>
+<main id="main">
 <section class="hero"><h1>Chess Videos</h1><div class="total"><span id="totalCount"></span> videos</div></section>
+<div class="search"><input id="q" type="search" placeholder="Search any chess topic: Sicilian Defense, rook endgames, Magnus Carlsen…" autocomplete="off"><button id="go">Search</button><button class="ghost" id="back" hidden>Curated</button></div>
+<p class="hint" id="hint"></p>
+<div id="liveBox"><div class="status"><span>Showing <strong id="liveCount">0</strong> results</span><span id="liveTopic"></span></div>
+<div class="grid" id="liveGrid"></div><div class="empty" id="liveEmpty"></div></div>
 <div class="filters"><div class="filter-row">
 <button class="filter active" data-filter="all">All</button><button class="filter" data-filter="fide">🏆 FIDE</button>
 <button class="filter" data-filter="tactics">♞ Tactics</button><button class="filter" data-filter="strategy">♟ Strategy</button>
@@ -238,7 +251,94 @@ footer{border-top:1px solid var(--line);padding:22px;text-align:center;color:#69
 </article></div>
 <div class="empty" id="empty">No videos found.</div>
 <div class="load-wrap"><button class="load-more" id="loadMore">＋ More Chess Videos</button></div>
+<div class="load-wrap live-wrap"><button class="load-more" id="liveMore" hidden>＋ Load more results</button></div>
 </main><footer>MyChess64</footer>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const main=$('main'),qIn=$('q'),hint=$('hint'),grid=$('liveGrid'),more=$('liveMore'),cnt=$('liveCount'),lempty=$('liveEmpty');
+const INV=['https://inv.nadeko.net','https://yewtu.be','https://invidious.nerdvpn.de','https://invidious.jing.rocks'];
+let KEY='';try{KEY=localStorage.getItem('yt_key')||''}catch(e){}
+let st=null,busy=false,timer=null,seen=new Set(),goodInv=null;
+const FA='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+function setHint(h){hint.innerHTML=h}
+function baseHint(){setHint(KEY?'Searching YouTube (API) and Dailymotion.':'No API key: using public YouTube mirrors + Dailymotion. For the most results, add a free <b>YouTube Data API key</b> (button, top right).')}
+async function jf(url,ms=7000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);return await r.json()}finally{clearTimeout(t)}}
+async function ytSearch(q,s){
+  if(s.done)return[];
+  if(KEY){
+    const u='https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=50&q='+encodeURIComponent(q)+'&key='+encodeURIComponent(KEY)+(s.token?'&pageToken='+s.token:'');
+    const d=await jf(u);s.token=d.nextPageToken||'';if(!s.token)s.done=true;
+    return(d.items||[]).map(i=>({id:i.id.videoId,t:i.snippet.title,ch:i.snippet.channelTitle,p:'yt'}));
+  }
+  const list=goodInv?[goodInv,...INV.filter(x=>x!==goodInv)]:INV;
+  for(const b of list){
+    try{const d=await jf(b+'/api/v1/search?type=video&page='+s.page+'&q='+encodeURIComponent(q));
+      if(!Array.isArray(d))continue;goodInv=b;s.page++;if(!d.length)s.done=true;
+      return d.filter(v=>v.videoId).map(v=>({id:v.videoId,t:v.title,ch:v.author,p:'yt'}));}catch(e){}
+  }
+  s.done=true;s.err=true;return[];
+}
+async function dmSearch(q,s){
+  if(s.done)return[];
+  const d=await jf('https://api.dailymotion.com/videos?fields=id,title,owner.screenname&limit=100&sort=relevance&search='+encodeURIComponent(q)+'&page='+s.page);
+  s.page++;if(!d.has_more)s.done=true;
+  return(d.list||[]).map(v=>({id:v.id,t:v.title,ch:v['owner.screenname'],p:'dm'}));
+}
+function card(v){
+  const a=document.createElement('article');a.className='card';
+  const yt=v.p==='yt';
+  const src=yt?'https://www.youtube-nocookie.com/embed/'+v.id+'?rel=0':'https://www.dailymotion.com/embed/video/'+v.id;
+  const link=yt?'https://www.youtube.com/watch?v='+v.id:'https://www.dailymotion.com/video/'+v.id;
+  const w=document.createElement('div');w.className='video';
+  const f=document.createElement('iframe');f.src=src;f.title=v.t;f.loading='lazy';f.allow=FA;f.referrerPolicy='strict-origin-when-cross-origin';f.allowFullscreen=true;w.appendChild(f);
+  const b=document.createElement('div');b.className='body';
+  const sp=document.createElement('span');sp.textContent=v.ch||'Chess';
+  const s2=document.createElement('i');s2.className='src';s2.textContent=yt?'YouTube':'Dailymotion';sp.appendChild(s2);
+  const h=document.createElement('h3');h.textContent=v.t;
+  const l=document.createElement('a');l.href=link;l.target='_blank';l.rel='noopener';l.textContent=(yt?'YouTube':'Dailymotion')+' ↗';
+  b.append(sp,h,l);a.append(w,b);return a;
+}
+async function loadPage(){
+  if(busy||!st)return;busy=true;more.disabled=true;more.textContent='Loading…';
+  const cur=st;
+  const [a,b]=await Promise.all([ytSearch(cur.q,cur.yt).catch(()=>{cur.yt.done=true;cur.yt.err=true;return[]}),dmSearch(cur.q,cur.dm).catch(()=>{cur.dm.done=true;return[]})]);
+  if(cur!==st){busy=false;return}
+  const out=[];for(let i=0;i<Math.max(a.length,b.length);i++){if(a[i])out.push(a[i]);if(b[i])out.push(b[i])}
+  const fr=document.createDocumentFragment();
+  out.forEach(v=>{const k=v.p+v.id;if(seen.has(k))return;seen.add(k);fr.appendChild(card(v))});
+  grid.appendChild(fr);cnt.textContent=seen.size;
+  const end=cur.yt.done&&cur.dm.done;
+  more.hidden=end;more.disabled=false;more.textContent='＋ Load more results';
+  lempty.style.display=seen.size?'none':'block';
+  if(!seen.size)lempty.textContent=cur.yt.err?'Could not reach YouTube. Add a YouTube API key (top right) and try again.':'No videos found. Try different words.';
+  else if(cur.yt.err&&!KEY)setHint('YouTube mirrors are unavailable right now, showing Dailymotion only. Add a <b>YouTube API key</b> for full results.');
+  busy=false;
+  if(!end&&seen.size<60&&out.length)loadPage();
+}
+function search(raw){
+  const q0=raw.trim();if(q0.length<2)return;
+  const q=/chess/i.test(q0)?q0:'chess '+q0;
+  st={q,yt:{page:1,token:'',done:false},dm:{page:1,done:false}};seen=new Set();busy=false;
+  grid.innerHTML='';cnt.textContent='0';lempty.style.display='none';
+  main.classList.add('live');$('back').hidden=false;$('liveTopic').textContent='“'+q0+'”';baseHint();
+  loadPage();
+}
+function back(){st=null;main.classList.remove('live');$('back').hidden=true;qIn.value='';hint.innerHTML='';grid.innerHTML=''}
+qIn.addEventListener('input',()=>{clearTimeout(timer);if(!qIn.value.trim()){if(st)back();return}timer=setTimeout(()=>search(qIn.value),700)});
+qIn.addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(timer);search(qIn.value)}});
+$('go').addEventListener('click',()=>{clearTimeout(timer);search(qIn.value)});
+$('back').addEventListener('click',back);
+more.addEventListener('click',loadPage);
+new IntersectionObserver(es=>{if(es[0].isIntersecting&&st&&!more.hidden&&!busy)loadPage()},{rootMargin:'400px'}).observe(more);
+$('keyBtn').addEventListener('click',()=>{
+  const k=prompt('Paste your YouTube Data API v3 key (stored only in this browser). Leave empty to remove.',KEY);
+  if(k===null)return;KEY=k.trim();try{KEY?localStorage.setItem('yt_key',KEY):localStorage.removeItem('yt_key')}catch(e){}
+  if(st)search(qIn.value);else baseHint();
+});
+baseHint();
+})();
+</script>
 <script>
 const cards=[...document.querySelectorAll('.card')];
 const buttons=[...document.querySelectorAll('.filter')];
