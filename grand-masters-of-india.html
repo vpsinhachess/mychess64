@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Indian Chess Grandmasters — 99 GMs</title>
+<meta name="description" content="Interactive directory of India's 99 chess Grandmasters, with photos, birth years, state, GM title year and expandable biographies.">
+<style>
+:root{
+ --bg:#070b12;--panel:#101722;--panel2:#151e2b;--text:#f4f7fb;--muted:#aeb8c7;
+ --gold:#f5c451;--gold2:#d89c2b;--line:rgba(255,255,255,.09);--accent:#61dafb;
+ --shadow:0 18px 55px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+ background:
+ radial-gradient(circle at 10% 0%,rgba(245,196,81,.12),transparent 28%),
+ radial-gradient(circle at 90% 10%,rgba(97,218,251,.08),transparent 25%),var(--bg);color:var(--text)}
+body:before{content:"♟ ♞ ♝ ♜ ♛ ♚";position:fixed;inset:0;pointer-events:none;opacity:.018;font-size:8rem;word-spacing:5rem;line-height:1.7;overflow:hidden}
+.wrap{width:min(1450px,94%);margin:auto}
+.hero{padding:42px 0 26px;position:relative}
+.topbar{display:flex;justify-content:space-between;gap:20px;align-items:center}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.04em}
+.brandMark{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold),#fff0b0);color:#111;font-size:25px;box-shadow:0 8px 30px rgba(245,196,81,.22)}
+.badge{border:1px solid rgba(245,196,81,.3);color:var(--gold);padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;background:rgba(245,196,81,.06)}
+h1{font-size:clamp(2.4rem,6vw,5.8rem);line-height:.95;margin:45px 0 15px;max-width:900px;letter-spacing:-.06em}
+h1 span{color:var(--gold)}
+.hero p{max-width:820px;color:var(--muted);font-size:1.08rem;line-height:1.7;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}
+.stat{background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:18px;padding:17px 18px;box-shadow:var(--shadow)}
+.stat b{font-size:1.65rem;color:var(--gold);display:block}.stat small{color:var(--muted)}
+.controls{position:sticky;top:10px;z-index:20;margin:20px 0;padding:12px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;background:rgba(10,15,23,.84);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+input,select,button{font:inherit}
+input,select{width:100%;background:#0c131d;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px 14px;outline:none}
+input:focus,select:focus{border-color:rgba(245,196,81,.65);box-shadow:0 0 0 3px rgba(245,196,81,.08)}
+button{border:0;border-radius:12px;padding:12px 15px;cursor:pointer;font-weight:800}
+.primary{background:linear-gradient(135deg,var(--gold),#ffe7a1);color:#16120a}
+.ghost{background:#111a25;color:#eaf0f6;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:10px 0 70px}
+.card{position:relative;overflow:hidden;background:linear-gradient(160deg,#131c28,#0d141e);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);transition:.25s transform,.25s border-color}
+.card:hover{transform:translateY(-5px);border-color:rgba(245,196,81,.32)}
+.photo{height:255px;position:relative;background:linear-gradient(135deg,#172131,#090d13);overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s;background:#101722}
+.card:hover .photo img{transform:scale(1.035)}
+.photo:after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,rgba(5,8,13,.92))}
+.rank{position:absolute;z-index:2;left:12px;top:12px;background:rgba(5,8,13,.76);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);padding:7px 10px;border-radius:10px;font-size:12px;font-weight:900;color:var(--gold)}
+.gmchip{position:absolute;z-index:2;right:12px;top:12px;background:var(--gold);color:#17120a;padding:7px 9px;border-radius:10px;font-size:11px;font-weight:900}
+.identity{position:absolute;z-index:2;left:15px;right:15px;bottom:13px}
+.identity h2{margin:0;font-size:1.18rem;line-height:1.15}.identity .state{margin-top:5px;color:#d4dae3;font-size:.84rem}
+.body{padding:15px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fact{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:11px;padding:9px 10px}
+.fact small{display:block;color:#8995a6;font-size:10px;text-transform:uppercase;letter-spacing:.09em}.fact b{font-size:.91rem}
+.toggle{width:100%;margin-top:12px;background:#111b27;color:var(--gold);border:1px solid rgba(245,196,81,.18);display:flex;justify-content:space-between;align-items:center}
+.toggle .chev{transition:.25s}
+.card.open .toggle .chev{transform:rotate(180deg)}
+.more{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px;color:#c3ccd8;font-size:.88rem;line-height:1.65}
+.card.open .more{display:block}
+.more h3{color:var(--gold);font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;margin:0 0 7px}
+.more p{margin:0 0 12px}.source{font-size:.75rem;color:#778496}
+.source a{color:#8edff6}
+.empty{display:none;text-align:center;padding:60px;color:var(--muted);grid-column:1/-1}
+.footer{border-top:1px solid var(--line);padding:30px 0 55px;color:#8490a0;font-size:.82rem;line-height:1.7}
+.footer strong{color:#d9e1eb}
+@media(max-width:1150px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr 1fr}.controls input{grid-column:1/-1}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.hero{padding-top:25px}.topbar .badge{display:none}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.photo{height:300px}.controls{grid-template-columns:1fr}.controls input{grid-column:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+ <div class="topbar"><div class="brand"><div class="brandMark">♞</div><div>MYCHESS64 · INDIA</div></div><div class="badge">UPDATED · 2026</div></div>
+ <h1>India's <span>Grandmasters</span><br>One nation. 99 journeys.</h1>
+ <p>An interactive chess hall of fame featuring all 99 Indian Grandmasters recorded by 2026. Explore each player through a visual card, then open the hidden profile for career highlights, GM journey and useful links.</p>
+ <div class="stats">
+   <div class="stat"><b>99</b><small>Indian Grandmasters</small></div>
+   <div class="stat"><b id="stateCount">—</b><small>States / UTs represented</small></div>
+   <div class="stat"><b>1988</b><small>First Indian GM title year</small></div>
+   <div class="stat"><b id="latestYear">2026</b><small>Latest title year in this roster</small></div>
+ </div>
+</section>
+
+<div class="controls">
+ <input id="search" placeholder="🔎  Search a Grandmaster by name, state or year…">
+ <select id="state"><option value="">All States</option></select>
+ <select id="year"><option value="">All GM Years</option></select>
+ <button class="primary" id="expand">Expand all</button>
+</div>
+
+<section class="grid" id="grid"></section>
+<div class="empty" id="empty">No Grandmaster matches your search. Try another name, state or year.</div>
+
+<footer class="footer">
+ <strong>Data note:</strong> The 99-player roster and title years/states are based on the 2026 Indian GM lists published by Jagran Josh and Nikhil Dixit, cross-checked with ChessBase India's report confirming V. S. Rathanvel as India's 99th GM. Portrait priority is ChessBase India for the first 66 GMs, followed by Wikimedia Commons/Wikipedia/Wikidata fallbacks for the remaining players. Birth years are resolved through Wikidata where available. Recent 94th–99th GM journey notes are cross-checked against ChessBase India and other contemporary reports.
+ <br><br>
+ <strong>Design:</strong> MyChess64 · Learn. Play. Improve. Anytime, Anywhere.
+</footer>
+</div>
+
+<script>
+const players = [{"rank": 1, "name": "Viswanathan Anand", "titleYear": 1987, "state": "Tamil Nadu"}, {"rank": 2, "name": "Dibyendu Barua", "titleYear": 1991, "state": "West Bengal"}, {"rank": 3, "name": "Praveen Thipsay", "titleYear": 1997, "state": "Maharashtra"}, {"rank": 4, "name": "Abhijit Kunte", "titleYear": 2000, "state": "Maharashtra"}, {"rank": 5, "name": "Krishnan Sasikiran", "titleYear": 2000, "state": "Tamil Nadu"}, {"rank": 6, "name": "Pentala Harikrishna", "titleYear": 2001, "state": "Andhra Pradesh"}, {"rank": 7, "name": "Koneru Humpy", "titleYear": 2002, "state": "Andhra Pradesh"}, {"rank": 8, "name": "Surya Shekhar Ganguly", "titleYear": 2003, "state": "West Bengal"}, {"rank": 9, "name": "Sandipan Chanda", "titleYear": 2003, "state": "West Bengal"}, {"rank": 10, "name": "Ramachandran Ramesh", "titleYear": 2004, "state": "Tamil Nadu"}, {"rank": 11, "name": "Tejas Bakre", "titleYear": 2004, "state": "Gujarat"}, {"rank": 12, "name": "Magesh Chandran Panchanathan", "titleYear": 2006, "state": "Tamil Nadu"}, {"rank": 13, "name": "J. Deepan Chakkravarthy", "titleYear": 2006, "state": "Tamil Nadu"}, {"rank": 14, "name": "Neelotpal Das", "titleYear": 2006, "state": "West Bengal"}, {"rank": 15, "name": "Parimarjan Negi", "titleYear": 2006, "state": "Delhi"}, {"rank": 16, "name": "Geetha Narayanan Gopal", "titleYear": 2007, "state": "Kerala"}, {"rank": 17, "name": "Abhijeet Gupta", "titleYear": 2008, "state": "Rajasthan"}, {"rank": 18, "name": "Subramanian Arun Prasad", "titleYear": 2008, "state": "Tamil Nadu"}, {"rank": 19, "name": "Sundararajan Kidambi", "titleYear": 2009, "state": "Tamil Nadu"}, {"rank": 20, "name": "R. R. Laxman", "titleYear": 2009, "state": "Tamil Nadu"}, {"rank": 21, "name": "Sriram Jha", "titleYear": 2010, "state": "Delhi"}, {"rank": 22, "name": "Deep Sengupta", "titleYear": 2010, "state": "West Bengal"}, {"rank": 23, "name": "Baskaran Adhiban", "titleYear": 2010, "state": "Tamil Nadu"}, {"rank": 24, "name": "S. P. Sethuraman", "titleYear": 2011, "state": "Tamil Nadu"}, {"rank": 25, "name": "Harika Dronavalli", "titleYear": 2011, "state": "Andhra Pradesh"}, {"rank": 26, "name": "M. R. Lalith Babu", "titleYear": 2012, "state": "Andhra Pradesh"}, {"rank": 27, "name": "Vaibhav Suri", "titleYear": 2012, "state": "Delhi"}, {"rank": 28, "name": "M. R. Venkatesh", "titleYear": 2012, "state": "Tamil Nadu"}, {"rank": 29, "name": "Sahaj Grover", "titleYear": 2012, "state": "Delhi"}, {"rank": 30, "name": "Vidit Gujrathi", "titleYear": 2013, "state": "Maharashtra"}, {"rank": 31, "name": "M. Shyam Sundar", "titleYear": 2013, "state": "Tamil Nadu"}, {"rank": 32, "name": "Akshayraj Kore", "titleYear": 2013, "state": "Maharashtra"}, {"rank": 33, "name": "V. Vishnu Prasanna", "titleYear": 2013, "state": "Tamil Nadu"}, {"rank": 34, "name": "Debashis Das", "titleYear": 2013, "state": "Odisha"}, {"rank": 35, "name": "Saptarshi Roy Chowdhury", "titleYear": 2013, "state": "West Bengal"}, {"rank": 36, "name": "Ankit Rajpara", "titleYear": 2014, "state": "Gujarat"}, {"rank": 37, "name": "Aravindh Chithambaram", "titleYear": 2015, "state": "Tamil Nadu"}, {"rank": 38, "name": "Karthikeyan Murali", "titleYear": 2015, "state": "Tamil Nadu"}, {"rank": 39, "name": "Ashwin Jayaram", "titleYear": 2015, "state": "Tamil Nadu"}, {"rank": 40, "name": "Swapnil Dhopade", "titleYear": 2015, "state": "Maharashtra"}, {"rank": 41, "name": "S. L. Narayanan", "titleYear": 2015, "state": "Kerala"}, {"rank": 42, "name": "Shardul Gagare", "titleYear": 2016, "state": "Maharashtra"}, {"rank": 43, "name": "Diptayan Ghosh", "titleYear": 2016, "state": "West Bengal"}, {"rank": 44, "name": "K. Priyadharshan", "titleYear": 2016, "state": "Tamil Nadu"}, {"rank": 45, "name": "Aryan Chopra", "titleYear": 2016, "state": "Delhi"}, {"rank": 46, "name": "Srinath Narayanan", "titleYear": 2017, "state": "Tamil Nadu"}, {"rank": 47, "name": "Himanshu Sharma", "titleYear": 2017, "state": "Haryana"}, {"rank": 48, "name": "Anurag Mhamal", "titleYear": 2017, "state": "Goa"}, {"rank": 49, "name": "Abhimanyu Puranik", "titleYear": 2017, "state": "Maharashtra"}, {"rank": 50, "name": "M. S. Thejkumar", "titleYear": 2017, "state": "Karnataka"}, {"rank": 51, "name": "Saptarshi Roy", "titleYear": 2018, "state": "West Bengal"}, {"rank": 52, "name": "R. Praggnanandhaa", "titleYear": 2018, "state": "Tamil Nadu"}, {"rank": 53, "name": "Nihal Sarin", "titleYear": 2018, "state": "Kerala"}, {"rank": 54, "name": "Arjun Erigaisi", "titleYear": 2018, "state": "Telangana"}, {"rank": 55, "name": "Karthik Venkataraman", "titleYear": 2018, "state": "Andhra Pradesh"}, {"rank": 56, "name": "Harsha Bharathakoti", "titleYear": 2018, "state": "Andhra Pradesh"}, {"rank": 57, "name": "P. Karthikeyan", "titleYear": 2018, "state": "Tamil Nadu"}, {"rank": 58, "name": "Stany G.A.", "titleYear": 2018, "state": "Karnataka"}, {"rank": 59, "name": "N. R. Visakh", "titleYear": 2019, "state": "Tamil Nadu"}, {"rank": 60, "name": "Gukesh D", "titleYear": 2019, "state": "Tamil Nadu"}, {"rank": 61, "name": "P. Iniyan", "titleYear": 2019, "state": "Tamil Nadu"}, {"rank": 62, "name": "Swayams Mishra", "titleYear": 2019, "state": "Odisha"}, {"rank": 63, "name": "Girish A. Koushik", "titleYear": 2019, "state": "Karnataka"}, {"rank": 64, "name": "Prithu Gupta", "titleYear": 2019, "state": "Delhi"}, {"rank": 65, "name": "Raunak Sadhwani", "titleYear": 2019, "state": "Maharashtra"}, {"rank": 66, "name": "G. Akash", "titleYear": 2020, "state": "Tamil Nadu"}, {"rank": 67, "name": "Leon Luke Mendonca", "titleYear": 2021, "state": "Goa"}, {"rank": 68, "name": "Arjun Kalyan", "titleYear": 2021, "state": "Tamil Nadu"}, {"rank": 69, "name": "Harshit Raja", "titleYear": 2021, "state": "Maharashtra"}, {"rank": 70, "name": "Raja Rithvik R.", "titleYear": 2021, "state": "Telangana"}, {"rank": 71, "name": "Sankalp Gupta", "titleYear": 2021, "state": "Maharashtra"}, {"rank": 72, "name": "Mitrabha Guha", "titleYear": 2021, "state": "West Bengal"}, {"rank": 73, "name": "Bharath Subramaniyam", "titleYear": 2022, "state": "Tamil Nadu"}, {"rank": 74, "name": "Rahul Srivatshav", "titleYear": 2022, "state": "Andhra Pradesh"}, {"rank": 75, "name": "Pranav V", "titleYear": 2022, "state": "Tamil Nadu"}, {"rank": 76, "name": "Pranav Anand", "titleYear": 2022, "state": "Karnataka"}, {"rank": 77, "name": "Aditya Mittal", "titleYear": 2022, "state": "Maharashtra"}, {"rank": 78, "name": "Koustav Chatterjee", "titleYear": 2023, "state": "West Bengal"}, {"rank": 79, "name": "Pranesh M", "titleYear": 2023, "state": "Tamil Nadu"}, {"rank": 80, "name": "Vignesh N. R.", "titleYear": 2023, "state": "Tamil Nadu"}, {"rank": 81, "name": "Sayantan Das", "titleYear": 2023, "state": "West Bengal"}, {"rank": 82, "name": "Prraneeth Vuppala", "titleYear": 2023, "state": "Telangana"}, {"rank": 83, "name": "Aditya Samant", "titleYear": 2023, "state": "Maharashtra"}, {"rank": 84, "name": "Vaishali Rameshbabu", "titleYear": 2024, "state": "Tamil Nadu"}, {"rank": 85, "name": "Shyaam Nikhil P.", "titleYear": 2024, "state": "Tamil Nadu"}, {"rank": 86, "name": "Srihari L. R.", "titleYear": 2025, "state": "Tamil Nadu"}, {"rank": 87, "name": "Harikrishnan A Ra", "titleYear": 2025, "state": "Tamil Nadu"}, {"rank": 88, "name": "Divya Deshmukh", "titleYear": 2025, "state": "Maharashtra"}, {"rank": 89, "name": "Rohith Krishna S.", "titleYear": 2025, "state": "Tamil Nadu"}, {"rank": 90, "name": "Ilamparthi A. R.", "titleYear": 2025, "state": "Tamil Nadu"}, {"rank": 91, "name": "V. S. Raahul", "titleYear": 2025, "state": "Tamil Nadu"}, {"rank": 92, "name": "Aaryan Varshney", "titleYear": 2026, "state": "Delhi"}, {"rank": 93, "name": "Aarav Dengla", "titleYear": 2026, "state": "Maharashtra"}, {"rank": 94, "name": "Mayank Chakraborty", "titleYear": 2026, "state": "Assam"}, {"rank": 95, "name": "Aronyak Ghosh", "titleYear": 2026, "state": "West Bengal"}, {"rank": 96, "name": "Ethan Vaz", "titleYear": 2026, "state": "Goa"}, {"rank": 97, "name": "Harshavardhan G.B.", "titleYear": 2026, "state": "Tamil Nadu"}, {"rank": 98, "name": "Aswath S", "titleYear": 2026, "state": "Tamil Nadu"}, {"rank": 99, "name": "V. S. Rathanvel", "titleYear": 2026, "state": "Tamil Nadu"}];
+
+const grid=document.getElementById('grid'), search=document.getElementById('search'),
+state=document.getElementById('state'), year=document.getElementById('year'), empty=document.getElementById('empty');
+const states=[...new Set(players.map(p=>p.state))].sort((a,b)=>a.localeCompare(b));
+const years=[...new Set(players.map(p=>p.titleYear))].sort((a,b)=>a-b);
+states.forEach(s=>state.insertAdjacentHTML('beforeend',`<option>${s}</option>`));
+years.forEach(y=>year.insertAdjacentHTML('beforeend',`<option>${y}</option>`));
+document.getElementById('stateCount').textContent=states.length;
+
+const clean = s => s.replace(/[.]/g,'').replace(/\s+/g,' ').trim();
+const specialJourneys = {"94": "Became India's 94th GM in March 2026 and the first Grandmaster from Assam and the wider Northeast region. His rise included national junior success and international tournament performances.", "95": "Completed his final GM norm at the Bangkok Chess Club Open 2026, becoming India's 95th GM at age 22. ChessBase India reported that the achievement followed a long period of financial and competitive sacrifice.", "96": "Completed his third and final GM norm at the Chess Summer in Sarajevo – GM Mix in June 2026, winning the tournament with 7/9. At 14, he became India's 96th GM and one of the world's youngest Grandmasters.", "97": "Secured his final GM norm at the Chola Chess 2nd GM Norm Round Robin in June 2026, finishing on 6.5/9 after key wins over visiting Grandmasters. He became India's 97th GM.", "98": "Needed a win in the final round of the Pune International GM Round Robin 2026. He defeated FM Kannan Vaidyanathan with Black, finished on 7/9 and secured the final GM norm to become India's 98th GM.", "99": "Completed all three GM norms in 2022 but waited nearly four years to cross the 2500 rating threshold. In July 2026 he crossed 2500 at the Guwahati Smart City International Open and became India's 99th GM."};
+const chessBasePhotos = {
+  "1": "https://cbin.b-cdn.net/img/AN/Anand_63_KJB07_478x390.jpeg",
+  "2": "https://cbin.b-cdn.net/img/BA/Barua_2_J3266_640x960.jpeg",
+  "3": "https://cbin.b-cdn.net/img/PR/Pravin_Thipsay_2_PTRJ9_1968x1312.jpeg",
+  "4": "https://cbin.b-cdn.net/img/AB/Abhijit-Kunte_3_5HXA9_959x640.jpeg",
+  "5": "https://cbin.b-cdn.net/img/SA/Sasikiran05_jpg_SBNYP_1555x1037.jpeg",
+  "6": "https://cbin.b-cdn.net/img/HA/Harikrishna_2_PRCSH_1176x813.jpeg",
+  "7": "https://cbin.b-cdn.net/img/HU/Humpy-6-_VR613_600x883.jpeg",
+  "8": "https://cbin.b-cdn.net/img/SS/SS_ganguly_jpg_KF9HS_540x360.jpeg",
+  "9": "https://cbin.b-cdn.net/img/SA/Sandipan_jpg_2_PZJ8E_1555x1037.jpeg",
+  "10": "https://cbin.b-cdn.net/img/RA/Ramesh01_4_2X28F_1000x855.jpeg",
+  "11": "https://cbin.b-cdn.net/img/GM/GM_Tejas_Bakre_of_Air_India_JPG_NW022_1067x800.jpeg",
+  "12": "https://cbin.b-cdn.net/img/MA/Magesh_jpg_PJ71M_656x960.jpeg",
+  "13": "https://cbin.b-cdn.net/img/DE/Deepan_7_EHN6Q_2048x1424.jpeg",
+  "14": "https://cbin.b-cdn.net/img/IM/IMG_2750_JPG_ZF7QF_1728x1152.jpeg",
+  "15": "https://cbin.b-cdn.net/img/NE/Negi_jpg_3_33FF3_800x1200.jpeg",
+  "16": "https://cbin.b-cdn.net/img/GN/GN_Gopal_ZB9ZY_600x400.jpeg",
+  "17": "https://cbin.b-cdn.net/img/AB/Abhijeet-Gupta01_2_DYV70_1324x883.jpeg",
+  "18": "https://cbin.b-cdn.net/img/AR/Arun-Prasad_5BVEX_1359x858.jpeg",
+  "19": "https://cbin.b-cdn.net/img/KI/Kidambi_2_CJPPG_1968x1312.jpeg",
+  "20": "https://cbin.b-cdn.net/img/LA/Laxman_9_6J8TN_1907x1242.jpeg",
+  "21": "https://cbin.b-cdn.net/img/JH/Jha_Sriram_PKA1S_1000x563.jpeg",
+  "22": "https://cbin.b-cdn.net/img/DE/Deep_Sengupta_ZV3CT_1136x813.jpeg",
+  "23": "https://cbin.b-cdn.net/img/AD/Adhiban-microsense_ZR8WM_1200x1596.jpeg",
+  "24": "https://cbin.b-cdn.net/img/SE/Sethuraman_3_2_Q8TMK_1125x813.jpeg",
+  "25": "https://cbin.b-cdn.net/img/HA/Harika02_4_PX886_1188x809.jpeg",
+  "26": "https://cbin.b-cdn.net/img/LA/Lalith_4_MCDHZ_661x960.jpeg",
+  "27": "https://cbin.b-cdn.net/img/VA/Vaibhav_Suri_5_AAQ8Z_722x960.jpeg",
+  "28": "https://cbin.b-cdn.net/img/VE/Venkatesh01_SVXV1_589x883.jpeg",
+  "29": "https://cbin.b-cdn.net/img/SA/Sahaj_Grover_jpg_KGYT9_550x354.jpeg",
+  "30": "https://cbin.b-cdn.net/img/VI/Vidit_27_817PZ_1255x883.jpeg",
+  "32": "https://cbin.b-cdn.net/img/AK/Akshayraj-Kore01_WJK0N_640x960.jpeg",
+  "34": "https://cbin.b-cdn.net/img/DE/Debashis-Das_2_6AQWH_1279x883.jpeg",
+  "36": "https://cbin.b-cdn.net/img/AN/Ankit-Rajpara_B1A0C_800x500.jpeg",
+  "38": "https://cbin.b-cdn.net/img/KA/Karthikeyan_Murali_6_R36FA_970x888.jpeg",
+  "40": "https://cbin.b-cdn.net/img/SW/Swapnil_Dhopade_jpg_ZGRY8_640x960.jpeg",
+  "41": "https://cbin.b-cdn.net/img/NA/Narayanan_5_YC4C5_854x883.jpeg",
+  "42": "https://cbin.b-cdn.net/img/SH/Shardul-Gagare_DX0WD_1162x1600.jpeg",
+  "43": "https://cbin.b-cdn.net/img/DI/Diptayan_9_5316S_1000x667.jpeg",
+  "44": "https://cbin.b-cdn.net/img/PR/Priyadharshan_K_B8P95_1365x1365.jpeg",
+  "45": "https://cbin.b-cdn.net/img/AR/Aryan_Chopra_3_4R0M8_2048x1471.jpeg",
+  "46": "https://cbin.b-cdn.net/img/SR/Srinath01_K0KEC_1944x1296.jpeg",
+  "47": "https://cbin.b-cdn.net/img/HI/Himanshu_Sharma_R5C6F_1665x1047.jpeg",
+  "48": "https://cbin.b-cdn.net/img/AN/Anurag-Mhamal_FXS69_1324x883.jpeg",
+  "49": "https://cbin.b-cdn.net/img/AB/Abhimanyu_2_07WHH_1210x888.jpeg",
+  "50": "https://cbin.b-cdn.net/img/TH/Thejkumar_3_NE340_1200x800.jpeg",
+  "51": "https://cbin.b-cdn.net/img/SA/Saptarshi_Roy_jpg_EJADX_960x890.jpeg",
+  "52": "https://cbin.b-cdn.net/img/PR/Pragg02_6_3HKHN_1320x883.jpeg",
+  "53": "https://cbin.b-cdn.net/img/NI/Nihal_Sarin_11_3V73B_660x960.jpeg",
+  "54": "https://cbin.b-cdn.net/img/AR/Arjun_Erigaisi_4_YENR4_640x960.jpeg",
+  "55": "https://cbin.b-cdn.net/img/KA/Karthik-Venkatraman_X79RM_1365x888.jpeg",
+  "56": "https://cbin.b-cdn.net/img/HA/Harsha_Bharathakoti_7_8JY2X_680x888.jpeg",
+  "57": "https://cbin.b-cdn.net/img/KA/Karthikeyan_P_jpg_6K7ND_477x640.jpeg",
+  "58": "https://cbin.b-cdn.net/img/ST/Stany_7_FB21P_960x640.jpeg",
+  "59": "https://cbin.b-cdn.net/img/VI/Visakh_N_R_YCWHB_1233x812.jpeg",
+  "60": "https://cbin.b-cdn.net/img/GU/Gukesh01-001_TX639_1200x800.jpeg",
+  "61": "https://cbin.b-cdn.net/img/IN/Iniyan_5_DR4A2_1324x883.jpeg",
+  "62": "https://cbin.b-cdn.net/img/SW/swayams_jpg_X84R5_1026x697.jpeg",
+  "63": "https://cbin.b-cdn.net/img/GI/Girish01_TZ5S5_1000x881.jpeg",
+  "64": "https://cbin.b-cdn.net/img/PR/Prithu01_2_FD85A_640x960.jpeg",
+  "65": "https://cbin.b-cdn.net/img/RA/Raunak01_4_R6KXQ_1280x853.jpeg",
+  "66": "https://cbin.b-cdn.net/img/AA/Aakash01_2_7NN4Y_800x593.jpeg"
+};
+const wikiAliases={
+ "R. Praggnanandhaa":"R Praggnanandhaa","Gukesh D":"Gukesh D",
+ "Aravindh Chithambaram":"Aravindh Chithambaram","V. S. Rathanvel":"Rathanvel V S",
+ "Harshavardhan G.B.":"Harshavardhan G B","Vaishali Rameshbabu":"Vaishali Rameshbabu",
+ "V. S. Raahul":"Rahul V. Srivatshav","K. Priyadharshan":"Priyadharshan Kannappan",
+ "R. R. Laxman":"R R Laxman","M. R. Lalith Babu":"Lalith Babu M R",
+ "M. R. Venkatesh":"M R Venkatesh","M. Shyam Sundar":"Shyam Sundar M",
+ "S. L. Narayanan":"S L Narayanan","S. P. Sethuraman":"S P Sethuraman",
+ "J. Deepan Chakkravarthy":"Deepan Chakkravarthy","V. Vishnu Prasanna":"V Vishnu Prasanna",
+ "N. R. Visakh":"N R Visakh","P. Iniyan":"Iniyan P","P. Karthikeyan":"P Karthikeyan",
+ "G. Akash":"G Akash","Raja Rithvik R.":"Raja Rithvik R","M. S. Thejkumar":"M S Thejkumar"
+};
+
+function initials(name){
+ return name.split(/\s+/).filter(Boolean).slice(0,3).map(x=>x.replace(/[^A-Za-z]/g,'')[0]||'').join('').toUpperCase() || 'GM';
+}
+function fallbackSvg(name){
+ const txt=initials(name);
+ return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#182435"/><stop offset="1" stop-color="#080c12"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="190" font-weight="800" fill="#f5c451">${txt}</text><text x="50%" y="72%" text-anchor="middle" font-family="Arial" font-size="26" fill="#aeb8c7">INDIAN GRANDMASTER</text></svg>`);
+}
+function card(p){
+ return `<article class="card" data-rank="${p.rank}" data-name="${p.name.toLowerCase()}" data-state="${p.state}" data-year="${p.titleYear}">
+  <div class="photo">
+   <img id="img-${p.rank}" src="${fallbackSvg(p.name)}" alt="${p.name}" loading="lazy">
+   <div class="rank">#${String(p.rank).padStart(2,'0')}</div><div class="gmchip">GM</div>
+   <div class="identity"><h2>${p.name}</h2><div class="state">🇮🇳 ${p.state}</div></div>
+  </div>
+  <div class="body">
+   <div class="facts">
+    <div class="fact"><small>Born</small><b id="birth-${p.rank}">Loading…</b></div>
+    <div class="fact"><small>GM Title</small><b>${p.titleYear}</b></div>
+   </div>
+   <button class="toggle" onclick="toggleCard(this)">View journey & facts <span class="chev">⌄</span></button>
+   <div class="more">
+    <h3>Grandmaster journey</h3>
+    <p id="bio-${p.rank}">Loading career profile…</p>
+    <h3>At a glance</h3>
+    <p><strong>India GM #${p.rank}</strong> · Title awarded ${p.titleYear} · ${p.state}. The player is part of the rapid expansion of India's Grandmaster generation.</p>
+    <div class="source" id="src-${p.rank}">Profile data: Wikipedia / Wikidata when available.</div>
+   </div>
+  </div>
+ </article>`;
+}
+function render(){
+ const q=search.value.toLowerCase().trim(), st=state.value, yr=year.value;
+ const filtered=players.filter(p=>(!q || `${p.name} ${p.state} ${p.titleYear}`.toLowerCase().includes(q)) && (!st||p.state===st) && (!yr||String(p.titleYear)===yr));
+ grid.innerHTML=filtered.map(card).join(''); empty.style.display=filtered.length?'none':'block';
+ filtered.forEach(loadProfile);
+}
+async function loadProfile(p){
+ const title=wikiAliases[p.name]||p.name;
+ const img=document.getElementById('img-'+p.rank);
+ try{
+  // 1) Prefer a verified ChessBase India portrait where one is available.
+  if(chessBasePhotos[p.rank]){
+    img.src=chessBasePhotos[p.rank];
+    img.dataset.source='ChessBase India';
+  }
+
+  // 2) Wikipedia provides a useful biography and Wikidata entity.
+  const res=await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title));
+  if(!res.ok) throw new Error('Wikipedia unavailable');
+  const d=await res.json();
+
+  // If no ChessBase portrait was assigned, use Wikipedia's thumbnail.
+  if(!chessBasePhotos[p.rank] && d.thumbnail?.source) {
+    img.src=d.thumbnail.source;
+    img.dataset.source='Wikipedia';
+  }
+  if(d.extract) document.getElementById('bio-'+p.rank).textContent=d.extract;
+  if(specialJourneys[p.rank]) document.getElementById('bio-'+p.rank).textContent=specialJourneys[p.rank]+' '+(d.extract||'');
+  if(d.content_urls?.desktop?.page) document.getElementById('src-'+p.rank).innerHTML=
+    `Sources: ${chessBasePhotos[p.rank] ? 'ChessBase India portrait · ' : ''}<a href="${d.content_urls.desktop.page}" target="_blank" rel="noopener">Wikipedia profile ↗</a>`;
+
+  // 3) Wikidata is the final photo/birth-year fallback.
+  const item=d.wikibase_item;
+  if(item){
+   const wr=await fetch(`https://www.wikidata.org/wiki/Special:EntityData/${item}.json`);
+   if(wr.ok){
+    const entity=(await wr.json()).entities?.[item];
+    const claims=entity?.claims||{};
+    const time=claims.P569?.[0]?.mainsnak?.datavalue?.value?.time;
+    if(time){ const m=time.match(/(\d{4})/); if(m) document.getElementById('birth-'+p.rank).textContent=m[1]; }
+
+    if(!chessBasePhotos[p.rank] && claims.P18?.[0]?.mainsnak?.datavalue?.value){
+      const file=claims.P18[0].mainsnak.datavalue.value;
+      const commons='https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(file);
+      img.src=commons;
+      img.dataset.source='Wikimedia Commons';
+      img.onerror=()=>{ if(d.thumbnail?.source) img.src=d.thumbnail.source; };
+    }
+   }
+  }
+ }catch(e){
+  document.getElementById('birth-'+p.rank).textContent='—';
+  document.getElementById('bio-'+p.rank).textContent=
+   `${p.name} is India GM #${p.rank}, with the Grandmaster title recorded in ${p.titleYear}. The profile can be expanded with a verified chess-source biography when available.`;
+  if(chessBasePhotos[p.rank]){
+    img.src=chessBasePhotos[p.rank];
+    document.getElementById('src-'+p.rank).innerHTML='Portrait: <a href="https://chessbase.in/news/Grandmasters-of-Indian-chess" target="_blank" rel="noopener">ChessBase India GM directory ↗</a>';
+  }
+ }
+}
+function toggleCard(btn){btn.closest('.card').classList.toggle('open')}
+document.getElementById('expand').onclick=()=>{
+ const cards=[...document.querySelectorAll('.card')], open=cards.every(c=>c.classList.contains('open'));
+ cards.forEach(c=>c.classList.toggle('open',!open));
+ document.getElementById('expand').textContent=open?'Expand all':'Collapse all';
+};
+search.oninput=render; state.onchange=render; year.onchange=render;
+render();
+</script>
+</body>
+</html>
