@@ -7,245 +7,302 @@
 <meta name="description" content="MyChess64 latest chess news — world chess, Indian chess, tournaments, Grandmasters, technology and more.">
 <title>MyChess64 — Latest Chess News</title>
 <style>
-:root{
-  --bg:#07101d;--panel:#0d1828;--panel2:#111f33;--text:#f4f7fb;--muted:#9eacc0;
-  --gold:#e8b85b;--gold2:#f4d48d;--line:#213149;--green:#65d6a0;--red:#ff7474;
-  --shadow:0 18px 50px rgba(0,0,0,.28);--radius:20px;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:
- radial-gradient(circle at 15% 0%,rgba(232,184,91,.10),transparent 28%),
- radial-gradient(circle at 85% 10%,rgba(55,120,210,.12),transparent 28%),var(--bg);
- color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-a{color:inherit;text-decoration:none}
-.container{width:min(1240px,94%);margin:auto}
-header{position:sticky;top:0;z-index:20;background:rgba(7,16,29,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
-.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
-.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:-.5px;font-size:1.2rem}
-.logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#f4d48d,#b97820);color:#111;font-size:24px;box-shadow:0 8px 25px rgba(232,184,91,.25)}
-.nav-right{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.86rem}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
-.hero{padding:48px 0 28px}
-.hero-grid{display:grid;grid-template-columns:1.55fr .75fr;gap:24px;align-items:stretch}
-.hero-main,.hero-side{background:linear-gradient(145deg,rgba(17,31,51,.96),rgba(9,20,34,.96));border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow)}
-.hero-main{padding:38px}
-.kicker{color:var(--gold2);font-size:.78rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-h1{font-size:clamp(2.4rem,6vw,5.2rem);line-height:.94;margin:12px 0 18px;letter-spacing:-.065em}
-.hero-main p{color:var(--muted);font-size:1.05rem;line-height:1.7;max-width:680px}
-.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
-button,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 16px;border-radius:12px;cursor:pointer;font-weight:750}
-button:hover,.btn:hover{border-color:#47627f;transform:translateY(-1px)}
-.primary{background:linear-gradient(135deg,#e8b85b,#bd7a24);color:#101010;border:0}
-.hero-side{padding:25px;display:flex;flex-direction:column;justify-content:center}
-.stat{padding:16px 0;border-bottom:1px solid var(--line)}
-.stat:last-child{border-bottom:0}
-.stat strong{display:block;font-size:1.55rem}.stat span{color:var(--muted);font-size:.84rem}
-.controls{position:sticky;top:72px;z-index:10;padding:14px 0;background:linear-gradient(var(--bg) 72%,transparent)}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.search{flex:1;min-width:230px;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:12px 15px;border-radius:12px;outline:none}
-.search:focus{border-color:var(--gold)}
-.filters{display:flex;gap:8px;overflow:auto;padding:8px 0 3px;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.filter{white-space:nowrap;background:transparent;color:var(--muted);border:1px solid var(--line);padding:9px 13px;border-radius:999px}
-.filter.active{background:rgba(232,184,91,.13);color:var(--gold2);border-color:rgba(232,184,91,.45)}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:22px 0 15px}
-.section-head h2{margin:0;font-size:1.45rem}
-.meta{color:var(--muted);font-size:.82rem}
-.featured{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;margin-bottom:20px}
-.feature{position:relative;min-height:360px;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
-.feature img{width:100%;height:100%;object-fit:cover;display:block;opacity:.78}
-.feature .shade{position:absolute;inset:0;background:linear-gradient(0deg,rgba(2,7,14,.96),rgba(2,7,14,.05) 65%)}
-.feature-content{position:absolute;left:25px;right:25px;bottom:24px}
-.feature h3{font-size:clamp(1.45rem,3vw,2.25rem);line-height:1.08;margin:10px 0}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.card{background:linear-gradient(145deg,var(--panel),#0b1524);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0;transition:.2s}
-.card:hover{transform:translateY(-3px);border-color:#3a516d}
-.thumb{height:175px;background:#101b2b;position:relative;overflow:hidden}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.placeholder{height:100%;display:grid;place-items:center;font-size:3rem;color:#687990;background:linear-gradient(135deg,#122035,#0b1422)}
-.card-body{padding:17px;display:flex;flex-direction:column;flex:1}
-.badge{display:inline-flex;width:max-content;padding:5px 8px;border-radius:7px;background:rgba(232,184,91,.11);color:var(--gold2);font-size:.69rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
-.card h3{font-size:1.03rem;line-height:1.35;margin:10px 0}
-.excerpt{color:var(--muted);font-size:.85rem;line-height:1.55;margin:0 0 15px}
-.card-footer{margin-top:auto;display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:.72rem}
-.read{color:#111;background:linear-gradient(135deg,#f4d48d,#d79a3b);font-weight:900;padding:8px 12px;border-radius:9px;letter-spacing:.04em;transition:.2s}.read:hover{transform:translateX(2px);box-shadow:0 5px 16px rgba(232,184,91,.2)}.thumb-link{display:block}
-.empty{padding:45px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px;grid-column:1/-1}
+:root{--bg:#0a0f1a;--card:#121a2b;--card2:#18223a;--text:#eef2f9;--muted:#93a1b8;--gold:#f0b95a;--gold2:#ffd98e;--line:#243049;--green:#4ade80}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,rgba(240,185,90,.13),transparent 45%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}.container{width:min(1280px,94%);margin:auto}
+.ticker{display:flex;align-items:center;height:38px;background:#05080f;border-bottom:1px solid var(--line);overflow:hidden;font-size:.8rem}
+.tk-label{flex:none;background:var(--gold);color:#111;font-weight:900;letter-spacing:.12em;padding:0 14px;height:100%;display:grid;place-items:center;font-size:.7rem}
+.tk-track{display:flex;white-space:nowrap;animation:tk 160s linear infinite;padding-left:20px}.tk-track:hover{animation-play-state:paused}
+.tk-track a{margin-right:42px;color:#c7d2e4}.tk-track a:hover{color:var(--gold2)}.tk-track b{color:var(--gold);margin-right:8px}
+@keyframes tk{to{transform:translateX(-50%)}}
+header{position:sticky;top:0;z-index:30;background:rgba(10,15,26,.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
+.nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:900;font-size:1.2rem;letter-spacing:-.03em}
+.logo{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#ffd98e,#b97820);color:#111;font-size:23px}
+.nav-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.82rem}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+button,.btn{font:inherit;border:1px solid var(--line);background:var(--card2);color:var(--text);padding:10px 16px;border-radius:11px;cursor:pointer;font-weight:700;transition:.2s}
+button:hover,.btn:hover{border-color:var(--gold);transform:translateY(-1px)}button:disabled{opacity:.5;cursor:wait}
+.primary{background:linear-gradient(135deg,#ffd98e,#d39a3a);color:#14100a;border:0}
+.hero{padding:30px 0 6px}
+.hero-card{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding:30px 34px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(120deg,rgba(24,34,58,.95),rgba(12,19,33,.95)),conic-gradient(#fff1 25%,transparent 0 50%,#fff1 0 75%,transparent 0) 0 0/46px 46px;position:relative;overflow:hidden}
+.hero-card:after{content:"♞";position:absolute;right:-10px;bottom:-60px;font-size:15rem;color:rgba(240,185,90,.06);line-height:1}
+.kicker{color:var(--gold2);font-size:.74rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1;margin:10px 0 8px;letter-spacing:-.05em}h1 span{color:var(--gold2)}
+.hero-card p{color:var(--muted);margin:0;max-width:560px;line-height:1.6}
+.stats{display:flex;gap:12px;position:relative;z-index:1}
+.stat{min-width:104px;padding:14px 16px;border-radius:16px;background:rgba(5,8,15,.55);border:1px solid var(--line);text-align:center}
+.stat strong{display:block;font-size:1.5rem;color:var(--gold2)}.stat span{color:var(--muted);font-size:.72rem}
+.controls{position:sticky;top:64px;z-index:20;padding:14px 0 8px;background:linear-gradient(var(--bg) 78%,transparent)}
+.toolbar{display:flex;gap:10px}
+.search{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);color:var(--text);padding:12px 16px;border-radius:12px;outline:none;font:inherit}.search:focus{border-color:var(--gold)}
+.filters{display:flex;gap:8px;overflow:auto;padding:12px 0 2px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}
+.filter{white-space:nowrap;background:transparent;color:var(--muted);padding:8px 15px;border-radius:999px;font-size:.85rem}
+.filter.active{background:var(--gold);color:#14100a;border-color:var(--gold)}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin:26px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.section-head h2{margin:0;font-size:1.3rem;letter-spacing:-.02em}.section-head h2:before{content:"";display:inline-block;width:5px;height:1.1em;background:var(--gold);border-radius:3px;margin-right:10px;vertical-align:-.15em}
+.meta{color:var(--muted);font-size:.8rem}
+.featured{display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr;gap:16px}
+.feature{position:relative;min-height:230px;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--card)}
+.feature:first-child{grid-row:span 2;min-height:470px}
+.feature img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}.feature:hover img{transform:scale(1.04)}
+.feature .placeholder{position:absolute;inset:0}
+.shade{position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,8,15,.97),rgba(4,8,15,.15) 70%)}
+.feature-content{position:absolute;left:22px;right:22px;bottom:20px}
+.feature h3{font-size:1.15rem;line-height:1.25;margin:10px 0 8px}.feature:first-child h3{font-size:clamp(1.5rem,2.8vw,2.3rem)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:.25s}
+.card:hover{transform:translateY(-4px);border-color:rgba(240,185,90,.5);box-shadow:0 16px 40px rgba(0,0,0,.35)}
+.thumb-link{display:block}.thumb{aspect-ratio:16/9;background:#0d1626;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.placeholder{height:100%;display:grid;place-items:center;font-size:3rem;color:#4b5d78;background:linear-gradient(135deg,#142038,#0b1322)}
+.card-body{padding:16px;display:flex;flex-direction:column;flex:1}
+.badge{display:inline-flex;width:max-content;padding:4px 9px;border-radius:6px;background:rgba(240,185,90,.14);color:var(--gold2);font-size:.66rem;font-weight:850;text-transform:uppercase;letter-spacing:.07em}
+.card h3{font-size:1rem;line-height:1.38;margin:10px 0 8px}
+.excerpt{color:var(--muted);font-size:.84rem;line-height:1.55;margin:0 0 14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-footer{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:.72rem}
+.read{color:#14100a;background:linear-gradient(135deg,#ffd98e,#d39a3a);font-weight:900;padding:7px 12px;border-radius:8px;font-size:.72rem}
+.more{display:block;margin:28px auto 0;padding:13px 34px}
+.empty{padding:44px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px;grid-column:1/-1}
 .loading{padding:30px;text-align:center;color:var(--muted)}
-footer{margin-top:55px;padding:30px 0 45px;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;line-height:1.7}
-footer strong{color:var(--text)}
-@media(max-width:900px){.hero-grid,.featured{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.hero-side{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.stat{border-bottom:0;border-right:1px solid var(--line);padding-right:15px}.stat:last-child{border-right:0}}
-@media(max-width:620px){.nav{height:62px}.controls{top:62px}.hero{padding-top:25px}.hero-main{padding:25px}.cards{grid-template-columns:1fr}.hero-side{grid-template-columns:1fr 1fr}.hero-side .stat:last-child{grid-column:1/-1;border-top:1px solid var(--line);padding-top:14px}.feature{min-height:330px}.nav-right span{display:none}}
+footer{margin-top:56px;padding:28px 0 44px;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;line-height:1.7}footer strong{color:var(--text)}
+@media(max-width:900px){.featured{grid-template-columns:1fr;grid-template-rows:none}.feature:first-child{grid-row:auto;min-height:340px}}
+@media(max-width:620px){.hero-card{padding:24px}.stats{width:100%}.stat{flex:1;min-width:0}.nav-right span:not(.status-dot){display:none}.cards{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header>
-  <div class="container nav">
-    <a class="brand" href="#"><span class="logo">♟</span><span>MyChess64 <small style="color:var(--muted);font-weight:600">News</small></span></a>
-    <div class="nav-right"><span class="status-dot"></span><span id="liveText">Updating feeds…</span></div>
-  </div>
-</header>
-
+<div class="ticker"><span class="tk-label">LATEST</span><div class="tk-track" id="ticker"></div></div>
+<header><div class="container nav">
+  <a class="brand" href="#"><span class="logo">♟</span><span>MyChess64 <small style="color:var(--muted);font-weight:600">News</small></span></a>
+  <div class="nav-right"><span class="status-dot"></span><span id="liveText">Updating feeds…</span><button class="primary" id="refreshBtn">↻ Refresh</button></div>
+</div></header>
 <main>
-<section class="hero container">
-  <div class="hero-grid">
-    <div class="hero-main">
-      <div class="kicker">♟ Daily Chess News</div>
-      <h1>Know the game.<br><span style="color:var(--gold2)">Every day.</span></h1>
-      <p>One chess news desk for tournaments, Grandmasters, Indian chess, FIDE, chess technology and the stories shaping the chess world.</p>
-      <div class="hero-actions">
-        <button class="primary" id="refreshBtn">↻ Refresh News</button>
-        <a class="btn" href="#news">Explore News ↓</a>
-      </div>
-    </div>
-    <div class="hero-side">
-      <div class="stat"><strong id="storyCount">—</strong><span>Stories loaded</span></div>
-      <div class="stat"><strong id="sourceCount">—</strong><span>News sources</span></div>
-      <div class="stat"><strong id="updatedAt">—</strong><span>Last successful update</span></div>
-    </div>
+<section class="hero container"><div class="hero-card">
+  <div style="position:relative;z-index:1"><div class="kicker">♟ Daily Chess News Desk</div>
+  <h1>Know the game. <span>Every day.</span></h1>
+  <p>FIDE, Indian chess, ChessBase, New in Chess, Chess.com and top chess sites — collected automatically, 24×7.</p></div>
+  <div class="stats">
+    <div class="stat"><strong id="storyCount">—</strong><span>Stories</span></div>
+    <div class="stat"><strong id="sourceCount">—</strong><span>Sources</span></div>
+    <div class="stat"><strong id="updatedAt">—</strong><span>Updated</span></div>
   </div>
-</section>
-
+</div></section>
 <section class="container controls">
-  <div class="toolbar">
-    <input id="search" class="search" type="search" placeholder="Search chess news, players, tournaments…">
-    <button id="todayBtn">Today</button>
-  </div>
+  <div class="toolbar"><input id="search" class="search" type="search" placeholder="Search players, tournaments, FIDE, India…"><button id="todayBtn">Today</button></div>
   <div class="filters" id="filters"></div>
 </section>
-
 <section id="news" class="container">
-  <div class="section-head"><div><h2>Top Stories</h2><div class="meta">Fresh stories are automatically collected from selected chess sources.</div></div><div class="meta" id="resultInfo"></div></div>
+  <div class="section-head"><h2>Top Stories</h2><div class="meta" id="resultInfo"></div></div>
   <div class="featured" id="featured"></div>
-
   <div class="section-head"><h2>Latest Chess News</h2><div class="meta">Newest first</div></div>
   <div id="grid" class="cards"><div class="loading">Loading the latest chess news…</div></div>
+  <button class="more" id="moreBtn" hidden>Load more stories ↓</button>
 </section>
 </main>
-
-<footer>
-<div class="container">
-  <strong>MyChess64 Chess News</strong> — an independent news aggregator. Headlines, excerpts, images and links belong to their respective publishers.
-  This page shows short news summaries and links to the original stories rather than republishing full articles.
-  <br><br>
-  <span>Feeds: FIDE, ChessBase, Chess.com, AICF and selected chess-news searches. Feed availability can vary by publisher.</span>
-</div>
-</footer>
-
+<footer><div class="container">
+  <strong>MyChess64 Chess News</strong> — an independent news aggregator. Headlines, excerpts and images belong to their publishers; each story links to the original source.
+  <br>Auto-updates every 10 minutes from FIDE, AICF, ChessBase (India &amp; World), New in Chess, Chess.com, Chessdom, Lichess, Indian media and more.
+</div></footer>
 <script>
+/* ============ CONFIG ============ */
+const REFRESH_MINUTES = 10;      // page re-fetches all feeds automatically every N minutes
+const MAX_STORIES     = 400;     // stories kept on page
+const MAX_AGE_DAYS    = 30;      // older stories are dropped
+const gn = (q,india)=>"https://news.google.com/rss/search?q="+encodeURIComponent(q+" when:14d")+(india?"&hl=en-IN&gl=IN&ceid=IN:en":"&hl=en&gl=US&ceid=US:en");
+
 const SOURCES = [
-  {name:"FIDE", category:"FIDE", color:"#e8b85b", rss:"https://www.fide.com/?format=feed&type=rss"},
-  {name:"ChessBase", category:"World", color:"#7eb4ff", rss:"https://en.chessbase.com/feed"},
-  {name:"Chess.com", category:"Chess.com", color:"#65d6a0", rss:"https://www.chess.com/rss/news"},
-  {name:"AICF", category:"India", color:"#ff9b6b", rss:"https://aicf.in/feed/"},
-  {name:"Indian Chess", category:"India", color:"#f28b82", rss:"https://news.google.com/rss/search?q=Indian%20chess%20when%3A7d&hl=en-IN&gl=IN&ceid=IN%3Aen"},
-  {name:"Chess Tournaments", category:"Tournaments", color:"#c69cff", rss:"https://news.google.com/rss/search?q=chess%20tournament%20when%3A7d&hl=en&gl=US&ceid=US%3Aen"},
-  {name:"Grandmasters", category:"Grandmasters", color:"#7dd3fc", rss:"https://news.google.com/rss/search?q=chess%20grandmaster%20when%3A7d&hl=en&gl=US&ceid=US%3Aen"},
-  {name:"Chess Technology", category:"Technology", color:"#a7f3d0", rss:"https://news.google.com/rss/search?q=chess%20AI%20OR%20Stockfish%20OR%20Lichess%20OR%20Chess.com%20when%3A7d&hl=en&gl=US&ceid=US%3Aen"}
+  // ---- FIDE ----
+  {name:"FIDE",            category:"FIDE",  rss:"https://www.fide.com/feed/"},
+  {name:"FIDE News",       category:"FIDE",  rss:gn("FIDE chess OR \"World Chess Federation\" OR \"FIDE Candidates\" OR \"Chess Olympiad\" OR \"FIDE World Cup\"")},
+  {name:"FIDE Official",   category:"FIDE",  rss:gn("site:fide.com")},
+  // ---- India ----
+  {name:"AICF",            category:"India", rss:"https://aicf.in/feed/"},
+  {name:"ChessBase India", category:"India", rss:"https://www.chessbase.in/feed"},
+  {name:"ChessBase India (web)",category:"India", rss:gn("site:chessbase.in",true)},
+  {name:"Indian Chess",    category:"India", rss:gn("Indian chess OR \"India chess\" OR AICF OR \"chess India\"",true)},
+  {name:"Indian Players",  category:"India", rss:gn("Gukesh OR Praggnanandhaa OR \"Arjun Erigaisi\" OR \"Divya Deshmukh\" OR \"Vidit Gujrathi\" OR \"Koneru Humpy\" OR Vaishali OR \"Harika Dronavalli\" chess",true)},
+  {name:"Indian Media",    category:"India", rss:gn("chess site:thehindu.com OR site:indianexpress.com OR site:timesofindia.indiatimes.com OR site:sportstar.thehindu.com OR site:hindustantimes.com",true)},
+  // ---- World ----
+  {name:"ChessBase",       category:"World", rss:"https://en.chessbase.com/feed"},
+  {name:"New in Chess",    category:"World", rss:gn("site:newinchess.com")},
+  {name:"New in Chess (feed)",category:"World", rss:"https://www.newinchess.com/feed/"},
+  {name:"Chessdom",        category:"World", rss:"https://www.chessdom.com/feed/"},
+  {name:"Lichess",         category:"Online Chess", rss:"https://lichess.org/blog.atom"},
+  {name:"Chess.com",       category:"Online Chess", rss:"https://www.chess.com/rss/news"},
+  {name:"Chess.com (web)", category:"Online Chess", rss:gn("site:chess.com/news")},
+  {name:"Europe & US Chess",category:"World", rss:gn("site:europechess.org OR site:uschess.org OR site:chess.com/news OR site:chess-results.com")},
+  {name:"Chess Tournaments",category:"Tournaments", rss:gn("chess tournament")},
+  {name:"Candidates & WCC",category:"Tournaments", rss:gn("chess \"world championship\" OR \"Candidates Tournament\" OR \"Grand Chess Tour\" OR \"Tata Steel Chess\" OR \"Norway Chess\"")},
+  {name:"Grandmasters",    category:"Grandmasters", rss:gn("chess grandmaster OR Carlsen OR Nakamura OR Caruana OR Firouzja OR Ding")},
+  {name:"Women's Chess",   category:"Grandmasters", rss:gn("women's chess OR \"Women's World Chess\" OR \"Judit Polgar\" OR \"Hou Yifan\" OR \"Ju Wenjun\"")},
+  {name:"Chess Technology",category:"Technology", rss:gn("chess AI OR Stockfish OR Lichess OR Leela OR \"chess engine\"")}
+];
+
+// Browsers block direct RSS requests (CORS), so feeds go through free public relays.
+// They are tried in order; if one is down the next is used automatically.
+const RELAYS = [
+  {url:u=>"https://api.allorigins.win/raw?url="+encodeURIComponent(u), type:"xml"},
+  {url:u=>"https://corsproxy.io/?url="+encodeURIComponent(u),          type:"xml"},
+  {url:u=>"https://api.codetabs.com/v1/proxy?quest="+encodeURIComponent(u), type:"xml"},
+  {url:u=>"https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(u), type:"json"}
 ];
 
 const FALLBACK = [
  {title:"WSTC 2026 European Stage begins in Tsaghkadzor",source:"FIDE",category:"FIDE",date:"2026-09-29",url:"https://www.fide.com/news/",image:"",excerpt:"FIDE reports on the start of the World Schools Team Championship European stage."},
  {title:"Uzbekistan’s dream finish: Olympiad gold in Samarkand",source:"FIDE",category:"Tournaments",date:"2026-09-27",url:"https://www.fide.com/news/",image:"",excerpt:"The 46th Chess Olympiad concluded in Samarkand with Uzbekistan taking the open title."},
  {title:"Clear win for China in Women's Chess Olympiad, while Kazakhstan and India complete the podium",source:"ChessBase",category:"World",date:"2026-09-28",url:"https://en.chessbase.com/newsroom",image:"",excerpt:"ChessBase reports on the final standings of the Women's Chess Olympiad."},
- {title:"Nakamura Completes Bullet Brawl Hat Trick",source:"Chess.com",category:"Chess.com",date:"2026-09-28",url:"https://www.chess.com/news",image:"",excerpt:"Chess.com reports on Hikaru Nakamura's third consecutive Bullet Brawl victory."},
- {title:"Aronian, Le, Mamedyarov Complete 24-Player Total Chess Pilot Field",source:"Chess.com",category:"Tournaments",date:"2026-09-28",url:"https://www.chess.com/news",image:"",excerpt:"The final six players complete the 24-player field for the Total Chess World Championship Tour pilot."},
  {title:"Western Asian Junior/ Girls Chess Championship – 2026",source:"AICF",category:"India",date:"2026-09-30",url:"https://aicf.in/",image:"",excerpt:"AICF announces the Western Asian Junior and Girls Chess Championship in Ahmedabad."}
 ];
 
-let allNews=[], active="All";
-
-function proxyUrl(rss){
-  return "https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(rss);
-}
-function stripHTML(s){const d=document.createElement("div");d.innerHTML=s||"";return d.textContent||d.innerText||"";}
-function cleanTitle(s){return stripHTML(s).replace(/\\s+/g," ").trim();}
-function normalize(item,src){
-  return {title:cleanTitle(item.title),source:src.name,category:src.category,date:item.pubDate||item.isoDate||new Date().toISOString(),url:item.link||item.guid||"#",image:item.thumbnail||item.enclosure?.link||"",excerpt:cleanTitle(item.description||"").slice(0,220)};
-}
-function unique(items){
-  const seen=new Set();
-  return items.filter(x=>{const k=x.title.toLowerCase().replace(/[^a-z0-9]+/g," ").trim();if(!k||seen.has(k))return false;seen.add(k);return true});
-}
+/* ============ HELPERS ============ */
+let allNews=[], active="All", lastUpdate=null, loading=false, shown=24;
+const $=id=>document.getElementById(id);
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stripHTML(s){const d=document.createElement("div");d.innerHTML=s||"";return(d.textContent||"").replace(/\s+/g," ").trim();}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 function ago(date){
   const t=new Date(date); if(isNaN(t)) return "";
   const m=Math.max(0,Math.floor((Date.now()-t.getTime())/60000));
-  if(m<60)return m+"m ago"; const h=Math.floor(m/60); if(h<24)return h+"h ago"; const d=Math.floor(h/24); if(d<7)return d+"d ago";
+  if(m<1)return "just now"; if(m<60)return m+"m ago"; const h=Math.floor(m/60); if(h<24)return h+"h ago"; const d=Math.floor(h/24); if(d<7)return d+"d ago";
   return t.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
 }
-function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function safeUrl(u){return /^https?:\/\//i.test(u||"")?u:"#";}
+function unique(items){
+  const seen=new Set();
+  return items.filter(x=>{const k=x.title.toLowerCase().replace(/[^a-z0-9]+/g," ").trim().slice(0,90);if(!k||seen.has(k))return false;seen.add(k);return true});
+}
 
+/* ============ FETCH + PARSE ============ */
+function txt(el,tag){const n=el.getElementsByTagName(tag)[0];return n?n.textContent:"";}
+function firstImg(html){const m=/<img[^>]+src=["']([^"']+)["']/i.exec(html||"");return m?m[1]:"";}
+function fromXML(xmlText,src){
+  const doc=new DOMParser().parseFromString(xmlText,"text/xml");
+  if(doc.getElementsByTagName("parsererror").length) throw new Error("bad xml");
+  const nodes=[...doc.getElementsByTagName("item"),...doc.getElementsByTagName("entry")];
+  if(!nodes.length) throw new Error("no items");
+  return nodes.slice(0,40).map(n=>{
+    const linkEl=n.getElementsByTagName("link")[0];
+    const link=(linkEl&&(linkEl.getAttribute("href")||linkEl.textContent))||txt(n,"guid");
+    const rawDesc=txt(n,"content:encoded")||txt(n,"description")||txt(n,"summary")||txt(n,"content");
+    const mc=n.getElementsByTagName("media:content")[0]||n.getElementsByTagName("media:thumbnail")[0];
+    const enc=n.getElementsByTagName("enclosure")[0];
+    let image=(mc&&mc.getAttribute("url"))||(enc&&/image/.test(enc.getAttribute("type")||"")&&enc.getAttribute("url"))||firstImg(rawDesc);
+    return build({title:txt(n,"title"),link,date:txt(n,"pubDate")||txt(n,"published")||txt(n,"updated")||txt(n,"dc:date"),desc:rawDesc,image,gsource:txt(n,"source")},src);
+  });
+}
+function fromJSON(data,src){
+  if(!data||!data.items||!data.items.length) throw new Error("no items");
+  return data.items.slice(0,40).map(x=>build({title:x.title,link:x.link,date:x.pubDate,desc:x.description||x.content,image:x.thumbnail||(x.enclosure&&x.enclosure.link)||firstImg(x.content||x.description),gsource:""},src));
+}
+function build(o,src){
+  let title=stripHTML(o.title), source=src.name;
+  // Google News appends " - Publisher" to titles; use publisher as the source label
+  if(o.gsource){source=o.gsource.trim();title=title.replace(new RegExp("\\s*[-–|]\\s*"+o.gsource.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"$"),"");}
+  let excerpt=stripHTML(o.desc).slice(0,220);
+  if(!excerpt||excerpt.toLowerCase().startsWith(title.toLowerCase().slice(0,40))) excerpt="";
+  let d=new Date(o.date); if(isNaN(d)||d>Date.now()+864e5) d=new Date();
+  return {title,source,category:src.category,date:d.toISOString(),url:safeUrl((o.link||"").trim()),image:safeUrl(o.image),excerpt:o.image&&o.image==="#"?"":excerpt};
+}
+async function withTimeout(url,ms){
+  const c=new AbortController(), t=setTimeout(()=>c.abort(),ms);
+  try{const r=await fetch(url,{signal:c.signal,cache:"no-store"}); if(!r.ok) throw new Error("HTTP "+r.status); return r;}
+  finally{clearTimeout(t);}
+}
 async function fetchSource(src){
-  const r=await fetch(proxyUrl(src.rss),{cache:"no-store"});
-  if(!r.ok)throw new Error("HTTP "+r.status);
-  const data=await r.json();
-  if(!data.items)throw new Error("No items");
-  return data.items.slice(0,18).map(x=>normalize(x,src));
-}
-async function loadNews(force=false){
-  document.getElementById("liveText").textContent="Updating feeds…";
-  const results=await Promise.allSettled(SOURCES.map(fetchSource));
-  let items=[];
-  results.forEach(r=>{if(r.status==="fulfilled")items.push(...r.value)});
-  items=unique(items).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(items.length<5){
-    const cached=JSON.parse(localStorage.getItem("mychess64-news")||"null");
-    items=(cached&&cached.length?cached:FALLBACK);
-    document.getElementById("liveText").textContent=items===FALLBACK?"Using built-in fallback":"Using cached news";
-  }else{
-    localStorage.setItem("mychess64-news",JSON.stringify(items.slice(0,100)));
-    localStorage.setItem("mychess64-news-updated",new Date().toISOString());
-    document.getElementById("liveText").textContent="Live feeds updated";
+  for(const relay of RELAYS){
+    try{
+      const r=await withTimeout(relay.url(src.rss),9000);
+      return relay.type==="json" ? fromJSON(await r.json(),src) : fromXML(await r.text(),src);
+    }catch(e){/* try next relay */}
   }
-  allNews=items.slice(0,100);
-  document.getElementById("storyCount").textContent=allNews.length;
-  document.getElementById("sourceCount").textContent=new Set(allNews.map(x=>x.source)).size;
-  const saved=localStorage.getItem("mychess64-news-updated");
-  document.getElementById("updatedAt").textContent=saved?ago(saved):"Just now";
-  renderFilters(); render();
+  throw new Error("all relays failed for "+src.name);
 }
+
+/* ============ LOAD ============ */
+async function loadNews(){
+  if(loading) return; loading=true;
+  $("liveText").textContent="Updating feeds…"; $("refreshBtn").disabled=true;
+  const results=await Promise.allSettled(SOURCES.map(fetchSource));
+  let items=[], ok=0;
+  results.forEach(r=>{if(r.status==="fulfilled"){ok++;items.push(...r.value)}});
+  const cutoff=Date.now()-MAX_AGE_DAYS*864e5;
+  items=unique(items.filter(x=>new Date(x.date).getTime()>cutoff).sort((a,b)=>new Date(b.date)-new Date(a.date))).slice(0,MAX_STORIES);
+  if(items.length>=5){
+    allNews=items; lastUpdate=new Date();
+    store.set("mychess64-news",items); store.set("mychess64-news-updated",lastUpdate.toISOString());
+    $("liveText").textContent="Live · "+ok+"/"+SOURCES.length+" feeds";
+  }else{
+    // keep whatever we already show; otherwise use cache, then the built-in fallback
+    if(!allNews.length){const c=store.get("mychess64-news");allNews=(c&&c.length)?c:FALLBACK;const u=store.get("mychess64-news-updated");lastUpdate=u?new Date(u):null;}
+    $("liveText").textContent="Offline · showing saved news (will retry)";
+  }
+  loading=false; $("refreshBtn").disabled=false;
+  paint();
+}
+function paint(){
+  $("storyCount").textContent=allNews.length;
+  $("sourceCount").textContent=new Set(allNews.map(x=>x.source)).size;
+  tick(); renderFilters(); render(); tickerFill();
+}
+function tick(){$("updatedAt").textContent=lastUpdate?ago(lastUpdate):"—";}
+
+/* ============ RENDER ============ */
 function renderFilters(){
-  const cats=["All",...Array.from(new Set(allNews.map(x=>x.category))).sort()];
-  document.getElementById("filters").innerHTML=cats.map(c=>`<button class="filter ${c===active?"active":""}" onclick="setFilter('${esc(c)}')">${esc(c)}</button>`).join("");
+  const order=["FIDE","India"];
+  const cats=Array.from(new Set(allNews.map(x=>x.category))).sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?9:ia)-(ib<0?9:ib)||a.localeCompare(b)});
+  $("filters").innerHTML=["All",...cats].map(c=>`<button class="filter ${c===active?"active":""}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
 }
-function setFilter(c){active=c;renderFilters();render();}
+$("filters").addEventListener("click",e=>{const b=e.target.closest(".filter");if(b){active=b.dataset.c;shown=24;renderFilters();render();}});
 function card(x){
- return `<article class="card" role="article">
+ return `<article class="card">
    <a class="thumb-link" target="_blank" rel="noopener" href="${esc(x.url)}" aria-label="Open ${esc(x.title)}">
-    <div class="thumb">${x.image?`<img loading="lazy" src="${esc(x.image)}" alt="" onerror="this.parentElement.innerHTML='<div class=placeholder>♞</div>'">`:`<div class="placeholder">♞</div>`}</div>
+    <div class="thumb">${x.image&&x.image!=="#"?`<img loading="lazy" referrerpolicy="no-referrer" src="${esc(x.image)}" alt="" onerror="this.parentElement.innerHTML='<div class=placeholder>♞</div>'">`:`<div class="placeholder">♞</div>`}</div>
    </a>
    <div class="card-body">
     <span class="badge">${esc(x.category)}</span>
     <h3>${esc(x.title)}</h3>
-    <p class="excerpt">${esc(x.excerpt || "Latest chess news and developments from the chess world.")}</p>
+    <p class="excerpt">${esc(x.excerpt||"Latest chess news and developments from the chess world.")}</p>
     <div class="card-footer"><span>${esc(x.source)} · ${ago(x.date)}</span><a class="read" target="_blank" rel="noopener" href="${esc(x.url)}">MORE →</a></div>
    </div>
  </article>`;
 }
 function render(){
- const q=document.getElementById("search").value.toLowerCase().trim();
- let list=allNews.filter(x=>(active==="All"||x.category===active)&&(!q||(x.title+" "+x.excerpt+" "+x.source).toLowerCase().includes(q)));
- document.getElementById("resultInfo").textContent=list.length+" stories";
+ const q=$("search").value.toLowerCase().trim();
+ const list=allNews.filter(x=>(active==="All"||x.category===active)&&(!q||(x.title+" "+x.excerpt+" "+x.source).toLowerCase().includes(q)));
+ $("resultInfo").textContent=list.length+" stories";
  const top=list.slice(0,3);
- document.getElementById("featured").innerHTML=top.length?top.map((x,i)=>`
+ $("featured").innerHTML=top.map(x=>`
   <a class="feature" target="_blank" rel="noopener" href="${esc(x.url)}">
-   ${x.image?`<img loading="lazy" src="${esc(x.image)}" alt="" onerror="this.style.display='none'">`:`<div class="placeholder" style="font-size:7rem">♟</div>`}
+   ${x.image&&x.image!=="#"?`<img loading="lazy" referrerpolicy="no-referrer" src="${esc(x.image)}" alt="" onerror="this.style.display='none'">`:`<div class="placeholder" style="font-size:7rem">♟</div>`}
    <div class="shade"></div><div class="feature-content"><span class="badge">${esc(x.category)} · ${esc(x.source)}</span><h3>${esc(x.title)}</h3><div class="meta">${esc(x.source)} · ${ago(x.date)} · MORE →</div></div>
-  </a>`).join(""):"";
- document.getElementById("grid").innerHTML=list.length?list.slice(3).map(card).join(""):`<div class="empty">No stories match your search/filter.</div>`;
+  </a>`).join("");
+ $("moreBtn").hidden=list.length<=3+shown;
+ $("grid").innerHTML=list.length?list.slice(3,3+shown).map(card).join(""):`<div class="empty">No stories match your search/filter.</div>`;
 }
-document.getElementById("search").addEventListener("input",render);
-document.getElementById("refreshBtn").addEventListener("click",()=>loadNews(true));
-document.getElementById("todayBtn").addEventListener("click",()=>{
- document.getElementById("search").value="";
- active="All"; renderFilters();
- const today=new Date();today.setHours(0,0,0,0);
- const todayList=allNews.filter(x=>new Date(x.date)>=today);
- document.getElementById("resultInfo").textContent=todayList.length+" stories today";
- document.getElementById("featured").innerHTML="";
- document.getElementById("grid").innerHTML=todayList.length?todayList.map(card).join(""):`<div class="empty">No feed has published a story dated today yet. Try Refresh News.</div>`;
+$("search").addEventListener("input",()=>{shown=24;render();});
+$("refreshBtn").addEventListener("click",loadNews);
+$("todayBtn").addEventListener("click",()=>{
+ $("search").value=""; active="All"; renderFilters();
+ const t=new Date();t.setHours(0,0,0,0);
+ const list=allNews.filter(x=>new Date(x.date)>=t);
+ $("resultInfo").textContent=list.length+" stories today"; $("featured").innerHTML=""; $("moreBtn").hidden=true;
+ $("grid").innerHTML=list.length?list.map(card).join(""):`<div class="empty">No story dated today yet. It updates automatically every ${REFRESH_MINUTES} minutes.</div>`;
 });
+
+$("moreBtn").addEventListener("click",()=>{shown+=24;render();});
+function tickerFill(){
+  const h=allNews.slice(0,15).map(x=>`<a target="_blank" rel="noopener" href="${esc(x.url)}"><b>${esc(x.category)}</b>${esc(x.title)}</a>`).join("");
+  $("ticker").innerHTML=h+h;
+}
+/* ============ AUTO-UPDATE ============ */
+// 1) show saved news instantly, 2) fetch fresh, 3) repeat on a timer, 4) refresh when tab is reopened
+const saved=store.get("mychess64-news");
+if(saved&&saved.length){allNews=saved;const u=store.get("mychess64-news-updated");lastUpdate=u?new Date(u):null;paint();}
 loadNews();
+setInterval(loadNews,REFRESH_MINUTES*60000);
+setInterval(tick,30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&(!lastUpdate||Date.now()-lastUpdate>REFRESH_MINUTES*60000))loadNews();});
 </script>
 </body>
 </html>
