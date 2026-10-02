@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#080909">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MyChess64 — Premium Chess Clock</title>
+<meta name="theme-color" content="#080909">
+
+
+<style>
+:root{
+  --bg:#080909;
+  --panel:#111315;
+  --panel2:#1a1c1e;
+  --ivory:#f2eee3;
+  --ivory2:#e4dfd2;
+  --sage:#e6eee0;
+  --sage2:#d4e0ca;
+  --ink:#111315;
+  --muted:#77736b;
+  --white:#f8f5ed;
+  --gold:#d4ad62;
+  --gold2:#f0d18a;
+  --amber:#c78b2f;
+  --red:#a33232;
+  --line:#393c3f;
+}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg)}
+body{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:#eee;
+}
+button,input,select{font:inherit}
+input{
+  -webkit-user-select:text;
+  user-select:text;
+  -webkit-touch-callout:default;
+}
+button{cursor:pointer}
+
+#app{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100dvh;
+  min-height:100dvh;
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto minmax(0,1fr);
+  background:
+    radial-gradient(circle at 50% 0,#292822 0,#111312 24%,#080909 68%);
+  overflow:hidden;
+  padding:
+    max(6px,env(safe-area-inset-top))
+    max(6px,env(safe-area-inset-right))
+    max(6px,env(safe-area-inset-bottom))
+    max(6px,env(safe-area-inset-left));
+}
+
+/* ---------- PLAYER CLOCK ---------- */
+.clock{
+  position:relative;
+  min-height:0;
+  margin:5px 0;
+  border-radius:24px;
+  border:1px solid #7a6744;
+  overflow:hidden;
+  color:var(--ink);
+  background:linear-gradient(135deg,#fffdf6 0%,var(--ivory) 56%,#ddd5c4 100%);
+  box-shadow:
+    0 16px 38px #000b,
+    inset 0 2px 0 #fff,
+    inset 0 -1px 0 #8b754d,
+    0 0 0 1px #111;
+  touch-action:manipulation;
+  user-select:none;
+}
+.clock::after{
+  content:"";
+  position:absolute;
+  inset:7px;
+  border:1px solid #c9a76288;
+  border-radius:18px;
+  pointer-events:none;
+}
+.clock-inner{
+  position:absolute;
+  inset:0;
+  padding:clamp(13px,2.6vh,25px) clamp(18px,5vw,30px);
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  align-items:center;
+  z-index:1;
+}
+.clock.black .clock-inner{transform:rotate(180deg)}
+
+.clock.inactive{
+  background:linear-gradient(135deg,#eeeae0 0%,#e2ddd1 58%,#d7d0c1 100%);
+}
+.clock.active{
+  background:linear-gradient(135deg,#242628 0%,#111315 55%,#070809 100%);
+  border-color:#d4ad62;
+  color:#f7f3e8;
+  box-shadow:
+    0 0 0 2px #d4ad62,
+    0 17px 42px #000b,
+    inset 0 2px 0 #ffffff10,
+    inset 0 -1px 0 #000;
+}
+.clock.active .player-line,
+.clock.active .clock-meta{color:#e2ddd2}
+.clock.active .status{
+  color:#f3d58f;
+  border-color:#d4ad62;
+  background:#00000033;
+}
+.clock.active .time{color:#fffdf6;text-shadow:0 1px 0 #000}
+
+.clock.warning{
+  background:linear-gradient(135deg,#fff8e8,#f2e3c4);
+  border-color:#c78b2f;
+}
+.clock.critical{
+  background:linear-gradient(135deg,#fff0ed,#eecfca);
+  border-color:#a33232;
+}
+
+.clock.running-red{
+  background:linear-gradient(135deg,#f6d7d4 0%,#e9b7b3 58%,#dca19e 100%);
+  border-color:#a33232;
+  box-shadow:0 0 0 2px #a33232,0 17px 42px #000b,inset 0 2px 0 #fff,inset 0 -1px 0 #7d2525;
+}
+.clock.running-red .status{color:#741f1f;border-color:#a33232;background:#fff1ef66}
+.clock.running-red .clock-meta{color:#6e2929}
+.clock.running-red .live-dot{background:#a33232;box-shadow:0 0 12px #a33232,inset 0 1px #fff}
+.clock.flag{
+  background:linear-gradient(135deg,#b43f3f,#761f1f);
+  border-color:#e07c7c;
+  color:#fff;
+}
+
+.player-line{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(11px,2.1vw,15px);
+  font-weight:700;
+  letter-spacing:.12em;
+}
+.player-name{display:flex;align-items:center;gap:7px}
+.player-symbol{font-size:1.2em}
+.clock.black .player-symbol{font-size:1.2em}
+.status{
+  border:1px solid #aaa398;
+  border-radius:8px;
+  padding:5px 10px;
+  font:700 9px/1 Inter,system-ui,sans-serif;
+  letter-spacing:.13em;
+  background:#d8d2c688;
+}
+.active .status{
+  color:#6c5525;
+  border-color:var(--gold);
+  background:#f0d18a33;
+}
+.flag .status{
+  color:#fff;
+  border-color:#f2b6b6;
+  background:#741c1c55;
+}
+.time{
+  align-self:center;
+  justify-self:center;
+  font-family:Georgia,"Times New Roman",serif;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum";
+  font-size:clamp(78px,22vw,148px);
+  line-height:.86;
+  font-weight:700;
+  letter-spacing:-.045em;
+  white-space:nowrap;
+  text-shadow:0 1px 0 #fff9;
+}
+.flag .time{color:#fff;text-shadow:0 1px #641818}
+.clock-meta{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:18px;
+  color:#716c63;
+  font-size:11px;
+}
+.clock-meta b{font-weight:800}
+.active .clock-meta{color:#58614f}
+.flag .clock-meta{color:#f7d8d8}
+.live-dot{
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  margin-right:5px;
+  background:#a7a299;
+  box-shadow:inset 0 1px #fff;
+}
+.active .live-dot{
+  background:var(--gold);
+  box-shadow:0 0 12px #d4ad62,inset 0 1px #fff;
+}
+.warning .live-dot{background:var(--amber)}
+.critical .live-dot{background:var(--red)}
+.flag .live-dot{background:#fff}
+
+/* ---------- CENTRAL CONTROL DECK ---------- */
+#controlDeck{
+  position:relative;
+  z-index:5;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  padding:8px;
+  border:1px solid #4b4030;
+  border-radius:19px;
+  background:linear-gradient(145deg,#25282a,#0f1011);
+  box-shadow:0 12px 30px #000c,inset 0 1px #fff1;
+}
+.control{
+  min-height:56px;
+  border:1px solid #50483b;
+  border-radius:14px;
+  color:#ddd8ce;
+  background:radial-gradient(circle at 50% 15%,#383b3d,#17191b 72%);
+  box-shadow:inset 0 1px #fff2,0 4px 9px #0009;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+}
+.control:active{transform:translateY(1px) scale(.99)}
+.control .icon{font-size:18px;color:#f0eadf}
+.control small{font-size:8px;letter-spacing:.11em;color:#bdb7aa}
+.control.primary{
+  border-color:var(--gold);
+  box-shadow:inset 0 1px #fff2,0 0 15px #d4ad6220,0 4px 9px #0009;
+}
+.control.primary .icon{color:var(--gold2)}
+
+/* ---------- MODE SHEET ---------- */
+#modeSheet{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:8px;
+  background:#000b;
+}
+#modeSheet.open{display:flex}
+.sheet{
+  width:min(600px,100%);
+  max-height:92dvh;
+  overflow:auto;
+  border:1px solid #4b4030;
+  border-radius:22px;
+  padding:16px;
+  background:linear-gradient(145deg,#1b1d1f,#0e0f10);
+  box-shadow:0 -15px 50px #000;
+}
+.sheet-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:14px;
+}
+.sheet-title{font:700 13px/1 Inter,sans-serif;letter-spacing:.17em}
+.close{
+  width:38px;height:38px;border-radius:10px;
+  border:1px solid #45484b;background:#25282a;color:#eee;
+}
+.section-title{
+  margin:15px 0 8px;
+  color:#9d988e;font-size:9px;font-weight:800;letter-spacing:.17em;
+}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.time-btn,.mode-card{
+  border:1px solid #3b3f42;
+  border-radius:11px;
+  background:linear-gradient(145deg,#292c2f,#1b1d1f);
+  color:#ddd;
+  box-shadow:inset 0 1px #fff1;
+}
+.time-btn{padding:10px 4px;font-size:11px}
+.time-btn:hover,.time-btn:focus{border-color:var(--gold)}
+.mode-card{
+  width:100%;
+  text-align:left;
+  padding:12px;
+  margin-top:7px;
+}
+.mode-card b{display:block;font-size:11px;margin-bottom:3px}
+.mode-card span{display:block;color:#919498;font-size:9px;line-height:1.4}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+
+/* ---------- CUSTOM TIME ---------- */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field{
+  padding:9px;border:1px solid #393d40;border-radius:11px;background:#1b1d1f;
+}
+.field label{display:block;margin-bottom:5px;color:#92969a;font-size:8px;letter-spacing:.11em}
+.field input{
+  width:100%;padding:9px;border-radius:8px;
+  border:1px solid #404449;background:#0d0f10;color:#fff;
+  text-align:center;outline:none;
+}
+.field input:focus{border-color:var(--gold)}
+.full-field{margin-top:8px}
+.sheet-actions{display:flex;gap:8px;margin-top:12px}
+.gold-btn,.dark-btn{
+  flex:1;padding:12px;border-radius:11px;font-weight:800;letter-spacing:.04em
+}
+.gold-btn{border:1px solid #e2bf75;background:linear-gradient(145deg,#d9b66d,#a98443);color:#17130b}
+.dark-btn{border:1px solid #414548;background:#25282b;color:#ddd}
+
+/* ---------- STATUS TOAST ---------- */
+#toast{
+  position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));
+  z-index:80;transform:translate(-50%,20px);
+  padding:10px 15px;border:1px solid #4a4e51;border-radius:99px;
+  background:#202326;color:#eee;font-size:11px;opacity:0;pointer-events:none;
+  transition:.18s;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-height:650px){
+  .clock-inner{padding:10px 18px}
+  .control{min-height:48px}
+  #controlDeck{padding:6px}
+  .clock{margin:3px 0}
+}
+@media(min-width:700px){
+  #app{width:min(680px,100%);margin:auto}
+}
+</style>
+</head>
+
+<body>
+<main id="app" aria-label="MyChess64 Premium Chess Clock">
+
+  <!-- BLACK: physically upside-down for the opponent -->
+  <section id="blackClock" class="clock black inactive" data-player="black" aria-label="Black clock">
+    <div class="clock-inner">
+      <div class="player-line">
+        <span class="player-name"><span class="player-symbol">♚</span>BLACK</span>
+        <span class="status" id="blackStatus">WAITING</span>
+      </div>
+      <div class="time" id="blackTime">10:00</div>
+      <div class="clock-meta">
+        <span><i class="live-dot"></i>Moves: <b id="blackMoves">0</b></span>
+        <span id="blackInc">+0 sec</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CENTRAL PHYSICAL-CLOCK-LIKE CONTROL DECK -->
+  <nav id="controlDeck" aria-label="Clock controls">
+    <button class="control" id="resetBtn" type="button">
+      <span class="icon">↻</span><small>RESET</small>
+    </button>
+    <button class="control primary" id="startBtn" type="button">
+      <span class="icon" id="startIcon">▶</span><small id="startLabel">START</small>
+    </button>
+    <button class="control" id="modeBtn" type="button">
+      <span class="icon">◴</span><small>MODE</small>
+    </button>
+    <button class="control" id="soundBtn" type="button">
+      <span class="icon" id="soundIcon">◉</span><small id="soundLabel">SOUND</small>
+    </button>
+  </nav>
+
+  <!-- WHITE -->
+  <section id="whiteClock" class="clock white active" data-player="white" aria-label="White clock">
+    <div class="clock-inner">
+      <div class="player-line">
+        <span class="player-name"><span class="player-symbol">♔</span>WHITE</span>
+        <span class="status" id="whiteStatus">READY</span>
+      </div>
+      <div class="time" id="whiteTime">10:00</div>
+      <div class="clock-meta">
+        <span><i class="live-dot"></i>Moves: <b id="whiteMoves">0</b></span>
+        <span id="whiteInc">+0 sec</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODE IS THE SINGLE GATEWAY FOR TIME CONTROL + ADVANCED SETTINGS -->
+<div id="modeSheet" aria-hidden="true">
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-head">
+      <span class="sheet-title" id="sheetTitle">MODE</span>
+      <button class="close" id="closeSheet" type="button">✕</button>
+    </div>
+    <div id="sheetContent"></div>
+  </section>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   MyChess64 — Architecture
+   1. State is the single source of truth.
+   2. Timing is timestamp based; setInterval is only a renderer.
+   3. Player switching and visual state happen in one transaction.
+   4. Mode sheet owns every time-control setting.
+   5. Main game screen never scrolls.
+   ============================================================ */
+
+const DEFAULT_PROGRAM_VERSION = "v4-color-alarm-default";
+
+const PRESETS = [
+  ["1 + 0",60,0],["1 + 1",60,1],["2 + 1",120,1],
+  ["3 + 0",180,0],["3 + 2",180,2],["5 + 0",300,0],
+  ["5 + 3",300,3],["10 + 0",600,0],["10 + 5",600,5],
+  ["15 + 10",900,10],["25 + 10",1500,10],["90 + 30",5400,30]
+];
+
+const state = {
+  players:{
+    white:{base:180,remain:180,inc:2,moves:0},
+    black:{base:180,remain:180,inc:2,moves:0}
+  },
+  activePlayer:"white",
+  status:"ready", // ready | running | paused | finished
+  sound:true,
+  haptic:true,
+  fullscreen:false,
+  wakeLock:null,
+  lastTimestamp:0,
+  renderHandle:0,
+  flagAlarmTimer:null,
+  flagAlarmActive:false,
+  flagAlarmTimer:null,
+  flagAlarmActive:false,
+  controlLabel:"3 + 2"
+};
+
+const $ = id => document.getElementById(id);
+
+function formatTime(ms){
+  let total = Math.max(0,Math.ceil(ms/1000));
+  const h = Math.floor(total/3600);
+  total %= 3600;
+  const m = Math.floor(total/60);
+  const s = total % 60;
+  return h
+    ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+    : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function playerClass(p){
+  const x = state.players[p];
+  if(x.remain <= 0) return "flag";
+  if(state.status === "running" && state.activePlayer === p) return "running-red";
+  if(x.remain <= 10000) return "critical";
+  if(x.remain <= 30000) return "warning";
+  return "inactive";
+}
+
+function statusText(p){
+  const x = state.players[p];
+  if(x.remain <= 0) return "FLAG FALL";
+  if(state.status === "finished") return "GAME OVER";
+  if(state.status === "paused") return "PAUSED";
+  if(state.status === "running") return state.activePlayer === p ? "YOUR TURN" : "WAITING";
+  return p === "white" ? "READY" : "WAITING";
+}
+
+/* ---------- Rendering: only reflects state ---------- */
+function render(){
+  for(const p of ["white","black"]){
+    const x = state.players[p];
+    const clock = $(p+"Clock");
+    clock.className = `clock ${p} ${playerClass(p)}`;
+    $(p+"Time").textContent = formatTime(x.remain);
+    $(p+"Moves").textContent = x.moves;
+    $(p+"Inc").textContent = `+${x.inc} sec`;
+    $(p+"Status").textContent = statusText(p);
+  }
+
+  $("startIcon").textContent =
+    state.status === "running" ? "Ⅱ" :
+    state.status === "paused" ? "▶" : "▶";
+
+  $("startLabel").textContent =
+    state.status === "running" ? "PAUSE" :
+    state.status === "paused" ? "RESUME" : "START";
+
+  $("soundIcon").textContent = state.sound ? "◉" : "○";
+  $("soundLabel").textContent = state.sound ? "SOUND" : "MUTED";
+}
+
+/* ---------- Audio / haptic ---------- */
+let audioContext=null;
+
+function ensureAudio(){
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!AudioCtx)return null;
+    if(!audioContext) audioContext=new AudioCtx();
+    if(audioContext.state==="suspended") audioContext.resume();
+    return audioContext;
+  }catch(_){return null}
+}
+
+function beep(type="move"){
+  const ctx=ensureAudio();
+  if(!ctx || !state.sound)return;
+
+  try{
+    const now=ctx.currentTime;
+
+    /* Soft mechanical chess-clock click for normal presses. */
+    if(type==="move"){
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.type="triangle";
+      osc.frequency.setValueAtTime(1050,now);
+      osc.frequency.exponentialRampToValueAtTime(760,now+0.025);
+      gain.gain.setValueAtTime(0.0001,now);
+      gain.gain.exponentialRampToValueAtTime(0.420,now+0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.045);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now+0.05);
+      return;
+    }
+
+    /* Start/resume: soft single click, slightly lower pitched. */
+    if(type==="start"){
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.type="triangle";
+      osc.frequency.setValueAtTime(700,now);
+      osc.frequency.exponentialRampToValueAtTime(520,now+0.03);
+      gain.gain.setValueAtTime(0.0001,now);
+      gain.gain.exponentialRampToValueAtTime(0.025,now+0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.05);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now+0.055);
+      return;
+    }
+
+    /* Flag alarm remains clearly audible and repeating. */
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.type="square";
+    osc.frequency.value=type==="flag" ? 420 : 660;
+    gain.gain.setValueAtTime(0.0001,now);
+    gain.gain.exponentialRampToValueAtTime(type==="flag" ? 0.16 : 0.05,now+0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001,now+(type==="flag" ? 0.24 : 0.08));
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now+(type==="flag" ? 0.25 : 0.085));
+  }catch(_){}
+}
+
+function haptic(ms=12){
+  if(state.haptic && navigator.vibrate) navigator.vibrate(ms);
+}
+
+/* Ensure the browser unlocks audio on the first real user gesture. */
+["pointerdown","touchstart","click"].forEach(evt=>{
+  document.addEventListener(evt,()=>ensureAudio(),{passive:true});
+});
+/* ---------- Touch protection ---------- */
+document.addEventListener("contextmenu", e=>{
+  if(!e.target.closest("input,textarea,select")) e.preventDefault();
+});
+document.addEventListener("selectstart", e=>{
+  if(!e.target.closest("input,textarea,select")) e.preventDefault();
+});
+document.addEventListener("dragstart", e=>e.preventDefault());
+
+/* ---------- Screen / wake ---------- */
+async function requestImmersive(){
+  try{
+    if(document.fullscreenElement !== document.documentElement &&
+       document.documentElement.requestFullscreen){
+      await document.documentElement.requestFullscreen();
+    }
+    state.fullscreen=true;
+  }catch(_){
+    state.fullscreen=false;
+  }
+  await requestWakeLock();
+}
+async function requestWakeLock(){
+  try{
+    if("wakeLock" in navigator){
+      if(state.wakeLock) return;
+      state.wakeLock = await navigator.wakeLock.request("screen");
+      state.wakeLock.addEventListener("release",()=>state.wakeLock=null);
+    }
+  }catch(_){}
+}
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible" && state.status==="running"){
+    state.lastTimestamp = performance.now();
+    requestWakeLock();
+  }
+});
+
+function startFlagAlarm(){
+  if(state.flagAlarmActive)return;
+  state.flagAlarmActive=true;
+  beep("flag");
+  haptic(180);
+  clearInterval(state.flagAlarmTimer);
+  state.flagAlarmTimer=setInterval(()=>{
+    if(state.status==="finished" && state.flagAlarmActive){
+      beep("flag");
+      haptic(180);
+    }else{
+      stopFlagAlarm();
+    }
+  },900);
+}
+
+function stopFlagAlarm(){
+  state.flagAlarmActive=false;
+  clearInterval(state.flagAlarmTimer);
+  state.flagAlarmTimer=null;
+}
+
+/* ---------- Timing engine ---------- */
+function startGame(){
+  if(state.status==="finished") return;
+  ensureAudio();
+  stopFlagAlarm();
+  state.status="running";
+  state.activePlayer="white";
+  state.lastTimestamp=performance.now();
+  requestImmersive();
+  beep("start"); haptic(16);
+  scheduleRender();
+  render();
+}
+
+function pauseGame(){
+  if(state.status!=="running") return;
+  consumeElapsed();
+  state.status="paused";
+  stopFlagAlarm();
+  beep("move");
+  render();
+}
+
+function resumeGame(){
+  if(state.status!=="paused") return;
+  ensureAudio();
+  stopFlagAlarm();
+  state.status="running";
+  state.lastTimestamp=performance.now();
+  requestImmersive();
+  scheduleRender();
+  beep("start");
+  render();
+}
+
+function consumeElapsed(){
+  if(state.status!=="running") return true;
+  const now=performance.now();
+  const delta=now-state.lastTimestamp;
+  state.lastTimestamp=now;
+  const p=state.players[state.activePlayer];
+  p.remain -= delta;
+  if(p.remain<=0){
+    p.remain=0;
+    state.status="finished";
+    startFlagAlarm();
+    return false;
+  }
+  return true;
+}
+
+function renderLoop(){
+  if(state.status!=="running") return;
+  consumeElapsed();
+  render();
+  if(state.status==="running") scheduleRender();
+}
+function scheduleRender(){
+  cancelAnimationFrame(state.renderHandle);
+  state.renderHandle=requestAnimationFrame(renderLoop);
+}
+
+/* ---------- The critical move transaction ---------- */
+function completeMove(player){
+  if(state.status!=="running") return;
+  if(state.activePlayer!==player) return;
+  ensureAudio(); // inactive side cannot switch clock
+
+  if(!consumeElapsed()){
+    render();
+    return;
+  }
+
+  const current=state.players[player];
+
+  // Fischer-style increment for this player.
+  current.remain += current.inc*1000;
+  current.moves += 1;
+
+  // Single authoritative switch.
+  state.activePlayer = player==="white" ? "black" : "white";
+  state.lastTimestamp = performance.now();
+
+  beep("move");
+  haptic(12);
+  render();
+  saveLastProgram();
+}
+
+/* ---------- Reset protection ---------- */
+function resetGame(){
+  if(state.status==="running"){
+    if(!confirm("Reset the current game?")) return;
+  }
+  stopFlagAlarm();
+  cancelAnimationFrame(state.renderHandle);
+  stopFlagAlarm();
+  state.status="ready";
+  state.activePlayer="white";
+  for(const p of ["white","black"]){
+    state.players[p].remain=state.players[p].base*1000;
+    state.players[p].moves=0;
+  }
+  render();
+}
+
+/* ---------- Time control ---------- */
+function applyPreset(label,seconds,increment){
+  if(state.status==="running" && !confirm("Start a new game with this time control?")) return;
+  state.players.white={base:seconds,remain:seconds*1000,inc:increment,moves:0};
+  state.players.black={base:seconds,remain:seconds*1000,inc:increment,moves:0};
+  state.activePlayer="white";
+  state.status="ready";
+  state.controlLabel=label;
+  saveLastProgram();
+  closeMode();
+  render();
+}
+
+function applyCustomTime(){
+  const wm=Math.max(0,+$("wm").value||0);
+  const ws=Math.max(0,Math.min(59,+$("ws").value||0));
+  const wi=Math.max(0,+$("wi").value||0);
+  const bm=Math.max(0,+$("bm").value||0);
+  const bs=Math.max(0,Math.min(59,+$("bs").value||0));
+  const bi=Math.max(0,+$("bi").value||0);
+
+  const white=wm*60+ws;
+  const black=bm*60+bs;
+
+  if(white<=0 || black<=0){
+    toast("Both players need a starting time.");
+    return;
+  }
+
+  if(state.status==="running" && !confirm("Start a new game with custom time?")) return;
+
+  state.players.white={base:white,remain:white*1000,inc:wi,moves:0};
+  state.players.black={base:black,remain:black*1000,inc:bi,moves:0};
+  state.activePlayer="white";
+  state.status="ready";
+  state.controlLabel=`W ${formatTime(white*1000)} +${wi} / B ${formatTime(black*1000)} +${bi}`;
+  saveLastProgram();
+  closeMode();
+  render();
+  toast("Custom asymmetric time applied.");
+}
+
+/* ---------- Mode UI ---------- */
+function openMode(content){
+  $("sheetContent").innerHTML=content;
+  $("modeSheet").classList.add("open");
+  $("modeSheet").setAttribute("aria-hidden","false");
+}
+function closeMode(){
+  $("modeSheet").classList.remove("open");
+  $("modeSheet").setAttribute("aria-hidden","true");
+}
+function modeHome(){
+  openMode(`
+    <div class="section-title">QUICK TIME</div>
+    <div class="time-grid">
+      ${PRESETS.map((p,i)=>`<button class="time-btn" data-preset="${i}">${p[0]}</button>`).join("")}
+    </div>
+
+    <div class="section-title">CUSTOM</div>
+    <button class="mode-card" id="customCard">
+      <b>Custom Time — Independent White & Black</b>
+      <span>Different starting times and different increments for each player.</span>
+    </button>
+
+    <div class="section-title">ADVANCED</div>
+    <div class="mode-grid">
+      <button class="mode-card" id="fischerCard"><b>Fischer Increment</b><span>Individual increment after each move.</span></button>
+      <button class="mode-card" id="delayCard"><b>Delay</b><span>Configure a delay before main time is consumed.</span></button>
+      <button class="mode-card" id="bronsteinCard"><b>Bronstein</b><span>Return unused delay after the move.</span></button>
+      <button class="mode-card" id="periodCard"><b>Multi-Period</b><span>Configure up to four tournament periods.</span></button>
+    </div>
+
+    <div class="section-title">ARBITER</div>
+    <button class="mode-card" id="arbiterCard">
+      <b>Arbiter Mode</b><span>Correct time, move count, active side and game state.</span>
+    </button>
+
+    <div class="section-title">DEVICE</div>
+    <div class="mode-grid">
+      <button class="mode-card" id="soundCard"><b>Sound</b><span>${state.sound?"ON":"OFF"}</span></button>
+      <button class="mode-card" id="hapticCard"><b>Haptic</b><span>${state.haptic?"ON":"OFF"}</span></button>
+    </div>
+  `);
+
+  document.querySelectorAll("[data-preset]").forEach(btn=>{
+    btn.onclick=()=>{
+      const p=PRESETS[+btn.dataset.preset];
+      applyPreset(...p);
+    };
+  });
+  $("customCard").onclick=customView;
+  $("fischerCard").onclick=()=>toast("Fischer mode uses the selected increment settings.");
+  $("delayCard").onclick=()=>toast("Delay configuration will be added to Advanced Time.");
+  $("bronsteinCard").onclick=()=>toast("Bronstein configuration will be added to Advanced Time.");
+  $("periodCard").onclick=()=>toast("Multi-Period configuration will be added to Tournament Mode.");
+  $("arbiterCard").onclick=arbiterView;
+  $("soundCard").onclick=()=>{state.sound=!state.sound;modeHome();render()};
+  $("hapticCard").onclick=()=>{state.haptic=!state.haptic;modeHome();render()};
+}
+
+function customView(){
+  openMode(`
+    <div class="section-title">WHITE CLOCK</div>
+    <div class="fields">
+      <div class="field"><label>MINUTES</label><input id="wm" type="number" min="0" value="${Math.floor(state.players.white.base/60)}"></div>
+      <div class="field"><label>SECONDS</label><input id="ws" type="number" min="0" max="59" value="${state.players.white.base%60}"></div>
+    </div>
+    <div class="field full-field"><label>WHITE INCREMENT / MOVE (SEC)</label><input id="wi" type="number" min="0" value="${state.players.white.inc}"></div>
+
+    <div class="section-title">BLACK CLOCK</div>
+    <div class="fields">
+      <div class="field"><label>MINUTES</label><input id="bm" type="number" min="0" value="${Math.floor(state.players.black.base/60)}"></div>
+      <div class="field"><label>SECONDS</label><input id="bs" type="number" min="0" max="59" value="${state.players.black.base%60}"></div>
+    </div>
+    <div class="field full-field"><label>BLACK INCREMENT / MOVE (SEC)</label><input id="bi" type="number" min="0" value="${state.players.black.inc}"></div>
+
+    <div class="sheet-actions">
+      <button class="gold-btn" id="applyCustom">APPLY CUSTOM TIME</button>
+      <button class="dark-btn" id="backMode">BACK</button>
+    </div>
+  `);
+  $("applyCustom").onclick=applyCustomTime;
+  $("backMode").onclick=modeHome;
+}
+
+function arbiterView(){
+  openMode(`
+    <div class="section-title">ARBITER CORRECTION</div>
+    <div class="fields">
+      <div class="field"><label>WHITE SECONDS</label><input id="aw" type="number" min="0" value="${Math.round(state.players.white.remain/1000)}"></div>
+      <div class="field"><label>BLACK SECONDS</label><input id="ab" type="number" min="0" value="${Math.round(state.players.black.remain/1000)}"></div>
+    </div>
+    <div class="field full-field"><label>MOVE COUNT</label><input id="am" type="number" min="0" value="${Math.max(state.players.white.moves,state.players.black.moves)}"></div>
+    <div class="section-title">ACTIVE CLOCK</div>
+    <div class="mode-grid">
+      <button class="mode-card" id="activeWhite"><b>WHITE</b><span>Make White the active side.</span></button>
+      <button class="mode-card" id="activeBlack"><b>BLACK</b><span>Make Black the active side.</span></button>
+    </div>
+    <div class="sheet-actions">
+      <button class="gold-btn" id="applyArbiter">APPLY CORRECTION</button>
+      <button class="dark-btn" id="backArbiter">BACK</button>
+    </div>
+  `);
+  $("activeWhite").onclick=()=>{state.activePlayer="white";toast("White selected as active side")};
+  $("activeBlack").onclick=()=>{state.activePlayer="black";toast("Black selected as active side")};
+  $("applyArbiter").onclick=()=>{
+    state.players.white.remain=Math.max(0,+$("aw").value||0)*1000;
+    state.players.black.remain=Math.max(0,+$("ab").value||0)*1000;
+    const m=Math.max(0,+$("am").value||0);
+    state.players.white.moves=m;state.players.black.moves=m;
+    if(state.status==="finished")state.status="paused";
+    render();closeMode();toast("Arbiter correction applied");
+  };
+  $("backArbiter").onclick=modeHome;
+}
+
+/* ---------- Persistence ---------- */
+function saveLastProgram(){
+  localStorage.setItem("mychess64-last-program",JSON.stringify({
+    white:{base:state.players.white.base,inc:state.players.white.inc},
+    black:{base:state.players.black.base,inc:state.players.black.inc},
+    label:state.controlLabel
+  }));
+}
+function loadLastProgram(){
+  // Keep the product default on every fresh page load:
+  // 03:00 for both players, +2 seconds per move.
+  // Saved programs are not allowed to override the startup default.
+  state.players.white={base:180,remain:180000,inc:2,moves:0};
+  state.players.black={base:180,remain:180000,inc:2,moves:0};
+  state.controlLabel="3 + 2";
+}
+
+/* ---------- UX ---------- */
+function toast(message){
+  const t=$("toast");
+  t.textContent=message;t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove("show"),1800);
+}
+
+$("startBtn").onclick=()=>{
+  if(state.status==="running") pauseGame();
+  else if(state.status==="paused") resumeGame();
+  else startGame();
+};
+$("resetBtn").onclick=resetGame;
+$("modeBtn").onclick=modeHome;
+$("soundBtn").onclick=()=>{
+  state.sound=!state.sound;
+  render();
+  beep("move");
+};
+
+$("whiteClock").addEventListener("pointerup",()=>completeMove("white"));
+$("blackClock").addEventListener("pointerup",()=>completeMove("black"));
+
+$("closeSheet").onclick=closeMode;
+$("modeSheet").addEventListener("pointerup",e=>{
+  if(e.target===$("modeSheet"))closeMode();
+});
+
+document.addEventListener("fullscreenchange",()=>{
+  state.fullscreen=!!document.fullscreenElement;
+});
+
+/* Initial state */
+loadLastProgram();
+render();
+
+/* PWA-first immersive behavior:
+   - Installed standalone PWA: already occupies the app window; do not call
+     browser Fullscreen API, avoiding Android's fullscreen notification.
+   - Normal browser tab: retain the existing automatic fullscreen request. */
+if (window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true) {
+  state.fullscreen = true;
+  requestWakeLock();
+} else {
+  requestImmersive();
+}
+</script>
+
+</body>
+</html>
