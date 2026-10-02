@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#171717">
+<title>Square Sense — Piece Training</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#eef1f5;--surface:#fff;--surface2:#f6f7f9;--border:#dfe3e8;
+  --text:#17191c;--muted:#6f7782;--accent:#b58863;--accent2:#f0d9b5;
+  --board-light:#f0d9b5;--board-dark:#b58863;
+  --shadow:0 10px 30px rgba(20,30,40,.08)
+}
+body.dark{
+  --bg:#0f1114;--surface:#181b20;--surface2:#20242a;--border:#30353d;
+  --text:#f2f4f7;--muted:#9aa3ad;--accent:#d3a276;--accent2:#f0d9b5;
+  --shadow:0 12px 34px rgba(0,0,0,.28)
+}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+body{display:flex;justify-content:center}
+button{font:inherit}
+.app{width:100%;max-width:1500px;min-height:100vh;padding:18px;display:flex;flex-direction:column;gap:16px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.brand{font-weight:900;letter-spacing:.5px;font-size:20px}.brand span{font-weight:600;color:var(--muted);font-size:12px;margin-left:8px}
+.top-actions{display:flex;gap:8px}.btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:800}.btn:hover{filter:brightness(.98)}.btn.icon{width:42px;padding:9px 0;text-align:center}.btn.primary{background:var(--accent2);color:#171717;border-color:var(--accent2)}
+.main{display:flex;gap:16px;align-items:stretch;flex:1;min-height:0}
+.board-area{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.board-wrap{position:relative;width:min(78vh,calc(100vw - 430px),820px);min-width:320px;aspect-ratio:1}
+.board{position:absolute;inset:0;overflow:hidden;border-radius:6px;box-shadow:0 12px 30px rgba(0,0,0,.20);user-select:none}
+.sq{position:absolute;width:12.5%;height:12.5%;display:flex;align-items:center;justify-content:center}
+.sq.light{background:var(--board-light)}.sq.dark{background:var(--board-dark)}
+.coord{position:absolute;font-size:clamp(10px,1.4vw,16px);font-weight:900;pointer-events:none;line-height:1}.file{right:5px;bottom:4px}.rank{left:5px;top:4px}.light .coord{color:#b58863}.dark .coord{color:#f0d9b5}
+.board-piece{position:absolute;width:12.5%;height:12.5%;z-index:8;display:flex;align-items:center;justify-content:center;pointer-events:none;user-select:none}.board-piece img{width:88%;height:88%;object-fit:contain;display:block}.piece-symbol img{width:30px;height:30px;object-fit:contain;display:block}.target-marker{position:absolute;width:12.5%;height:12.5%;z-index:5;pointer-events:none;border:5px solid rgba(255,255,255,.96);box-shadow:0 0 0 4px rgba(0,0,0,.28),inset 0 0 0 999px rgba(255,255,255,.08);border-radius:2px;transition:left .12s,top .12s}
+.target-marker[hidden]{display:none}
+.feedback{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.18);pointer-events:none}
+.feedback[hidden]{display:none}
+.feedback-symbol{font-size:clamp(54px,9vw,92px);font-weight:1000;line-height:1;color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.55)}
+.feedback-text{margin-top:8px;font-size:clamp(30px,5vw,56px);font-weight:1000;text-transform:uppercase;color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.55)}
+.panel{width:350px;flex:0 0 350px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between}.panel h2{font-size:20px;margin:0}.panel-tag{font-size:10px;font-weight:900;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.answer-display{min-height:88px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--surface2);border:1px solid var(--border);font-size:48px;font-weight:950;letter-spacing:2px;color:var(--accent)}
+.keys{display:flex;flex-direction:column;gap:8px}.reset-score{width:100%;margin-top:10px;}
+.key-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:900}.key-row{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.key{min-width:0;min-height:44px;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:8px;cursor:pointer;font-weight:900;font-size:15px}.key.active{background:var(--accent2);color:#171717;border-color:var(--accent2);box-shadow:0 0 0 2px rgba(181,136,99,.18)}
+.training-mode{display:flex;flex-direction:column;gap:8px}.mode-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}.mode{min-height:40px;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:8px;cursor:pointer;font-weight:850;font-size:12px;text-transform:uppercase;letter-spacing:.2px}.mode.active{background:var(--accent2);color:#171717;border-color:var(--accent2)}
+.piece-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.piece-key{min-height:48px;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:9px;cursor:pointer;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px}.piece-key:hover{filter:brightness(.98)}.piece-key.selected{background:var(--accent2);color:#171717;border-color:var(--accent2);box-shadow:0 0 0 2px rgba(181,136,99,.18)}.piece-key:disabled{opacity:.55;cursor:default}.piece-symbol{font-size:25px;line-height:1}.piece-name{font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.stat{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 5px;text-align:center}.stat .n{font-size:20px;font-weight:950}.stat .l{font-size:9px;color:var(--muted);text-transform:uppercase;margin-top:3px;letter-spacing:.6px}
+.status{min-height:20px;text-align:center;font-size:12px;font-weight:800;color:var(--muted)}
+.start{margin-top:auto;width:100%;min-height:46px}
+@media(max-width:900px){.app{padding:8px;gap:10px}.topbar{padding:9px}.brand{font-size:17px}.brand span{display:none}.main{flex-direction:column}.board-area{padding:7px}.board-wrap{width:min(94vw,calc(100vh - 190px),720px);min-width:0}.panel{width:100%;flex:auto}}
+@media(max-width:520px){.board-wrap{width:96vw}.panel{padding:12px}.piece-key{min-height:46px}.answer-display{min-height:78px;font-size:42px}.stats{gap:5px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">SQUARE SENSE</div>
+    <div class="top-actions">
+      <button class="btn icon" id="themeBtn" type="button" aria-label="Switch theme">☾</button>
+      <button class="btn" id="flipBtn" type="button">Flip Board</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="board-area">
+      <div class="board-wrap">
+        <div class="board" id="board" aria-label="Chess board"></div>
+        <div class="target-marker" id="targetMarker" hidden></div>
+        <div class="feedback" id="feedback" hidden aria-live="assertive">
+          <div class="feedback-symbol">✕</div>
+          <div class="feedback-text">Incorrect</div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="keys">
+        <div class="piece-grid" id="pieceKeys"></div>
+        <button class="btn primary start" id="startBtn" type="button">Start to Identify the pieces</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="n" id="attempts">0</div><div class="l">Attempt</div></div>
+        <div class="stat"><div class="n" id="correct">0</div><div class="l">Correct</div></div>
+        <div class="stat"><div class="n" id="incorrect">0</div><div class="l">Incorrect</div></div>
+        <div class="stat"><div class="n" id="result">0%</div><div class="l">Result %</div></div>
+      </div>
+
+      <button class="btn reset-score" id="resetScoreBtn" type="button">Reset Score</button>
+
+      <div class="status" id="status">Click Start Training</div>
+    </aside>
+  </main>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const pieces=[
+    {id:'king',name:'King',type:'K'},
+    {id:'queen',name:'Queen',type:'Q'},
+    {id:'rook',name:'Rook',type:'R'},
+    {id:'bishop',name:'Bishop',type:'B'},
+    {id:'knight',name:'Knight',type:'N'},
+    {id:'pawn',name:'Pawn',type:'P'}
+  ];
+  const pieceBase='https://cdn.jsdelivr.net/gh/lichess-org/lila@master/public/piece/cburnett/';
+  const files=['a','b','c','d','e','f','g','h'];
+  const ranks=['1','2','3','4','5','6','7','8'];
+  const state={
+    target:null,
+    active:false,
+    flipped:false,
+    lastColor:null,
+    attempts:0,
+    correct:0,
+    incorrect:0,
+    checking:false,
+    feedbackTimer:null,
+    targetSquare:null
+  };
+  const $=id=>document.getElementById(id);
+
+  function boardPosition(square){
+    const f=files.indexOf(square[0]);
+    const r=ranks.indexOf(square[1]);
+    return {f:state.flipped?7-f:f,r:state.flipped?r:7-r};
+  }
+
+  function renderBoard(){
+    const board=$('board');
+    board.innerHTML='';
+    for(let r=0;r<8;r++){
+      for(let f=0;f<8;f++){
+        const name=files[f]+ranks[r];
+        const pos=boardPosition(name);
+        const sq=document.createElement('div');
+        sq.className='sq '+(((f+r)%2===0)?'dark':'light');
+        sq.style.left=(pos.f*12.5)+'%';
+        sq.style.top=(pos.r*12.5)+'%';
+        if(pos.r===7){const x=document.createElement('span');x.className='coord file';x.textContent=name[0];sq.appendChild(x)}
+        if(pos.f===0){const x=document.createElement('span');x.className='coord rank';x.textContent=name[1];sq.appendChild(x)}
+        board.appendChild(sq);
+      }
+    }
+    renderPiece();
+  }
+
+  function renderPiece(){
+    const old=document.querySelector('.board-piece');
+    if(old) old.remove();
+    if(!state.active || !state.target || !state.targetSquare)return;
+    const piece=pieces.find(p=>p.id===state.target);
+    if(!piece)return;
+    const pos=boardPosition(state.targetSquare);
+    const el=document.createElement('div');
+    el.className='board-piece';
+    el.style.left=(pos.f*12.5)+'%';
+    el.style.top=(pos.r*12.5)+'%';
+
+    const img=document.createElement('img');
+    img.src=pieceBase+(state.targetColor==='w'?'w':'b')+piece.type+'.svg';
+    img.alt=piece.name+' on '+state.targetSquare;
+    el.appendChild(img);
+
+    el.setAttribute('aria-label',piece.name+' on '+state.targetSquare);
+    $('board').appendChild(el);
+  }
+
+  function randomSquare(exclude){
+    let square;
+    do{
+      square=files[Math.floor(Math.random()*files.length)] + ranks[Math.floor(Math.random()*ranks.length)];
+    }while(exclude && square===exclude);
+    return square;
+  }
+
+  function nextPiece(){
+    // Every successful answer creates a completely new random challenge.
+    state.target=pieces[Math.floor(Math.random()*pieces.length)].id;
+    state.targetSquare=randomSquare(state.targetSquare);
+
+    let color=Math.random()<0.5?'w':'b';
+    if(state.lastColor && color===state.lastColor) color=color==='w'?'b':'w';
+    state.lastColor=color;
+    state.targetColor=color;
+
+    renderPiece();
+    updatePanel();
+  }
+
+  function buildPieceKeys(){
+    const wrap=$('pieceKeys');
+    wrap.innerHTML='';
+    pieces.forEach(piece=>{
+      const b=document.createElement('button');
+      b.type='button';
+      b.className='piece-key';
+      b.dataset.piece=piece.id;
+      b.innerHTML='<span class="piece-name">'+piece.name+'</span>';
+      b.addEventListener('click',()=>answer(piece.id));
+      wrap.appendChild(b);
+    });
+  }
+
+  function setAnswerButtonsDisabled(disabled){
+    document.querySelectorAll('.piece-key').forEach(b=>b.disabled=disabled);
+  }
+
+  function updateStats(){
+    $('attempts').textContent=state.attempts;
+    $('correct').textContent=state.correct;
+    $('incorrect').textContent=state.incorrect;
+    $('result').textContent=state.attempts?Math.round(state.correct/state.attempts*100)+'%':'0%';
+  }
+
+  function updatePanel(){
+    if(!state.active){
+      $('status').textContent='Click Start Training';
+    }else if(state.target){
+      $('status').textContent='Identify the piece';
+    }
+  }
+
+  function startTraining(){
+    clearTimeout(state.feedbackTimer);
+    state.active=true;
+    state.checking=false;
+    state.lastColor=null;
+    state.attempts=0;
+    state.correct=0;
+    state.incorrect=0;
+    state.target=null;
+    state.targetSquare=null;
+    $('feedback').hidden=true;
+    setAnswerButtonsDisabled(false);
+    updateStats();
+    nextPiece();
+  }
+
+  function showIncorrect(){
+    const fb=$('feedback');
+    fb.hidden=false;
+    clearTimeout(state.feedbackTimer);
+    state.feedbackTimer=setTimeout(()=>{
+      fb.hidden=true;
+      state.feedbackTimer=null;
+    },1000);
+  }
+
+  function answer(selected){
+    if(!state.active || state.checking || !state.target)return;
+    state.checking=true;
+    setAnswerButtonsDisabled(true);
+    state.attempts++;
+
+    if(selected===state.target){
+      state.correct++;
+      updateStats();
+      state.checking=false;
+      setAnswerButtonsDisabled(false);
+      nextPiece();
+    }else{
+      state.incorrect++;
+      updateStats();
+      $('status').textContent='Try again';
+      showIncorrect();
+      state.checking=false;
+      setAnswerButtonsDisabled(false);
+    }
+  }
+
+  $('resetScoreBtn').addEventListener('click',()=>{
+    state.attempts=0;
+    state.correct=0;
+    state.incorrect=0;
+    updateStats();
+  });
+
+  $('startBtn').addEventListener('click',()=>{
+    if(state.active)return;
+    startTraining();
+    $('startBtn').disabled=true;
+    $('startBtn').textContent='Training Active';
+  });
+
+  $('flipBtn').addEventListener('click',()=>{
+    state.flipped=!state.flipped;
+    renderBoard();
+  });
+  $('themeBtn').addEventListener('click',()=>{
+    document.body.classList.toggle('dark');
+    const dark=document.body.classList.contains('dark');
+    $('themeBtn').textContent=dark?'☀':'☾';
+    $('themeBtn').setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');
+  });
+
+  // Initial state: board is ready, no piece is shown until training starts.
+  buildPieceKeys();
+  setAnswerButtonsDisabled(true);
+  renderBoard();
+  updateStats();
+  updatePanel();
+})();
+</script>
+</body>
+</html>
