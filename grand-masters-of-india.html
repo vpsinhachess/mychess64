@@ -10,37 +10,51 @@
 <style>
 :root{--ink:#13201c;--paper:#f3f6f1;--card:#fff;--board:#2c5e4f;--tint:#dde9e0;--saf:#c8700f;--mute:#56645e;--line:#cfdad2;
 --h:'Bricolage Grotesque',system-ui,sans-serif;--b:'Newsreader',Georgia,serif}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
+*{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font:1.05rem/1.6 var(--b)}
 :focus-visible{outline:3px solid var(--saf);outline-offset:2px}
 .wrap{width:min(1280px,92%);margin:auto}
 header{background:var(--board);color:#fff;padding:44px 0 0;background-image:conic-gradient(rgba(255,255,255,.05) 25%,transparent 0 50%,rgba(255,255,255,.05) 0 75%,transparent 0);background-size:56px 56px}
 h1{font:800 clamp(2.4rem,6vw,5rem)/1 var(--h);letter-spacing:-.03em;margin:0 0 14px;max-width:14ch}
 header p{max-width:60ch;margin:0 0 28px;color:#d8e8df}
-.chart{background:var(--paper);color:var(--ink);margin-top:10px;padding:18px 0 14px;border-radius:18px 18px 0 0}
+.chart{background:var(--paper);color:var(--ink);margin-top:10px;padding:20px 26px 16px;border-radius:20px 20px 0 0}
 .chart h2{font:700 1rem var(--h);margin:0 0 4px}.chart small{color:var(--mute)}
-.bars{display:flex;align-items:flex-end;gap:3px;height:96px;margin-top:10px}
+.bars{display:flex;align-items:flex-end;gap:3px;height:96px;margin-top:14px;border-bottom:2px solid var(--board)}
 .bar{flex:1;min-width:6px;border:0;padding:0;background:var(--board);border-radius:3px 3px 0 0;cursor:pointer;position:relative;opacity:.85}
 .bar:hover,.bar.on{background:var(--saf);opacity:1}
-.axis{display:flex;justify-content:space-between;font:.8rem var(--h);color:var(--mute);margin-top:4px}
+.axis{display:flex;justify-content:space-between;font:600 .8rem var(--h);color:var(--mute);margin-top:6px}
 .bar:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font:.75rem var(--h);padding:3px 7px;border-radius:5px;white-space:nowrap;margin-bottom:4px}
-.tools{position:sticky;top:0;z-index:10;background:rgba(243,246,241,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0}
+.tools{position:sticky;top:0;z-index:10;background:#fff;box-shadow:0 2px 10px rgba(19,32,28,.1);padding:12px 0}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 input,select{font:500 .95rem var(--h);padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
 input[type=search]{flex:1 1 220px}
 .chip{font:600 .9rem var(--h);padding:9px 14px;border:1px solid var(--board);border-radius:99px;background:#fff;color:var(--board);cursor:pointer}
 .chip[aria-pressed=true]{background:var(--board);color:#fff}
+#stats{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 22px}#stats div{background:rgba(255,255,255,.12);border-radius:12px;padding:10px 18px;min-width:120px}#stats b{display:block;font:800 1.9rem/1 var(--h)}#stats span{font:.85rem var(--h);color:#d8e8df}
+#mapsec{padding:34px 0 26px}#mapsec h2{font:800 1.7rem/1.1 var(--h);margin:0 0 4px}#mapsec>.wrap>p{margin:0 0 18px;color:var(--mute)}
+.mapbox{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;align-items:start}
+.tmap{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(5,1fr);gap:6px;aspect-ratio:7/5}
+.tile{border:2px solid transparent;border-radius:10px;padding:4px;cursor:pointer;font:600 clamp(.6rem,1.3vw,.82rem)/1.15 var(--h);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.tile b{font:800 clamp(1rem,2.6vw,1.8rem)/1 var(--h)}
+.tile:hover{border-color:var(--saf)}.tile.on{border-color:var(--saf);box-shadow:0 0 0 3px var(--saf)}
+.rank{list-style:none;margin:0;padding:0}.rank li{margin-bottom:5px}
+.rank button{display:grid;grid-template-columns:120px 1fr 34px;gap:10px;align-items:center;width:100%;border:0;background:none;padding:3px 6px;border-radius:8px;cursor:pointer;font:600 .9rem var(--h);color:var(--ink);text-align:left}
+.rank button:hover,.rank button.on{background:var(--tint)}
+.rank i{display:block;height:10px;border-radius:5px;background:var(--board)}.rank span{text-align:right}
+.note{font:.8rem var(--h);color:var(--mute);margin-top:10px}
+.grid{scroll-margin-top:80px}
+@media(max-width:760px){.mapbox{grid-template-columns:1fr}}
 #count{font:600 .9rem var(--h);color:var(--mute);margin-left:auto}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;padding:24px 0 60px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit;display:flex;flex-direction:column}
-.card:hover{border-color:var(--board);box-shadow:0 6px 18px rgba(19,32,28,.12)}
+.card{transition:border-color .15s,box-shadow .15s}.card:hover{border-color:var(--board);box-shadow:0 6px 18px rgba(19,32,28,.12)}
 .ph{aspect-ratio:4/5;background:var(--tint);position:relative;overflow:hidden}
-.ph img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
-.ph .ini{position:absolute;inset:0;display:grid;place-items:center;font:800 3rem var(--h);color:var(--board);opacity:.5}
-.no{position:absolute;top:8px;left:8px;background:var(--ink);color:#fff;font:700 .75rem var(--h);padding:2px 8px;border-radius:99px}
-.star{position:absolute;top:8px;right:8px;background:var(--saf);color:#fff;font:700 .72rem var(--h);padding:2px 8px;border-radius:99px}
-.info{padding:12px 14px 14px}.info b{font:700 1.02rem/1.2 var(--h);display:block}
-.info span{font:.9rem var(--h);color:var(--mute)}
+.ph img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.ph .ini{position:absolute;inset:0;display:grid;place-items:center;font:800 3.4rem var(--h);color:var(--board);opacity:.45;background:repeating-conic-gradient(#d3e2d7 0 25%,#e6efe8 0 50%) 0 0/48px 48px}
+.no,.star{position:absolute;top:10px;z-index:2;font:700 .85rem/1 var(--h);padding:6px 11px;border-radius:8px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);color:#fff}.no{left:10px;background:var(--ink)}
+.star{right:10px;background:#a8590a}
+.info{padding:12px 14px 14px}.info b{font:700 1.1rem/1.2 var(--h);display:block}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:7px}.meta span{font:600 .85rem var(--h);color:var(--mute)}.meta .yr{background:var(--tint);color:var(--board);padding:3px 9px;border-radius:6px}
 .info em{display:block;font-size:.92rem;margin-top:6px;color:var(--ink);line-height:1.4}
 #empty{display:none;padding:50px 0;text-align:center;color:var(--mute)}
 dialog{border:0;border-radius:18px;padding:0;width:min(860px,94vw);max-height:90vh;overflow:auto;background:var(--paper);color:var(--ink)}
@@ -64,9 +78,12 @@ dialog::backdrop{background:rgba(10,20,16,.6)}
 <header><div class="wrap">
 <h1>Grandmasters of India</h1>
 <p>All 99 players who hold the title, from Viswanathan Anand in 1987 to the class of 2026. Open any card for a longer biography and career highlights.</p>
+<div id="stats"></div>
 <div class="chart"><h2>New Grandmasters each year</h2><small id="cs">Select a bar to show only that year.</small>
 <div class="bars" id="bars"></div><div class="axis"><span>1987</span><span>2000</span><span>2013</span><span>2026</span></div></div>
 </div></header>
+<section id="mapsec"><div class="wrap"><h2>Where the Grandmasters come from</h2><p>Tamil Nadu alone has produced more than a third of India's GMs. Select a state to filter the players below.</p>
+<div class="mapbox"><div><div class="tmap" id="tmap" role="group" aria-label="State map"></div><div class="note">Tile map: each state is a square placed roughly where it sits in India. Darker means more Grandmasters.</div></div><ol class="rank" id="rank"></ol></div></div></section>
 <div class="tools"><div class="wrap row">
 <input type="search" id="q" placeholder="Search name, state or year" aria-label="Search">
 <select id="st" aria-label="State"><option value="">All states</option></select>
@@ -174,28 +191,40 @@ const cnt={};players.forEach(p=>cnt[p.titleYear]=(cnt[p.titleYear]||0)+1);
 const mx=Math.max(...Object.values(cnt));
 for(let y=1987;y<=2026;y++){const c=cnt[y]||0,b=document.createElement('button');b.className='bar';b.style.height=Math.max(c/mx*100,3)+'%';b.dataset.t=y+': '+c;b.dataset.y=y;b.setAttribute('aria-label',y+': '+c+' new GMs');b.onclick=()=>{yr=yr==y?'':String(y);render()};$('bars').append(b)}
 [...new Set(players.map(p=>p.state))].sort().forEach(s=>$('st').add(new Option(s,s)));
-function card(p){const k=K[p.rank];return `<button class="card" data-r="${p.rank}"><div class="ph"><div class="ini">${ini(p.name)}</div><img alt="${p.name}" loading="lazy" hidden><span class="no">GM #${p.rank}</span>${k?'<span class="star">Highlights</span>':''}</div><div class="info"><b>${p.name}</b><span>GM ${p.titleYear} — ${p.state}</span>${k?`<em>${k.f}</em>`:''}</div></button>`}
+function card(p){const k=K[p.rank];return `<button class="card" data-r="${p.rank}"><div class="ph"><div class="ini">${ini(p.name)}</div><img alt="${p.name}" loading="lazy" hidden><span class="no">GM #${p.rank}</span>${k?'<span class="star">Highlights</span>':''}</div><div class="info"><b>${p.name}</b><div class="meta"><span class="yr">GM ${p.titleYear}</span><span>${p.state}</span></div>${k?`<em>${k.f}</em>`:''}</div></button>`}
 function render(){
  const q=$('q').value.toLowerCase().trim(),s=$('st').value;
  list=players.filter(p=>(!q||`${p.name} ${p.state} ${p.titleYear}`.toLowerCase().includes(q))&&(!s||p.state===s)&&(!yr||p.titleYear==yr)&&(!onlyW||women.includes(p.rank))&&(!onlyF||K[p.rank]));
  const so=$('so').value;if(so=='new')list.sort((a,b)=>b.titleYear-a.titleYear||b.rank-a.rank);if(so=='az')list.sort((a,b)=>a.name.localeCompare(b.name));
  $('grid').innerHTML=list.map(card).join('');$('empty').style.display=list.length?'none':'block';
  $('count').textContent=`${list.length} of ${players.length} players`;$('fr').hidden=!yr;$('fr').textContent='Year '+yr+' ×';
+ document.querySelectorAll('[data-s]').forEach(t=>t.classList.toggle('on',t.dataset.s===s));
  document.querySelectorAll('.bar').forEach(b=>b.classList.toggle('on',b.dataset.y==yr));
  document.querySelectorAll('.card').forEach(el=>io.observe(el));
 }
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);paint(e.target)}}),{rootMargin:'300px'});
-async function paint(el){const p=players[el.dataset.r-1],d=await profile(p),img=el.querySelector('img');if(d.photo){img.onload=()=>{img.hidden=false};img.onerror=()=>{img.hidden=true};img.src=d.photo}}
-// Photo + bio: ChessBase portrait first, then Wikipedia (found by search, so name spelling differences still resolve)
+function tryImgs(img,urls,cb){let i=0;const t=()=>{if(i>=urls.length){cb(null);return}const u=urls[i++];img.onerror=t;img.onload=()=>cb(u);img.src=u};t()}
+async function showPhoto(ph,p,alt){
+ const d=await profile(p);let img=ph.querySelector('img');if(!img){img=document.createElement('img');img.alt=alt||p.name;img.hidden=true;ph.append(img)}
+ const urls=d.ok?[d.ok]:d.photos;
+ tryImgs(img,urls,u=>{if(u){d.ok=u;img.hidden=false;ph.querySelector('.ini').hidden=true;if(!d.src||u!==cbPhotos[p.rank])d.src=u===cbPhotos[p.rank]?'ChessBase India':(/commons/.test(u)?'Wikimedia Commons':'Wikipedia')}else img.remove()})
+}
+function paint(el){showPhoto(el.querySelector('.ph'),players[el.dataset.r-1])}
+// Photo + bio: ChessBase portrait, then Wikipedia (found by search), then Wikimedia Commons
 async function profile(p){
  if(cache[p.rank])return cache[p.rank];
- const d={photo:cbPhotos[p.rank]||'',text:'',url:'',src:cbPhotos[p.rank]?'ChessBase India':''};
+ const d={photos:cbPhotos[p.rank]?[cbPhotos[p.rank]]:[],text:'',url:'',src:''},nm=p.name.replace(/\./g,' ').replace(/\s+/g,' ').trim();
  try{
-  const u='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=4&gsrsearch='+encodeURIComponent(p.name.replace(/\./g,' ')+' chess grandmaster')+'&prop=pageimages|extracts|info&piprop=thumbnail&pithumbsize=600&exintro=1&explaintext=1&exlimit=4&inprop=url';
+  const u='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=4&gsrsearch='+encodeURIComponent(nm+' chess grandmaster')+'&prop=pageimages|extracts|info&piprop=thumbnail&pithumbsize=600&exintro=1&explaintext=1&exlimit=4&inprop=url';
   const r=await (await fetch(u)).json(),pg=Object.values(r.query?.pages||{}).sort((a,b)=>a.index-b.index);
-  const last=p.name.replace(/\./g,' ').split(/\s+/).filter(x=>x.length>2).map(x=>x.toLowerCase());
-  const hit=pg.find(x=>/chess/i.test(x.extract||'')&&last.some(l=>x.title.toLowerCase().includes(l)));
-  if(hit){d.text=hit.extract;d.url=hit.fullurl;if(!d.photo&&hit.thumbnail){d.photo=hit.thumbnail.source;d.src='Wikipedia'}}
+  const toks=nm.split(' ').filter(x=>x.length>2).map(x=>x.toLowerCase());
+  const hit=pg.find(x=>/chess/i.test(x.extract||'')&&toks.some(l=>x.title.toLowerCase().includes(l)));
+  if(hit){d.text=hit.extract;d.url=hit.fullurl;if(hit.thumbnail)d.photos.push(hit.thumbnail.source)}
+ }catch(e){}
+ try{
+  const u='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=6&gsrsearch='+encodeURIComponent(nm+' chess')+'&prop=imageinfo&iiprop=url&iiurlwidth=600';
+  const r=await (await fetch(u)).json(),big=nm.split(' ').sort((a,b)=>b.length-a.length)[0].toLowerCase();
+  Object.values(r.query?.pages||{}).sort((a,b)=>a.index-b.index).filter(x=>x.title.toLowerCase().includes(big)&&/\.(jpe?g|png)$/i.test(x.title)).slice(0,2).forEach(x=>{const i=x.imageinfo?.[0];if(i)d.photos.push(i.thumburl||i.url)});
  }catch(e){}
  return cache[p.rank]=d;
 }
@@ -209,12 +238,13 @@ async function open(r){
  let b=k?.b;if(!b&&d.text){const m=d.text.slice(0,260).match(/\b(19[5-9]\d|200\d)\b/);if(m)b=+m[1]}
  const items=[...(k?k.a:[]),...(k?[]:auto(d.text))];
  const idx=list.findIndex(x=>x.rank==r);
- dlg.querySelector('.m').innerHTML=`<div class="ph"><div class="ini">${ini(p.name)}</div>${d.photo?`<img src="${d.photo}" alt="${p.name}" onerror="this.remove()">`:''}</div><div class="mb"><h2>${p.name}</h2><div class="facts"><span>GM #${p.rank}</span><span>Title ${p.titleYear}</span><span>${p.state}</span>${b?`<span>Born ${b}</span><span>GM at about ${p.titleYear-b}</span>`:''}</div>
+ dlg.querySelector('.m').innerHTML=`<div class="ph"><div class="ini">${ini(p.name)}</div></div><div class="mb"><h2>${p.name}</h2><div class="facts"><span>GM #${p.rank}</span><span>Title ${p.titleYear}</span><span>${p.state}</span>${b?`<span>Born ${b}</span><span>GM at about ${p.titleYear-b}</span>`:''}</div>
  ${k?`<p><b>${k.f}.</b></p>`:''}
  <h3>About</h3><p>${d.text?d.text.split('\n').slice(0,2).join('</p><p>'):`${p.name} became India's ${ord(p.rank)} Grandmaster in ${p.titleYear} and represents ${p.state}. A detailed biography was not found online yet.`}</p>
  <h3>Career achievements</h3><ul><li>Awarded the Grandmaster title in ${p.titleYear}, India's GM number ${p.rank}.</li>${items.map(i=>`<li>${i}</li>`).join('')}</ul>
- <p class="src">${d.url?`Source: <a href="${d.url}" target="_blank" rel="noopener">Wikipedia</a> (CC BY-SA). `:''}${d.src=='ChessBase India'?'Photo: ChessBase India.':d.photo?'Photo: Wikipedia.':''}</p>
+ <p class="src">${d.url?`Source: <a href="${d.url}" target="_blank" rel="noopener">Wikipedia</a> (CC BY-SA). `:''}${d.ok?'Photo: '+d.src+'.':''}</p>
  <div class="nav"><button class="chip" ${idx<1?'disabled':''} data-n="${idx-1}">Previous</button><button class="chip" ${idx<0||idx>=list.length-1?'disabled':''} data-n="${idx+1}">Next</button></div></div>`;
+ showPhoto(dlg.querySelector('.ph'),p);
  dlg.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>open(list[b.dataset.n].rank));
 }
 $('grid').onclick=e=>{const c=e.target.closest('.card');if(c)open(+c.dataset.r)};
@@ -223,6 +253,14 @@ $('q').oninput=render;$('st').onchange=render;$('so').onchange=render;
 $('fw').onclick=e=>{onlyW=!onlyW;e.target.setAttribute('aria-pressed',onlyW);render()};
 $('ff').onclick=e=>{onlyF=!onlyF;e.target.setAttribute('aria-pressed',onlyF);render()};
 $('fr').onclick=()=>{yr='';render()};
+const POS={'Rajasthan':[1,0],'Haryana':[2,0],'Delhi':[3,0],'Assam':[6,0],'Gujarat':[0,1],'West Bengal':[5,1],'Maharashtra':[2,2],'Telangana':[3,2],'Odisha':[4,2],'Goa':[1,3],'Karnataka':[2,3],'Andhra Pradesh':[3,3],'Kerala':[2,4],'Tamil Nadu':[3,4]};
+const sc={};players.forEach(p=>sc[p.state]=(sc[p.state]||0)+1);const smax=Math.max(...Object.values(sc));
+function pick(st){$('st').value=$('st').value===st?'':st;render();if($('st').value)$('grid').scrollIntoView({behavior:'smooth'})}
+$('tmap').innerHTML=Object.entries(POS).map(([n,[c,r]])=>{const t=(sc[n]||0)/smax,bg=`color-mix(in srgb,#2c5e4f ${Math.round(18+t*82)}%,#fff)`;return `<button class="tile" data-s="${n}" style="grid-column:${c+1};grid-row:${r+1};background:${bg};color:${t>.3?'#fff':'#13201c'}" aria-label="${n}: ${sc[n]} GMs"><b>${sc[n]}</b>${n}</button>`}).join('');
+$('rank').innerHTML=Object.entries(sc).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<li><button data-s="${n}"><span style="text-align:left">${n}</span><i style="width:${c/smax*100}%"></i><span>${c}</span></button></li>`).join('');
+document.querySelectorAll('#tmap [data-s],#rank [data-s]').forEach(b=>b.onclick=()=>pick(b.dataset.s));
+const nSt=new Set(players.map(p=>p.state)).size;
+$('stats').innerHTML=`<div><b>${players.length}</b><span>Grandmasters</span></div><div><b>${nSt}</b><span>States</span></div><div><b>${women.length}</b><span>Women GMs</span></div><div><b>${Object.keys(K).length}</b><span>Profiles with highlights</span></div>`;
 render();
 </script>
 </body>
