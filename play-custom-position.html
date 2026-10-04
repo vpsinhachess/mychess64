@@ -1172,6 +1172,13 @@ function promoteGuestConnection(conn, sessionId){
   saveSessionSnapshot();
 }
 
+/* WebRTC connectivity: STUN finds the public address, TURN relays when a direct path is impossible
+   (mobile carriers, office/school Wi-Fi, symmetric NAT). Add your own relay with:
+   window.MYCHESS64_ICE_SERVERS=[{urls:'turn:your.server:3478',username:'u',credential:'p'}] before this script. */
+const PEER_OPTS={ debug:0, config:{ iceCandidatePoolSize:4, iceServers:[
+  {urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:global.stun.twilio.com:3478']},
+  {urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}
+].concat(window.MYCHESS64_ICE_SERVERS||[]) } };
 function hostGame(initialFen=null){
   roomCode = randomCode();
   guestSessionId=null;
@@ -1186,7 +1193,7 @@ function createHostPeer(retryCount){
   if(!roomCode) roomCode = randomCode();
   retryCount = Number.isFinite(retryCount) ? retryCount : 0;
   try{ if(peer) peer.destroy(); }catch(e){}
-  peer = new Peer('chess-' + roomCode);
+  peer = new Peer('chess-' + roomCode, PEER_OPTS);
   peer.__hostOpened = false;
   peer.__hostRetryCount = retryCount;
 
@@ -1512,11 +1519,29 @@ function sendGuestCommand(msg){
   return false;
 }
 function connectGuestToHost(){
-  if(!peer || !roomCode || guestConnectInProgress) return;
+  if(!peer || !roomCode || guestConnectInProgress || peer.destroyed) return;
+  // Signalling dropped (phone slept, Wi-Fi switched): reconnect it first; connect() returns nothing while disconnected.
+  if(peer.disconnected){ try{ peer.reconnect(); }catch(e){} scheduleGuestReconnect(); return; }
   guestConnectInProgress=true;
   guestReconnectAttempts++;
-  const conn=peer.connect('chess-'+roomCode,{reliable:true}); hostConn=conn;
+  let conn=null;
+  try{ conn=peer.connect('chess-'+roomCode,{reliable:true}); }catch(e){ conn=null; }
+  if(!conn){ guestConnectInProgress=false; scheduleGuestReconnect(); return; }
+  hostConn=conn;
+  if(guestReconnectAttempts>=3){
+    const el=document.querySelector('.waiting-card .waiting-subtitle');
+    if(el) el.innerHTML='Room <b>'+esc(roomCode)+'</b> — still trying to reach the host. Ask them to keep their page open; switching Wi-Fi/mobile data can help.';
+  }
+  // A connection that never opens (blocked ICE, host offline) must not hang forever.
+  const giveUp=setTimeout(()=>{
+    if(conn.open) return;
+    guestConnectInProgress=false;
+    try{ conn.close(); }catch(e){}
+    if(hostConn===conn) hostConn=null;
+    scheduleGuestReconnect();
+  },12000);
   conn.on('open',()=>{
+    clearTimeout(giveUp);
     guestReconnectAttempts=0; guestConnectInProgress=false; markConnectionConnected(); renderGame();
     try{ conn.send({type:'sessionHello',sessionId:clientSessionId}); }catch(e){}
     try{ conn.send({type:'name',name:myName}); }catch(e){}
@@ -1529,22 +1554,32 @@ function connectGuestToHost(){
     flushGuestCommands();
   });
   conn.on('data',data=>handleGuestData(data));
-  conn.on('close',()=>{ guestConnectInProgress=false; if(hostConn===conn){ hostConn=null; scheduleGuestReconnect(); } });
-  conn.on('error',()=>{ guestConnectInProgress=false; if(hostConn===conn) scheduleGuestReconnect(); });
+  conn.on('close',()=>{ clearTimeout(giveUp); guestConnectInProgress=false; if(hostConn===conn){ hostConn=null; scheduleGuestReconnect(); } });
+  conn.on('error',()=>{ clearTimeout(giveUp); guestConnectInProgress=false; if(hostConn===conn) scheduleGuestReconnect(); });
 }
 
 function joinGame(code, isResume=false){
   roomCode = code;
   if(!isResume) clearSessionSnapshot();
   saveSessionSnapshot();
-  peer = new Peer();
+  guestReconnectAttempts=0; guestConnectInProgress=false;
+  peer = new Peer(undefined, PEER_OPTS);
+  peer.on('disconnected', () => { try{ if(!peer.destroyed) peer.reconnect(); }catch(e){} });
   peer.on('open', () => {
     isHost = false; connectionState='reconnecting';
     content.innerHTML = '<div class="card lobby-card waiting-card"><div class="waiting-title">Connecting to game…</div><p class="waiting-subtitle">Room <b>' + esc(code) + '</b></p><div class="connection-card"><span class="connection-dot reconnecting"></span><span>Connecting to opponent…</span></div></div>';
     startGuestHeartbeat();
     connectGuestToHost();
   });
-  peer.on('error', err => { connectionState='reconnecting'; if(err.type!=='peer-unavailable') scheduleGuestReconnect(); else showMessage('Could not reach room "' + code + '" (' + err.type + '). Check the code and make sure the host is online.', true); });
+  peer.on('error', err => {
+    connectionState='reconnecting'; guestConnectInProgress=false;
+    if(err.type==='peer-unavailable' && guestReconnectAttempts>=5){
+      showMessage('Could not reach room "' + code + '". Check the code and make sure the host still has the game page open.', true);
+      return;
+    }
+    if(err.type==='unavailable-id' || err.type==='invalid-id') return;
+    scheduleGuestReconnect();
+  });
 }
 
 function handleGuestData(data){
@@ -1764,7 +1799,7 @@ function renderGame(){
     resetClock(clockPreset);
     hostSync();
   };
-  document.getElementById('pasteFenBtn').onclick=()=>{ if(!isHost) return; askFen(f=>{ customPositionFen=f; lastCustomFenText=f; chess=makeChess(); resetGameState(); resetClock(clockPreset); hostSync(); },{title:'Paste FEN',note:'Restarts the game from this position for both players.',live:true}); };
+  document.getElementById('pasteFenBtn').onclick=()=>{ if(!isHost) return; askFen(f=>{ customPositionFen=f; lastCustomFenText=f; processedMoveCommandIds.clear(); lastAppliedMoveCommandId=null; chess=makeChess(); resetGameState(); resetClock(clockPreset); hostSync(); },{title:'Paste FEN',note:'Restarts the game from this position for both players.',live:true}); };
   document.getElementById('drawBtn').onclick=()=>offerDraw();
   document.getElementById('takebackBtn').onclick=()=>offerTakeback();
   const at=document.getElementById('acceptTakebackBtn'); if(at) at.onclick=()=>respondTakeback(true);
