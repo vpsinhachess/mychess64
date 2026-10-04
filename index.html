@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MyChess64 – Learn. Play. Improve. Anytime, Anywhere.</title>
-<meta name="description" content="MyChess64: 21 chess tools in one place for training, live play, analysis, tournaments, books and news.">
+<meta name="description" content="MyChess64: 26 chess tools in one place for training, live play, analysis, tournaments, books and news.">
 <link rel="icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0060d6">
@@ -104,7 +104,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
    <a class="brand" href="#top" aria-label="MyChess64 home"><img src="logo.png" alt="MyChess64" height="46"></a>
    <div class="search">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>
-    <input id="q" type="search" placeholder="Search 21 tools" aria-label="Search tools" autocomplete="off">
+    <input id="q" type="search" placeholder="Search tools" aria-label="Search tools" autocomplete="off">
     <kbd>/</kbd>
    </div>
    <button class="install" id="install" type="button">⬇ Install app</button>
@@ -125,7 +125,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
     <a class="path" href="#analyse"><span>♝</span><div><b>I want to study</b><small>Analysis and openings</small></div></a>
     <a class="path" href="#organise"><span>♜</span><div><b>I teach or organise</b><small>Tracker and pairing</small></div></a>
    </div>
-   <div class="stats"><div><b>21</b><span>chess tools</span></div><div><b>6</b><span>categories</span></div><div><b>1</b><span>home for chess</span></div></div>
+   <div class="stats"><div><b id="cnt">26</b><span>chess tools</span></div><div><b>6</b><span>categories</span></div><div><b>1</b><span>home for chess</span></div></div>
   </div>
   <div>
    <div id="board" role="img" aria-label="Chessboard with a knight touring all 64 squares" tabindex="0"></div>
@@ -165,7 +165,8 @@ const CATS=[
  ["Identify the Chess Pieces","♟️","Learn every piece by its look, name and moves.","identify-the-chess-pieces.html"],
  ["Set the Chess Board","🧩","Practise placing all pieces on their starting squares.","set-the-chess-board.html"],
  ["Chess Training Board","🎓","A free board to set positions and practise ideas.","chess-training-board.html"],
- ["Chess Learning Videos","🎬","Watch lessons for beginners to advanced players.","chess-learning-videos.html"]]},
+ ["Chess Learning Videos","🎬","Watch lessons for beginners to advanced players.","chess-learning-videos.html"],
+ ["Chess Rules & Theories","📜","Learn the rules of chess and the key ideas behind good play.","chess-rules"]]},
 {id:"play",piece:"♛",name:"Play",desc:"Play the computer, a friend or the community.",tools:[
  ["Live Game Play","⚡","Play live games with a real opponent.","live-game-play.html"],
  ["Play with Computer and Friend","🤝","Face the engine or play on one device with a friend.","play-with-computer-and-friend.html"],
@@ -177,10 +178,14 @@ const CATS=[
 {id:"organise",piece:"♜",name:"Coach & Organise",desc:"Tools for coaches, academies and organisers.",tools:[
  ["Student Tracker","📋","Track student progress, ratings and attendance.","student-tracker.html"],
  ["Chess Tournament Pairing","🧮","Create pairings and standings for your event.","chess-tournament-pairing.html"],
+ ["Make Chess Pairing","🔀","Quickly make round-by-round pairings for your players.","chess-tournament-pairing"],
  ["Upcoming Chess Tournaments in India","📅","Find the next tournaments happening across India.","upcoming-chess-tournaments-in-india.html"]]},
 {id:"world",piece:"♚",name:"Chess World",desc:"Meet the champions and follow chess today.",tools:[
  ["World Chess Champions","👑","The story of every world champion, in order.","world-chess-champions.html"],
+ ["Women World Chess Champions","👩","The women who have held the world title, in order.","women-champions"],
  ["Grand Masters of India","🇮🇳","Profiles of India's grandmasters and their journeys.","grand-masters-of-india.html"],
+ ["India's Medals in International Chess","🥇","India's medals at Olympiads and other world events.","india-chess-medals"],
+ ["Search FIDE Rating","📈","Look up a player's FIDE rating and details.","search-fide-rating"],
  ["Chess News","📰","Fresh headlines from the chess world.","chess-news.html"]]},
 {id:"resources",piece:"♟",name:"Free Resources",desc:"Software, books and websites at no cost.",tools:[
  ["Free Chess Softwares","💻","Engines, databases and GUIs worth downloading.","free-chess-softwares.html"],
@@ -196,6 +201,7 @@ const card=(t,fav)=>`<article class="card" data-s="${(t[0]+' '+t[2]).toLowerCase
  <button class="star" aria-pressed="${fav}" aria-label="Favourite ${t[0]}" title="Add to favourites">${fav?'★':'☆'}</button>
  <div class="ic" aria-hidden="true">${t[1]}</div><h3><a href="${t[3]}">${t[0]}</a></h3><p>${t[2]}</p><span class="go">Open tool</span></article>`;
 const all=CATS.flatMap(c=>c.tools);
+$('#cnt').textContent=all.length;$('#q').placeholder='Search '+all.length+' tools';
 
 function render(){
  $('#cats').innerHTML=CATS.map(c=>`<section class="sec" id="${c.id}" data-c="${c.id}">

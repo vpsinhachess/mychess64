@@ -2,7 +2,7 @@
   "id": "./",
   "name": "MyChess64",
   "short_name": "MyChess64",
-  "description": "Learn. Play. Improve. Anytime, Anywhere. 21 chess tools in one app.",
+  "description": "Learn. Play. Improve. Anytime, Anywhere. 26 chess tools in one app.",
   "start_url": "./?source=pwa",
   "scope": "./",
   "display": "standalone",
