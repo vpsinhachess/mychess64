@@ -405,6 +405,43 @@ button:focus-visible,.tab:focus-visible{outline:3px solid rgba(9,105,232,.25);ou
 .an-fen{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:.68rem;padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:var(--panel2);color:var(--text);margin:6px 0;}
 .an-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
 .an-actions button{margin:0;width:100%;}
+
+/* ===== MyChess64 front page v2 ===== */
+body:not(:has(.game-app)) .lobby-card:has(.cp2){max-width:1040px;padding:30px 34px 22px;}
+.cp2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px;align-items:start;text-align:left}
+@media(max-width:820px){.cp2{grid-template-columns:1fr;gap:20px}body:not(:has(.game-app)) .lobby-card:has(.cp2){padding:22px 16px 16px}}
+.cp2 h2{font-size:1.02rem;font-weight:800;margin:0 0 4px;color:var(--text)}
+.cp2 .cp2-help{font-size:.82rem;color:var(--muted);margin:0 0 12px;line-height:1.45}
+.cp2-board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1/1;width:100%;border-radius:12px;overflow:hidden;user-select:none;-webkit-user-select:none;box-shadow:0 0 0 1px rgba(0,0,0,.1),0 16px 36px rgba(16,37,62,.2)}
+.cp2-sq{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;min-width:0}
+.cp2-sq.l{background:var(--sq-light)}.cp2-sq.d{background:var(--sq-dark)}
+.cp2-sq:hover{box-shadow:inset 0 0 0 3px rgba(255,255,255,.55)}
+.cp2-sq.sel{box-shadow:inset 0 0 0 4px var(--sq-sel);background-image:linear-gradient(rgba(246,211,101,.45),rgba(246,211,101,.45))}
+.cp2-sq .pc{width:90%;height:90%;pointer-events:none}
+.cp2 .pcg{font-size:min(5.4vw,44px);line-height:1;pointer-events:none}
+.cp2-co{position:absolute;font:700 10px/1 Inter,system-ui,sans-serif;font-style:normal;opacity:.75;pointer-events:none}
+.cp2-sq.l .cp2-co{color:var(--sq-dark)}.cp2-sq.d .cp2-co{color:var(--sq-light)}
+.cp2-co.r{top:3px;left:4px}.cp2-co.f{bottom:2px;right:4px}
+.cp2-tray{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.cp2-t{margin:0;min-height:44px;padding:4px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text);display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer}
+.cp2-t .pc{width:32px;height:32px}
+.cp2-t.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);background:var(--panel)}
+.cp2-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.cp2-tools button{margin:0;flex:1;min-width:84px;min-height:38px;font-size:.84rem}
+.cp2 textarea#customFenInput{min-height:78px}
+.cp2-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 4px}
+.cp2-meta .cp2-label{font-size:.76rem;font-weight:800;color:var(--muted);display:block;margin-bottom:6px}
+.cp2-castle{display:flex;gap:10px;flex-wrap:wrap;font-size:.86rem}
+.cp2-castle label{display:flex;align-items:center;gap:5px;margin:0;font-weight:600;cursor:pointer}
+.cp2-castle input{width:auto;min-height:0;margin:0}
+.cp2 select{width:100%;min-height:40px;border-radius:8px;border:1px solid var(--border);background:var(--panel2);color:var(--text);padding:0 8px}
+.cp2-sep{height:1px;background:var(--border);margin:14px 0}
+.cp2-modal{position:fixed;inset:0;background:rgba(8,20,36,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999}
+.cp2-dlg{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:16px;padding:20px;width:min(520px,100%);box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:left}
+.cp2-dlg h3{margin:0 0 4px;font-size:1.05rem}.cp2-dlg p{margin:0 0 10px;font-size:.84rem;color:var(--muted)}
+.cp2-dlg textarea{width:100%;min-height:84px;font:.8rem ui-monospace,Menlo,monospace;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text);resize:vertical}
+.cp2-dlg .cp2-row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}.cp2-dlg .cp2-row button{margin:0}
+.cp2-msg{min-height:20px;margin-top:6px;font-size:.84rem}
 </style>
 </head>
 <body>
@@ -754,7 +791,7 @@ function renderLobby(){
       </div>
       <div class="lobby-intro">
         <div class="lobby-title">Play Chess. Connect. Move.</div>
-        <p class="lobby-subtitle">Set up any position with a FEN, then play it live with a friend or study it on the analysis board.</p>
+        <p class="lobby-subtitle">Build any position, then play it live with a friend or study it on the analysis board.</p>
       </div>
       <div id="lobbyBody"></div>
       <div class="brand-note">
@@ -849,36 +886,78 @@ function validateCustomFEN(fenText){
   return {ok:true,fen:c.fen(),terminal};
 }
 
-function fenPreviewHTML(fenText){
-  const placement=String(fenText||'').trim().split(/\s+/)[0]||'';
-  const ranks=placement.split('/'); let cells='';
-  for(let r=0;r<8;r++){
-    const row=[]; for(const ch of (ranks[r]||'')){ if(/[1-8]/.test(ch)){ for(let k=0;k<Number(ch);k++) row.push(null);} else row.push(ch); }
-    for(let f=0;f<8;f++){
-      const ch=row[f]; const light=((r+f)%2===0);
-      const img=(ch&&/[prnbqkPRNBQK]/.test(ch))?'<img alt="" src="'+PIECE_URL+(ch===ch.toUpperCase()?'w':'b')+ch.toUpperCase()+'.svg">':'';
-      cells+='<div class="'+(light?'l':'d')+'">'+img+'</div>';
-    }
-  }
-  return cells;
+const GLY={K:'♔',Q:'♕',R:'♖',B:'♗',N:'♘',P:'♙',k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
+function pcImg(ch){
+  return `<img class="pc" draggable="false" alt="" src="${PIECE_URL}${ch===ch.toUpperCase()?'w':'b'}${ch.toUpperCase()}.svg" onerror="this.outerHTML='<span class=&quot;pcg&quot;>${GLY[ch]}</span>'">`;
+}
+function fenToGrid(t){
+  const rk=String(t||'').trim().split(/\s+/)[0].split('/'); if(rk.length!==8) return null;
+  const g=[];
+  for(const row of rk){ let n=0; for(const ch of row){ if(/[1-8]/.test(ch)){ for(let k=0;k<+ch;k++) g.push(null); n+=+ch; } else if(/[prnbqkPRNBQK]/.test(ch)){ g.push(ch); n++; } else return null; } if(n!==8) return null; }
+  return g;
+}
+function edFEN(e){
+  let p=''; for(let r=0;r<8;r++){ let n=0; for(let f=0;f<8;f++){ const c=e.g[r*8+f]; if(c){ if(n) p+=n; n=0; p+=c; } else n++; } if(n) p+=n; if(r<7) p+='/'; }
+  return `${p} ${e.turn} ${['K','Q','k','q'].filter(x=>e.c[x]).join('')||'-'} ${e.ep} 0 1`;
+}
+/* Paste-FEN dialog used by the analysis board and live games. apply(fen) runs on success. */
+function askFen(apply,o={}){
+  const m=document.createElement('div'); m.className='cp2-modal';
+  m.innerHTML=`<div class="cp2-dlg" role="dialog" aria-modal="true"><h3>${esc(o.title||'Paste FEN')}</h3><p>${esc(o.note||'The position is checked against the rules of chess before it is applied.')}</p><textarea spellcheck="false" autocapitalize="off" placeholder="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"></textarea><div class="cp2-msg" aria-live="polite"></div><div class="cp2-row"><button type="button" class="ghost" data-clip>Paste from clipboard</button><button type="button" class="ghost" data-x>Cancel</button><button type="button" data-ok disabled>Apply position</button></div></div>`;
+  document.body.appendChild(m);
+  const ta=m.querySelector('textarea'), msg=m.querySelector('.cp2-msg'), ok=m.querySelector('[data-ok]');
+  const close=()=>{ document.removeEventListener('keydown',key); m.remove(); };
+  const key=ev=>{ if(ev.key==='Escape') close(); };
+  const check=()=>{
+    const v=ta.value.trim(); let chk=v?validateCustomFEN(v):{ok:false,error:''};
+    if(chk.ok&&chk.terminal&&o.live) chk={ok:false,error:chk.terminal+' — nothing to play from here.'};
+    ok.disabled=!chk.ok; msg.className='cp2-msg '+(chk.ok?'custom-fen-ok':'custom-fen-error');
+    msg.textContent=chk.ok?'✓ Valid — '+(chk.fen.split(' ')[1]==='w'?'White':'Black')+' to move.':chk.error; return chk;
+  };
+  ta.addEventListener('input',check);
+  m.querySelector('[data-clip]').onclick=async()=>{ try{ ta.value=await navigator.clipboard.readText(); check(); }catch(err){ msg.className='cp2-msg custom-fen-error'; msg.textContent='Clipboard access was blocked — paste into the box with Ctrl+V.'; } ta.focus(); };
+  m.querySelector('[data-x]').onclick=close;
+  m.addEventListener('mousedown',ev=>{ if(ev.target===m) close(); });
+  ok.onclick=()=>{ const chk=check(); if(!chk.ok) return; close(); apply(chk.fen); };
+  document.addEventListener('keydown',key); ta.focus();
 }
 
 function showCustomPositionForm(savedName){
   const startText=lastCustomFenText||DEFAULT_FEN;
   const presets=[['Standard start',DEFAULT_FEN],['King + Queen vs King','8/8/8/4k3/8/8/2Q5/4K3 w - - 0 1'],['Lucena position','1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1'],['Promotion test','4k3/P6P/8/8/8/8/p6p/4K3 w - - 0 1']];
+  const names={K:'White king',Q:'White queen',R:'White rook',B:'White bishop',N:'White knight',P:'White pawn',k:'Black king',q:'Black queen',r:'Black rook',b:'Black bishop',n:'Black knight',p:'Black pawn',mv:'Move pieces',x:'Erase'};
+  const trayKeys=['K','Q','R','B','N','P','mv','k','q','r','b','n','p','x'];
+  const e={g:fenToGrid(startText)||fenToGrid(DEFAULT_FEN),turn:'w',c:{K:1,Q:1,k:1,q:1},ep:'-',flip:false,tool:'mv',sel:null};
+  const syncMeta=t=>{ const p=String(t).trim().split(/\s+/); e.turn=p[1]==='b'?'b':'w'; const cs=p[2]||'-'; ['K','Q','k','q'].forEach(x=>e.c[x]=cs.includes(x)?1:0); e.ep=/^[a-h][36]$/.test(p[3]||'')?p[3]:'-'; };
+  syncMeta(startText);
+  const epOpts=['-',...'abcdefgh'.split('').map(f=>f+'6'),...'abcdefgh'.split('').map(f=>f+'3')];
   document.getElementById('lobbyBody').innerHTML=`
-    <div class="lobby-section custom-position-section">
-      <div class="custom-position-title">Play from Custom Position / FEN</div>
-      <div class="custom-position-help">Paste a FEN. It is checked against the rules of chess (kings, pawns, castling rights, en passant, checks) before you can continue.</div>
-      <div class="fen-chips">${presets.map((p,i)=>`<button type="button" class="fen-chip" data-i="${i}">${esc(p[0])}</button>`).join('')}</div>
-      <div class="cp-grid">
-        <div>
-          <label>FEN Position</label>
-          <textarea id="customFenInput" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off">${esc(startText)}</textarea>
-          <div id="customFenError" class="custom-fen-error" aria-live="polite"></div>
-        </div>
-        <div><div class="fen-preview" id="fenPreview"></div></div>
+  <div class="cp2">
+    <div>
+      <h2>Position editor</h2>
+      <p class="cp2-help">Pick a piece, then click squares to place it. Click the same piece again to remove it. Right-click clears a square. Use <b>Move</b> to drag pieces around.</p>
+      <div class="cp2-board" id="cp2Board" aria-label="Chess position editor"></div>
+      <div class="cp2-tray" id="cp2Tray">${trayKeys.map(t=>`<button type="button" class="cp2-t" data-t="${t}" title="${names[t]}" aria-label="${names[t]}">${t==='mv'?'✥':t==='x'?'✕':pcImg(t)}</button>`).join('')}</div>
+      <div class="cp2-tools">
+        <button type="button" class="ghost" id="edStart">Start position</button>
+        <button type="button" class="ghost" id="edClear">Clear board</button>
+        <button type="button" class="ghost" id="edFlip">⇅ Flip view</button>
       </div>
+    </div>
+    <div>
+      <h2>Play from a custom position</h2>
+      <p class="cp2-help">The FEN updates as you edit. You can also paste one here.</p>
+      <div class="fen-chips">${presets.map((p,i)=>`<button type="button" class="fen-chip" data-i="${i}">${esc(p[0])}</button>`).join('')}</div>
+      <textarea id="customFenInput" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="FEN position">${esc(startText)}</textarea>
+      <div id="customFenError" class="custom-fen-error" aria-live="polite"></div>
+      <div class="cp2-tools"><button type="button" class="ghost" id="edCopy">Copy FEN</button></div>
+      <div class="cp2-meta">
+        <div><span class="cp2-label">Side to move</span><div class="color-row" id="edTurn"><button type="button" class="color-btn" data-t="w">White</button><button type="button" class="color-btn" data-t="b">Black</button></div></div>
+        <div><span class="cp2-label">En passant square</span><select id="edEp" aria-label="En passant square">${epOpts.map(s=>`<option value="${s}">${s==='-'?'None':s}</option>`).join('')}</select></div>
+      </div>
+      <span class="cp2-label" style="font-size:.76rem;font-weight:800;color:var(--muted);display:block;margin:10px 0 6px">Castling rights</span>
+      <div class="cp2-castle">${[['K','White short'],['Q','White long'],['k','Black short'],['q','Black long']].map(c=>`<label><input type="checkbox" class="ed-c" data-k="${c[0]}">${c[1]}</label>`).join('')}</div>
+      <div class="cp2-sep"></div>
       <span class="cp-label">Your name (for Live with Friend)</span>
       <input id="cpName" autocomplete="name" placeholder="Enter your name" value="${esc(savedName)}">
       <span class="cp-label">Play as</span>
@@ -889,26 +968,60 @@ function showCustomPositionForm(savedName){
       </div>
       <div class="custom-action-grid">
         <button id="customLiveBtn">♟ Live with Friend</button>
-        <button class="secondary" id="customAnalysisBtn">♞ Go to Analysis Board</button>
+        <button class="secondary" id="customAnalysisBtn">♞ Analysis Board</button>
       </div>
-      <div class="lobby-hint">Live with Friend: you get a room link and play peer-to-peer from this position. Analysis Board: runs only in this browser — no peer, no engine.</div>
+      <div class="lobby-hint">Live with Friend gives you a room link to play peer-to-peer from this position. The Analysis Board runs only in this browser — no peer, no engine.</div>
       <button type="button" class="cp-link" id="cpJoinLink">Have a room code? Join a friend's game</button>
-    </div>`;
-  const input=document.getElementById('customFenInput');
-  const errBox=document.getElementById('customFenError');
-  const pv=document.getElementById('fenPreview');
+    </div>
+  </div>`;
+  const input=document.getElementById('customFenInput'), errBox=document.getElementById('customFenError'), boardEl=document.getElementById('cp2Board');
+  const liveBtn=document.getElementById('customLiveBtn'), anBtn=document.getElementById('customAnalysisBtn');
   let chosen='w';
+  const drawEd=()=>{
+    let h='';
+    for(let r=0;r<8;r++) for(let f=0;f<8;f++){
+      const rr=e.flip?7-r:r, ff=e.flip?7-f:f, i=rr*8+ff, c=e.g[i];
+      h+=`<div class="cp2-sq ${(rr+ff)%2===0?'l':'d'}${e.sel===i?' sel':''}" data-i="${i}">${c?pcImg(c):''}${f===0?`<i class="cp2-co r">${8-rr}</i>`:''}${r===7?`<i class="cp2-co f">${'abcdefgh'[ff]}</i>`:''}</div>`;
+    }
+    boardEl.innerHTML=h;
+  };
   const refresh=()=>{
     const chk=validateCustomFEN(input.value);
-    pv.innerHTML=fenPreviewHTML(input.value);
-    pv.classList.toggle('bad',!chk.ok);
+    drawEd();
+    document.querySelectorAll('#cp2Tray .cp2-t').forEach(b=>b.classList.toggle('on',b.dataset.t===e.tool));
+    document.querySelectorAll('#edTurn .color-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===e.turn));
+    document.querySelectorAll('.ed-c').forEach(b=>b.checked=!!e.c[b.dataset.k]);
+    document.getElementById('edEp').value=e.ep;
     if(!chk.ok){ errBox.className='custom-fen-error'; errBox.textContent=input.value.trim()?chk.error:''; }
     else if(chk.terminal){ errBox.className='custom-fen-warn'; errBox.textContent='⚠ '+chk.terminal+' (Analysis Board only)'; }
     else { errBox.className='custom-fen-ok'; errBox.textContent='✓ Valid position — '+(chk.fen.split(' ')[1]==='w'?'White':'Black')+' to move.'; }
+    liveBtn.disabled=!chk.ok||!!chk.terminal; anBtn.disabled=!chk.ok;
     return chk;
   };
-  input.addEventListener('input',refresh);
-  document.querySelectorAll('.fen-chip').forEach(b=>b.onclick=()=>{ input.value=presets[Number(b.dataset.i)][1]; refresh(); });
+  const push=()=>{
+    const ok=(k,r)=>e.g[k[0]]===k[1]&&e.g[r[0]]===r[1];
+    if(!ok([60,'K'],[63,'R'])) e.c.K=0; if(!ok([60,'K'],[56,'R'])) e.c.Q=0;
+    if(!ok([4,'k'],[7,'r'])) e.c.k=0; if(!ok([4,'k'],[0,'r'])) e.c.q=0;
+    input.value=edFEN(e); refresh();
+  };
+  const place=i=>{
+    if(e.tool==='mv'){ if(e.sel===null){ if(e.g[i]) e.sel=i; } else { if(e.sel!==i){ e.g[i]=e.g[e.sel]; e.g[e.sel]=null; } e.sel=null; } }
+    else if(e.tool==='x') e.g[i]=null;
+    else e.g[i]=(e.g[i]===e.tool)?null:e.tool;
+    push();
+  };
+  boardEl.onclick=ev=>{ const s=ev.target.closest('.cp2-sq'); if(s) place(+s.dataset.i); };
+  boardEl.oncontextmenu=ev=>{ ev.preventDefault(); const s=ev.target.closest('.cp2-sq'); if(s){ e.g[+s.dataset.i]=null; e.sel=null; push(); } };
+  document.querySelectorAll('#cp2Tray .cp2-t').forEach(b=>b.onclick=()=>{ e.tool=b.dataset.t; e.sel=null; refresh(); });
+  document.querySelectorAll('#edTurn .color-btn').forEach(b=>b.onclick=()=>{ e.turn=b.dataset.t; push(); });
+  document.querySelectorAll('.ed-c').forEach(b=>b.onchange=()=>{ e.c[b.dataset.k]=b.checked?1:0; push(); });
+  document.getElementById('edEp').onchange=ev=>{ e.ep=ev.target.value; push(); };
+  document.getElementById('edClear').onclick=()=>{ e.g=Array(64).fill(null); e.c={K:0,Q:0,k:0,q:0}; e.ep='-'; e.sel=null; push(); };
+  document.getElementById('edStart').onclick=()=>{ e.g=fenToGrid(DEFAULT_FEN); syncMeta(DEFAULT_FEN); e.sel=null; push(); };
+  document.getElementById('edFlip').onclick=()=>{ e.flip=!e.flip; drawEd(); };
+  document.getElementById('edCopy').onclick=ev=>copyText(input.value.trim(),ev.currentTarget);
+  input.addEventListener('input',()=>{ const g=fenToGrid(input.value); if(g){ e.g=g; syncMeta(input.value); } e.sel=null; refresh(); });
+  document.querySelectorAll('.fen-chip').forEach(b=>b.onclick=()=>{ input.value=presets[Number(b.dataset.i)][1]; input.dispatchEvent(new Event('input')); });
   document.querySelectorAll('#cpColors .color-btn').forEach(btn=>btn.onclick=()=>{
     document.querySelectorAll('#cpColors .color-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active'); chosen=btn.dataset.c;
@@ -929,8 +1042,8 @@ function showCustomPositionForm(savedName){
       startCustomAnalysis(chk.fen);
     }
   };
-  document.getElementById('customLiveBtn').onclick=()=>run('live');
-  document.getElementById('customAnalysisBtn').onclick=()=>run('analysis');
+  liveBtn.onclick=()=>run('live');
+  anBtn.onclick=()=>run('analysis');
   document.getElementById('cpJoinLink').onclick=()=>showJoinForm(document.getElementById('cpName').value.trim()||savedName,'');
   refresh();
 }
@@ -1528,7 +1641,7 @@ function renderGame(){
         <span class="status-chip"><span class="connection-dot ${names.status==='connected'||names.status==='playing'?'connected':names.status==='reconnecting'?'reconnecting':''}"></span>${names.status==='connected'||names.status==='playing'?'Connected':names.status==='reconnecting'?'Reconnecting…':'Waiting'}</span>
         <span class="room-chip">Game <b>${esc(roomCode)}</b></span>
         <button class="icon-btn" id="themeBtn" title="Light / Dark">◐</button>
-        <button class="secondary" id="leaveBtn">Leave</button>
+        <button class="secondary" id="leaveBtn">← Home</button>
       </div>
     </div>
     <div class="game-layout">
@@ -1574,6 +1687,7 @@ function renderGame(){
             <button id="resignBtn" class="secondary" ${getGameResult()?'disabled':''}>Resign</button>
             <button id="takebackBtn" class="ghost" ${(!((isHost ? hist.length : remoteHistory.length))||takebackOfferBy||getGameResult())?'disabled':''}>Takeback</button>
             <button id="newGameBtn" ${isHost?'':'disabled'}>New Game</button>
+            <button class="ghost" id="pasteFenBtn" ${isHost?'':'disabled'} title="${isHost?'Restart from a pasted FEN':'Only the host can change the position'}">Paste FEN…</button>
             <button class="secondary" id="pdfBtn">Export PDF</button>
             <button class="secondary" id="pgnBtn">Export PGN</button>
           </div>
@@ -1590,7 +1704,7 @@ function renderGame(){
     mobileOfferSlot.innerHTML=mobileOffers.join('');
   }
 
-  document.getElementById('leaveBtn').onclick=()=>{cleanup();renderLobby();};
+  document.getElementById('leaveBtn').onclick=()=>{ if(!getGameResult() && !confirm('Leave this game and go back to the home page?')) return; cleanup(); renderLobby(); };
   document.getElementById('themeBtn').onclick=toggleTheme;
   document.getElementById('navStart').onclick=()=>setViewPly(0);
   document.getElementById('navPrev').onclick=()=>setViewPly((viewPly===null||viewPly===undefined?hist.length:viewPly)-1);
@@ -1618,6 +1732,7 @@ function renderGame(){
     resetClock(clockPreset);
     hostSync();
   };
+  document.getElementById('pasteFenBtn').onclick=()=>{ if(!isHost) return; askFen(f=>{ customPositionFen=f; lastCustomFenText=f; chess=makeChess(); resetGameState(); resetClock(clockPreset); hostSync(); },{title:'Paste FEN',note:'Restarts the game from this position for both players.',live:true}); };
   document.getElementById('drawBtn').onclick=()=>offerDraw();
   document.getElementById('takebackBtn').onclick=()=>offerTakeback();
   const at=document.getElementById('acceptTakebackBtn'); if(at) at.onclick=()=>respondTakeback(true);
@@ -2133,7 +2248,7 @@ function renderCustomAnalysis(){
   <div class="game-app">
     <div class="game-topbar">
       <div class="brand"><img class="brand-logo" src="${MYCHESS64_LOGO}" alt="MyChess64"><span class="brand-name">MyChess64</span></div>
-      <div class="top-actions"><span class="status-chip"><span class="connection-dot connected"></span>Analysis Board</span><button class="icon-btn" id="analysisThemeBtn" title="Light / Dark">◐</button><button class="secondary" id="analysisLeaveBtn">Exit</button></div>
+      <div class="top-actions"><span class="status-chip"><span class="connection-dot connected"></span>Analysis Board</span><button class="icon-btn" id="analysisThemeBtn" title="Light / Dark">◐</button><button class="secondary" id="analysisLeaveBtn">← Home</button></div>
     </div>
     <div class="game-layout">
       <div class="board-zone"><div id="board"></div></div>
@@ -2152,6 +2267,7 @@ function renderCustomAnalysis(){
             <button class="ghost" id="anRedo" ${analysisRedo.length?'':'disabled'}>Redo ▶</button>
             <button class="ghost" id="anFlip">⇅ Flip Board</button>
             <button class="ghost" id="anCopy">Copy FEN</button>
+            <button class="ghost" id="anPaste" style="grid-column:1/-1">Paste FEN…</button>
             <button class="ghost" id="analysisResetBtn">Reset Position</button>
             <button class="secondary" id="analysisExitBtn">New Position</button>
           </div>
@@ -2167,6 +2283,7 @@ function renderCustomAnalysis(){
   document.getElementById('anRedo').onclick=analysisForward;
   document.getElementById('anFlip').onclick=()=>{ analysisFlip=!analysisFlip; selected=null; drawBoard(); };
   document.getElementById('anCopy').onclick=(e)=>copyText(chess.fen(), e.currentTarget);
+  document.getElementById('anPaste').onclick=()=>askFen(f=>{ lastCustomFenText=f; startCustomAnalysis(f); },{title:'Paste FEN',note:'Loads this position on the analysis board and clears the current moves.'});
   document.getElementById('analysisResetBtn').onclick=()=>{chess=makeChess();analysisRedo=[];selected=null;lastMoveSquares={from:null,to:null};resetGameState();renderCustomAnalysis();};
   const nt=document.getElementById('notation'); if(nt) nt.scrollTop=nt.scrollHeight;
   drawBoard();
