@@ -496,6 +496,24 @@ body:not(:has(.game-app)) #content>.card{margin:0 auto}
   .cp2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .cp2-left{width:min(100%,max(220px,calc(100dvh - 130px)))}
 }
+
+/* ===== v5: join screen ===== */
+.cp2-or{display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:var(--muted);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.cp2-or::before,.cp2-or::after{content:"";flex:1;height:1px;background:var(--border)}
+.cp2-join{width:100%;margin:0;min-height:52px;font-size:.98rem;font-weight:800;border-radius:12px;background:var(--panel);color:var(--accent);border:2px solid var(--accent);cursor:pointer;transition:background .12s,color .12s,transform .08s}
+.cp2-join:hover{background:var(--accent);color:#fff}.cp2-join:active{transform:scale(.98)}
+.cp2-joinbox{max-width:440px;margin:0 auto;text-align:left}
+.cp2-joinbox h2{margin:0 0 6px;font-size:1.25rem;font-weight:800;color:var(--text)}
+.cp2-joinhelp{margin:0 0 10px;font-size:.88rem;line-height:1.5;color:var(--muted)}
+.cp2-code{width:100%;text-align:center;text-transform:uppercase;font:800 1.9rem/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.35em;padding:14px 10px 14px calc(10px + .35em);min-height:64px;border:2px solid var(--border);border-radius:14px;background:var(--panel2);color:var(--text)}
+.cp2-code::placeholder{letter-spacing:.2em;font-size:1.2rem;font-weight:600;opacity:.45}
+.cp2-code:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(9,105,232,.18)}
+.cp2-joinmsg{min-height:22px;margin:6px 2px 0;font-size:.85rem;font-weight:600;color:#c0392b}
+.cp2-go1{grid-template-columns:1fr}
+.cp2-joinhint{margin:12px 2px 0;font-size:.78rem;color:var(--muted);line-height:1.5}
+.cp2-back{display:block;margin:14px auto 0;background:none;border:0;color:var(--accent);font-weight:700;font-size:.9rem;cursor:pointer;padding:8px 12px;min-height:40px}
+.cp2-back:hover{text-decoration:underline}
+body:not(:has(.game-app)) .lobby-card:has(.cp2-joinbox){max-width:560px}
 </style>
 </head>
 <body>
@@ -1022,7 +1040,8 @@ function showCustomPositionForm(savedName){
         <button id="customLiveBtn">♟ Play with a friend</button>
         <button class="secondary" id="customAnalysisBtn">♞ Analysis board</button>
       </div>
-      <button type="button" class="cp-link" id="cpJoinLink">Have a room code? Join a friend's game</button>
+      <div class="cp2-or"><span>or</span></div>
+      <button type="button" class="cp2-join" id="cpJoinBtn">🔑 Join the Position to Play</button>
     </section>
   </div>`;
   const input=document.getElementById('customFenInput'), errBox=document.getElementById('customFenError'), boardEl=document.getElementById('cp2Board');
@@ -1094,7 +1113,7 @@ function showCustomPositionForm(savedName){
   };
   liveBtn.onclick=()=>run('live');
   anBtn.onclick=()=>run('analysis');
-  document.getElementById('cpJoinLink').onclick=()=>showJoinForm(document.getElementById('cpName').value.trim()||savedName,'');
+  document.getElementById('cpJoinBtn').onclick=()=>showJoinForm(document.getElementById('cpName').value.trim()||savedName,'');
   refresh();
 }
 
@@ -1134,23 +1153,32 @@ function showHostForm(savedName){
 function showJoinForm(savedName, prefillCode){
   setActiveTab('tabJoin');
   document.getElementById('lobbyBody').innerHTML = `
-    <div class="lobby-section">
-      <label>Your name</label>
+    <div class="cp2-joinbox">
+      <h2>Join a position</h2>
+      <p class="cp2-joinhelp">Enter the 4-character room code your friend shared. You will join the same position they set up.</p>
+      <label class="cp2-label" for="codeInput">Room code</label>
+      <input id="codeInput" class="cp2-code" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text" maxlength="60" placeholder="e.g. K7M2" value="${esc(prefillCode)}">
+      <div id="joinMsg" class="cp2-joinmsg" aria-live="polite"></div>
+      <label class="cp2-label" for="nameInput">Your name</label>
       <input id="nameInput" autocomplete="name" placeholder="Enter your name" value="${esc(savedName)}">
-      <label>Room code</label>
-      <input id="codeInput" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" placeholder="Enter room code" value="${esc(prefillCode)}">
-      <div class="lobby-actions"><button id="joinBtn">Join Game</button></div>
-      <div class="lobby-hint">Use the room code shared by your opponent, or open their game link directly.</div>
-      <button type="button" class="cp-link" id="joinBackLink">← Back to Custom Position</button>
+      <div class="cp2-go cp2-go1"><button id="joinBtn">Join the game</button></div>
+      <p class="cp2-joinhint">Tip: you can paste the full invite link here — the code is picked out for you.</p>
+      <button type="button" class="cp2-back" id="joinBackLink">← Back to set up a position</button>
     </div>`;
-  document.getElementById('joinBackLink').onclick = () => { history.replaceState(null,'',location.pathname); showCustomPositionForm(savedName); };
-  document.getElementById('joinBtn').onclick = () => {
-    myName = document.getElementById('nameInput').value.trim() || 'Student';
-    const code = document.getElementById('codeInput').value.trim().toUpperCase();
-    if(!code) return;
-    localStorage.setItem('cc_name', myName);
+  const codeEl=document.getElementById('codeInput'), msgEl=document.getElementById('joinMsg');
+  const readCode=()=>{ const raw=codeEl.value.trim(); const m=raw.match(/[?&]code=([A-Za-z0-9]+)/i); return (m?m[1]:raw).replace(/[^A-Za-z0-9]/g,'').toUpperCase(); };
+  const doJoin=()=>{
+    const code=readCode();
+    if(code.length<4){ msgEl.textContent='Please enter the 4-character room code.'; codeEl.focus(); return; }
+    myName=document.getElementById('nameInput').value.trim()||'Player 2';
+    localStorage.setItem('cc_name',myName);
     joinGame(code);
   };
+  codeEl.addEventListener('input',()=>{ msgEl.textContent=''; const c=readCode(); if(c!==codeEl.value.trim().toUpperCase() && /[?&]code=/i.test(codeEl.value)) codeEl.value=c; });
+  document.querySelectorAll('#codeInput,#nameInput').forEach(el=>el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); doJoin(); } }));
+  document.getElementById('joinBtn').onclick=doJoin;
+  document.getElementById('joinBackLink').onclick=()=>{ history.replaceState(null,'',location.pathname); showCustomPositionForm(document.getElementById('nameInput').value.trim()||savedName); };
+  if(!prefillCode) setTimeout(()=>{ try{ codeEl.focus(); }catch(e){} },50);
 }
 
 function showMessage(msg, isError){
