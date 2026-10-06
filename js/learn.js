@@ -53,18 +53,68 @@ async function top(){
  const j=await J("https://api.chess.com/pub/leaderboards");if(!j)return off();
  const f=(k,t)=>j[k]?"<b>"+t+"</b>\n"+j[k].slice(0,5).map((p,i)=>(i+1)+". "+esc(p.username)+" — "+p.score).join("\n"):"";
  bot([f("live_blitz","Blitz"),f("live_rapid","Rapid"),f("live_bullet","Bullet")].filter(Boolean).join("\n\n"),["🏆 Chess.com live leaderboards"],j.live_blitz?["Player "+j.live_blitz[0].username]:null)}
-/* ---------- QUIZ ---------- */
-let qz=null;
-function quiz(){
- const e=pick(DB.filter(x=>!/Quote|History/.test(x.topic)&&x.title.length<32)),ws=(e.title+" "+e.key).split(/[^A-Za-z]+/).filter(w=>w.length>2&&!STOP.has(w.toLowerCase()));
- const t=ws.length?e.answer.replace(new RegExp("\\b("+ws.join("|")+")\\w*","gi"),"____"):e.answer;
- qz={e};bot("<b>Quiz:</b> What is this about?\n“"+esc(t)+"”",["🎯 "+esc(e.topic)],["Hint","Skip"])}
-function qans(v){const u=toks(v),t=toks(qz.e.title),h=t.filter(w=>u.some(x=>x==w||(w.length>4&&x.length>4&&x.slice(0,4)==w.slice(0,4))));return(t.length&&h.length>=Math.ceil(t.length/2))||norm(v).includes(norm(qz.e.key))}
-function qflow(v,n){
- if(/^hint$/i.test(n)){add("user",v);const t=qz.e.title;bot("Hint: it starts with “"+esc(t[0])+"” and has "+t.split(" ").length+" word(s).",null,["Skip"]);return true}
- if(/^(skip|pass|give up|answer|i don'?t know)$/i.test(n)){add("user",v);const e=qz.e;qz=null;bot("It was <b>"+esc(e.title)+"</b>.\n"+esc(e.answer),["🎯 "+esc(e.topic)],["Next quiz"]);return true}
- if(n.split(/\s+/).length<=6&&!/^(what|how|why|who|when|where|explain|tell|define|show|play|analy|top|player|puzzle|random)/i.test(n)){add("user",v);const e=qz.e,ok=qans(v);qz=null;bot((ok?"✅ Correct! ":"Not quite — it was ")+"<b>"+esc(e.title)+"</b>.\n"+esc(e.answer),["🎯 "+esc(e.topic)],["Next quiz"]);return true}
- qz=null;return false}
+/* ---------- QUIZ (objective, 4 options) ---------- */
+const qsty=document.createElement("style");qsty.textContent=".qh{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.qh span{font-size:11.5px;color:#cfc6f5;border:1px solid var(--line);border-radius:99px;padding:3px 9px;background:#ffffff0d}.qq{font-size:15.5px;line-height:1.6;margin-bottom:6px}.qz{display:grid;gap:8px;margin:10px 0}.qo{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:11px 13px;border-radius:14px;border:1px solid #ffffff2e;background:#ffffff10;color:#f4f1ff;font-size:14.5px;line-height:1.45;cursor:pointer;transition:.2s}.qo b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#ffffff1f;font-size:12px}.qo:hover:not(:disabled){background:#f5c65a22;border-color:#f5c65a99;transform:translateY(-1px)}.qo:disabled{cursor:default}.qo.ok{background:#1fbf6f38;border-color:#37e08a;animation:qp .5s}.qo.no{background:#ff4d6d30;border-color:#ff6b86;animation:shk .35s}.qo.dim{opacity:.45}@keyframes qp{50%{transform:scale(1.03)}}.qx{margin-top:8px;font-size:14px;line-height:1.55;color:#e4dcff;white-space:pre-line}";document.head.append(qsty);
+const shuf=a=>a.slice().sort(()=>Math.random()-.5),hiq=()=>localStorage.cl==="hi",LQ=(a,b)=>hiq()?b:a;
+let QT=null,QC=null,QGEN=0,QS={n:0,ans:0,ok:0,st:0,best:0,rn:0,ro:0,seen:new Set()};
+const topics=()=>[...new Set(DB.map(e=>e.topic))];
+function ftopic(k){
+ const ws=norm(k).split(" ").filter(w=>w.length>2);if(!ws.length)return null;
+ const tp=topics().filter(t=>{const x=norm(t);return ws.some(w=>x.includes(w.slice(0,5)))}),cap=k.replace(/^./,c=>c.toUpperCase());
+ if(tp.length)return{l:tp.length==1?tp[0]:cap,f:e=>tp.includes(e.topic)};
+ const m=DB.filter(e=>{const x=norm(e.title+" "+e.key);return ws.some(w=>x.includes(w))});
+ return m.length>=4?{l:cap,f:e=>m.includes(e)}:null}
+const mask=e=>{const ws=(e.title+" "+e.key).split(/[^A-Za-z]+/).filter(w=>w.length>2&&!STOP.has(w.toLowerCase())),t=(e.answer.match(/^(?:[^.!?]+[.!?]+\s*){1,2}/)||[e.answer])[0].trim();
+ return ws.length?t.replace(new RegExp("\\b("+ws.join("|")+")\\w*","gi"),"____"):t};
+const first=a=>{const m=a.match(/^[^.!?]+[.!?]/);let s=(m?m[0]:a).trim();return s.length>120?s.slice(0,117).trim()+"…":s};
+function makeQ(){
+ let P=DB.filter(e=>e.answer.length>35&&e.answer.length<420&&e.title.length<50&&!/quote/i.test(e.topic)&&(!QT||QT.f(e))&&!QS.seen.has(e.title));
+ if(!P.length){QS.seen.clear();P=DB.filter(e=>!QT||QT.f(e))}if(!P.length)P=DB;
+ const e=pick(P);QS.seen.add(e.title);
+ const lv=+localStorage.clv||0,same=DB.filter(x=>x.title!=e.title&&x.topic==e.topic),oth=DB.filter(x=>x.title!=e.title&&x.topic!=e.topic);
+ const src=shuf(lv>0&&same.length>=3?same:oth.length>=3?oth:DB.filter(x=>x.title!=e.title)),ty=Math.random()<.5?0:1,key=ty?x=>first(x.answer):x=>x.title,ok=key(e),o=[ok];
+ for(const x of src){const t=key(x);if(!o.includes(t))o.push(t);if(o.length==4)break}
+ while(o.length<4)o.push("—".repeat(o.length));
+ const opts=shuf(o);
+ return{e,opts,ci:opts.indexOf(ok),q:ty?LQ("Which statement about ","कौन सा कथन ")+"<b>"+esc(e.title)+"</b>"+LQ(" is correct?"," सही है?"):LQ("What is this describing?","यह किसके बारे में है?")+"<br>“"+esc(mask(e))+"”"}}
+function show(){
+ if(QC)QC.dead=true;if(th){th.remove();th=null}document.body.classList.add("chat");
+ const Q=makeQ(),n=++QS.n,D=c=>{const x=document.createElement("div");x.className=c;return x},row=D("msg bot"),av=D("av"),b=D("bubble"),hd=D("qh"),qt=D("qq"),ol=D("qz"),xp=D("qx"),ct=D("meta"),me={dead:false,done:false};
+ av.textContent="♛";ct.style.cssText="opacity:1;animation:none";QC=me;
+ const hdr=()=>hd.innerHTML="<span>🎯 "+esc(QT?QT.l:LQ("Mixed","मिक्स्ड"))+"</span><span>Q"+n+"</span><span>✅ "+QS.ok+"</span><span>🔥 "+QS.st+"</span>";hdr();
+ qt.innerHTML=Q.q;
+ const go2=()=>{me.dead=true;(QS.rn>=5?summary:show)()},after=ms=>{const gg=QGEN;setTimeout(()=>{if(!me.dead&&gg==QGEN)go2()},ms)};
+ const btns=Q.opts.map((o,i)=>{const x=document.createElement("button"),l=document.createElement("b"),s=document.createElement("span");x.className="qo";l.textContent="ABCD"[i];s.textContent=o;x.append(l,s);x.onclick=()=>pk(i);ol.append(x);return x});
+ function ctr(a){ct.innerHTML="";(a?[[LQ("Next ▶","अगला ▶"),go2]]:[[LQ("⏭ Skip","⏭ छोड़ें"),skip]]).concat([[LQ("🏁 End","🏁 समाप्त"),()=>{me.dead=true;qend()}]]).forEach(([t,f])=>{const s=document.createElement("span");s.className="rl";s.textContent=t;s.onclick=()=>{if(!me.dead)f()};ct.append(s)})}
+ function skip(){if(!me.done){QS.st=0;go2()}}
+ function pk(i){if(me.done||me.dead)return;me.done=true;const ok=i==Q.ci;QS.rn++;QS.ans++;
+  btns.forEach((x,j)=>{x.disabled=true;x.classList.add(j==Q.ci?"ok":j==i?"no":"dim")});
+  if(ok){QS.ok++;QS.ro++;QS.st++;QS.best=Math.max(QS.best,QS.st);if(window.CHESSA.confetti)window.CHESSA.confetti()}else QS.st=0;
+  hdr();speak(ok?LQ("Correct!","सही!"):LQ("Not quite.","थोड़ा चूक गए।"));
+  xp.textContent=(ok?"✅ "+LQ("Correct!","सही!"):"❌ "+LQ("Not quite. Correct answer: ","सही उत्तर: ")+Q.opts[Q.ci])+"\n💡 "+Q.e.title+": "+Q.e.answer.slice(0,260)+(Q.e.answer.length>260?"…":"")+"\n📚 "+Q.e.ref;
+  ctr(true);after(ok?3500:5500);setTimeout(()=>main.scrollTo({top:main.scrollHeight}),60)}
+ me.pick=pk;me.skip=skip;me.next=go2;
+ b.append(hd,qt,ol,xp,ct);row.append(av,b);row.dataset.rel=JSON.stringify(["Quiz topics"].concat(shuf(topics()).slice(0,4).map(t=>"Quiz: "+t),["Quiz: Mixed"]));
+ chat.append(row);ctr(false);main.scrollTo({top:main.scrollHeight})}
+function summary(){
+ const k=QS.ro,t=QS.rn,g=QGEN;QS.rn=0;QS.ro=0;QC=null;
+ window.botUI("<b>"+LQ("Round complete!","राउंड पूरा!")+"</b> "+(k>=4?"🎉":k>=2?"👍":"💪")+"\n"+LQ("You got ","आपने ")+k+"/"+t+LQ(" right. Best streak: "," सही दिए। सबसे लंबी लकीर: ")+QS.best+"\n"+LQ("Next round starting soon…","अगला राउंड जल्द शुरू होगा…"),["🎯 "+esc(QT?QT.l:"Mixed")],["Next quiz","Quiz topics"].concat(shuf(topics()).slice(0,3).map(x=>"Quiz: "+x)));
+ if(k>=4&&window.CHESSA.confetti)window.CHESSA.confetti();
+ setTimeout(()=>{if(g==QGEN&&!QC)show()},9000)}
+function qend(){
+ const a=QS.ans,k=QS.ok,b=QS.best;QC=null;QS={n:0,ans:0,ok:0,st:0,best:0,rn:0,ro:0,seen:QS.seen};
+ window.botUI("<b>"+LQ("Quiz ended","क्विज़ समाप्त")+"</b>\n"+LQ("Score: ","स्कोर: ")+k+"/"+a+LQ(" correct. Best streak: "," सही। सबसे लंबी लकीर: ")+b,["🎯 Quiz"],["Quiz me","Quiz topics","Puzzle"])}
+function menu(){window.botUI(LQ("Choose a quiz topic:","क्विज़ विषय चुनें:"),["🎯 Quiz topics"],["Quiz: Mixed"].concat(topics().slice(0,14).map(t=>"Quiz: "+t)))}
+function qintent(n){
+ if(/^(quiz|quiz topics?|topics|quiz menu)$/i.test(n)&&!/^quiz$/i.test(n))return{menu:1};
+ let m=n.match(/^(?:(?:next|another|new|start|play|take|give me a|give me)\s+)?(?:quiz|test)(?:\s+me)?(?:\s*(?:on|about|of|:)\s*(.+))?$/i);
+ if(m)return{t:(m[1]||"").trim()};
+ m=n.match(/^(.+?)\s+quiz$/i);return m?{t:m[1].trim()}:null}
+function quizStart(i){
+ if(i.menu)return menu();
+ const k=(i.t||"").trim();
+ if(k){if(/^(me|mixed|random|any|all|everything|chess)$/i.test(k))QT=null;else{const T=ftopic(k);if(!T)return window.botUI(LQ("I don't have a quiz topic called ","मेरे पास इस नाम का क्विज़ विषय नहीं है: ")+"<b>"+esc(k)+"</b>. "+LQ("Pick one of these:","इनमें से चुनें:"),["🎯 Quiz topics"],["Quiz: Mixed"].concat(shuf(topics()).slice(0,8).map(x=>"Quiz: "+x)));QT=T}QS.rn=0;QS.ro=0}
+ show()}
 /* ---------- CHESS960 ---------- */
 async function c960(){
  if(!await lib())return off();const b=Array(8).fill(""),fr=()=>b.map((x,i)=>x?null:i).filter(x=>x!==null);
@@ -90,9 +140,13 @@ const prev=ask;
 ask=async function(v){
  try{
   const n=v.trim();
-  if(qz&&qflow(v,n))return;
+  QGEN++;
+  if(QC&&!QC.dead&&!QC.done&&/^[a-d1-4]$/i.test(n)){add("user",v);if(th){th.remove();th=null}QC.pick("abcd".indexOf(n.toLowerCase())>=0?"abcd".indexOf(n.toLowerCase()):+n-1);return}
+  if(QC&&!QC.dead&&/^(skip|next)$/i.test(n)){add("user",v);if(th){th.remove();th=null}if(QC.done)QC.next();else QC.skip();return}
+  if(/^(stop|end|exit|quit) (the )?quiz$/i.test(n)){add("user",v);return qend()}
+  const qi=qintent(n);if(qi){add("user",v);return quizStart(qi)}
   if(/^(explain (it )?(like|to) (a )?(beginner|child|kid|5)|explain like i'?m 5|eli5|simplify( it)?|in simple words|make it simple|i don'?t (understand|get it))\??$/i.test(n)){add("user",v);return await eli()}
-  if(/^(?:next |another |new )?quiz(?: me)?$/i.test(n)){add("user",v);return quiz()}
+  
   if(/^(?:random|another|new|next|more) puzzle$/i.test(n)){add("user",v);return await rpz()}
   if(/^(give me a |show me a |today'?s )?(daily )?puzzle( of the day)?$/i.test(n))cz=null;
   if(cz&&/^(show )?(the )?(solution|answer)$/i.test(n)){add("user",v);return bot("<b>Solution:</b> "+esc(cz.san.join(" ")||"see Chess.com"),[lk(cz.url,"Open on Chess.com")],["Another puzzle"])}

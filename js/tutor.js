@@ -17,7 +17,7 @@ const st=document.createElement("style");st.textContent="#modes{display:flex;gap
 const bar=document.createElement("div");bar.id="modes";document.querySelector("header").after(bar);
 const PLAN=["Beginner plan: learn how the pieces move and the basic checkmates, play one slow game a day, solve 10 easy puzzles and review one mistake.","Intermediate plan: 20 minutes of tactics, one opening line, one endgame theme (Lucena, Philidor) and a review of every loss.","Advanced plan: deep calculation, model games, a repertoire, engine review of your own games and rook-endgame drills."];
 const say=(h,c)=>{document.body.classList.add("chat");bot(h,["🎓 "+LV[lvl]],c)};
-const M={Learn:()=>say("Pick a lesson, or ask me anything:",[...new Set(Array.from({length:8},()=>pick(DB).title))].slice(0,4)),
+const M={Learn:()=>say("Choose a category, or ask me anything:",[...new Set(DB.map(e=>e.topic))].slice(0,14).map(x=>"Learn: "+x)),
  Analyze:()=>say("Paste a <b>FEN</b> or a full <b>PGN</b> and Stockfish will give the best move, the evaluation and any blunders or mistakes.",["rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]),
  Puzzle:()=>{q.value="Puzzle";send.click()},Quiz:()=>{q.value="Quiz me";send.click()},
  Study:()=>say("<b>Study plan</b>\n"+PLAN[lvl],["Quiz me","Daily puzzle","Random opening"]),
@@ -26,4 +26,9 @@ Object.keys(M).forEach(k=>{const b=document.createElement("button");b.textConten
 const lb=document.createElement("button");lb.className="ib";lb.style.fontSize="13px";lb.title="Level";
 const ul=()=>lb.textContent=LV[lvl][0];lb.onclick=()=>{lvl=(lvl+1)%3;localStorage.clv=lvl;ul();say("Level set to <b>"+LV[lvl]+"</b>. Answers, tips and study plans now match this level.")};ul();
 document.getElementById("vc").before(lb);
+const prevA=ask;
+ask=async function(v){const n=v.trim(),m=n.match(/^learn(?:ing)?\s*[:\-]\s*(.+)$/i);
+ if(m){const k=norm(m[1]).slice(0,5),tp=[...new Set(DB.map(e=>e.topic))].find(x=>norm(x).includes(k));
+  if(tp){add("user",v);return say("<b>"+esc(tp)+"</b> — choose a lesson:",DB.filter(e=>e.topic==tp).slice(0,12).map(e=>e.title))}}
+ return prevA(v)};
 })();
