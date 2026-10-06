@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MyChess64 – Learn. Play. Improve. Anytime, Anywhere.</title>
 <meta name="description" content="MyChess64: 29 chess tools in one place for training, live play, analysis, tournaments, books and news.">
-<link rel="icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0060d6">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -83,7 +84,7 @@ h1{font:700 clamp(2.5rem,5.6vw,4.3rem)/1.05 var(--serif);letter-spacing:-.025em;
 
 footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
 .f-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:28px;padding-bottom:28px;border-bottom:1px solid #223557}
-.f-brand img{height:56px;background:#fff;padding:4px 10px;border-radius:10px;display:block}.f-brand p{margin-top:12px}
+.f-brand img{height:120px;width:auto;max-width:100%;background:#fff;padding:4px 10px;border-radius:10px;display:block}.f-brand p{margin-top:12px}
 .f-links{display:grid;grid-template-columns:repeat(2,auto);gap:8px 40px;align-content:start}.f-links a:hover{color:#fff;text-decoration:underline}
 .f-bot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;padding-top:20px;font-size:.92rem}.f-bot b{color:#fff}
 #up{position:fixed;right:20px;bottom:20px;z-index:20}
@@ -93,7 +94,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
  .search kbd{display:none}.search{flex-basis:200px}
  .brand{font-size:1.35rem}
 }
-@media(max-width:520px){.install{padding:0 12px;font-size:.82rem}.paths{grid-template-columns:1fr}.search{flex-basis:140px}}
+@media(max-width:520px){.lbl{display:none}.install{width:40px;padding:0;font-size:1.1rem}.brand img{height:34px}.search{flex:1 1 80px;min-width:0}.install{padding:0 12px;font-size:.82rem}.paths{grid-template-columns:1fr}.search{flex-basis:140px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 .wrap{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
@@ -125,13 +126,13 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
 <header>
  <div class="wrap">
   <div class="top">
-   <a class="brand" href="#top" aria-label="MyChess64 home"><img src="logo.png" alt="MyChess64" height="46"></a>
+   <a class="brand" href="#top" aria-label="MyChess64 home"><img src="logo-header.png" alt="MyChess64 – Learn. Play. Improve. Anytime, Anywhere." height="46"></a>
    <div class="search">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>
     <input id="q" type="search" placeholder="Search tools" aria-label="Search tools" autocomplete="off">
     <kbd>/</kbd>
    </div>
-   <button class="install" id="install" type="button">⬇ Install app</button>
+   <button class="install" id="install" type="button"><span aria-hidden="true">⬇</span><span class="lbl"> Install app</span></button>
    <button class="icon-btn" id="theme" aria-label="Switch light or dark theme" title="Switch theme">☾</button>
   </div>
   <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
@@ -172,7 +173,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
 <button class="install" id="howclose" type="button">Got it</button></dialog>
 
 <footer><div class="wrap">
- <div class="f-top"><div class="f-brand"><img src="logo.png" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere.</p></div>
+ <div class="f-top"><div class="f-brand"><img src="logo-footer.png" alt="MyChess64 – Learn. Play. Improve. Anytime, Anywhere."></div>
  <nav class="f-links" id="flinks" aria-label="Footer"></nav></div>
  <div class="f-bot"><span>Designed &amp; Developed by: <b>Ved Prakash Sinha</b></span><span>Proudly Made in Bharat 🇮🇳</span><span>© <span id="yr"></span> MyChess64</span></div>
 </div></footer>
