@@ -15,7 +15,7 @@ function sfLoad(){return sfp||(sfp=(async()=>{
  sfp=null;return null})())}
 function sfGo(fen,mt){return new Promise(res=>{const o={};SF.onmessage=e=>{const l=String(e.data);
  if(l.startsWith("info")&&l.includes(" pv ")){const m=l.match(/score (cp|mate) (-?\d+)/);if(m){delete o.cp;delete o.mate;o[m[1]]=+m[2]}o.pv=l.split(" pv ")[1].trim().split(" ");o.d=+(l.match(/depth (\d+)/)||[0,0])[1]}
- if(l.startsWith("bestmove")){o.best=l.split(" ")[1];res(o)}};SF.postMessage("position fen "+fen);SF.postMessage("go movetime "+mt)})}
+ if(l.startsWith("bestmove")){clearTimeout(tm);o.best=l.split(" ")[1];res(o)}};const tm=setTimeout(()=>res(o),mt+8000);SF.postMessage("position fen "+fen);SF.postMessage("go movetime "+mt)})}
 const sv=(o,t)=>(o.mate!=null?Math.sign(o.mate)*(10000-Math.abs(o.mate)*10):(o.cp||0))*(t=="w"?1:-1);
 const fm=s=>Math.abs(s)>9000?(s>0?"+":"−")+"M":(s>0?"+":"")+(s/100).toFixed(2);
 const sans=(fen,u)=>{const h=new Chess(fen),o=[];for(const x of u){const m=h.move({from:x.slice(0,2),to:x.slice(2,4),promotion:x[4]});if(!m)break;o.push(m.san)}return o};
@@ -26,7 +26,7 @@ function why(fen,u,sc){const g=new Chess(fen),m=g.move({from:u.slice(0,2),to:u.s
  return(t.length?"Why: "+t.join(" and ")+". ":"")+(a>9000?side+" has a forced checkmate.":a<40?"The position is roughly equal.":a<150?side+" has a slight edge.":a<400?side+" has a clear advantage.":side+" is winning.")}
 async function fenSF(fen){
  const g=new Chess(fen),w=bot("<i>Analyzing…</i>"),o=await sfGo(fen,1800);if(w&&w.parentNode)w.parentNode.remove();
- if(!o.pv)return bot("<b>"+(g.in_checkmate()?"Checkmate.":"Game over.")+"</b>\n"+boardHTML(g));
+ if(!o.pv)return bot(g.game_over()?"<b>"+(g.in_checkmate()?"Checkmate.":"Game over.")+"</b>\n"+boardHTML(g):"The engine didn't respond in time. Please try again.");
  const sc=sv(o,g.turn()),s=sans(fen,o.pv.slice(0,6));
  bot(boardHTML(g)+"<b>"+(g.turn()=="w"?"White":"Black")+" to move.</b>\nBest move: <b>"+esc(s[0])+"</b>\nEvaluation: <b>"+fm(sc)+"</b> (White's view)\nLine: "+esc(s.join(" "))+"\n"+why(fen,o.pv[0],sc),["♟ Stockfish · depth "+o.d],["Explain like a beginner","Quiz me"])}
 async function review(v){

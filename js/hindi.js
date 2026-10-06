@@ -29,7 +29,7 @@ async function trHtml(h){
 const orig=window.botUI;let qp=Promise.resolve();
 window.botUI=function(h,m,c){
  if(lang!="hi"||/Analyzing/.test(h))return orig(h,m,c);
- qp=qp.then(async()=>{const o=await trHtml(h);o==null?orig(h,(m||[]).concat(["English — translation unavailable"]),c):orig(o,m,c)});return null};
+ qp=qp.then(async()=>{const o=await trHtml(h);o==null?orig(h,(m||[]).concat(["English — translation unavailable"]),c):orig(o,m,c)}).catch(()=>{orig(h,m,c)});return null};
 window.pv2=s=>DEV.test(s)?{lang:"hi-IN",voice:window.hv||speechSynthesis.getVoices().find(x=>/^hi/i.test(x.lang))}:{lang:"en-US",voice:voice};
 let skip2=false;const _a=add;add=(r,t)=>{if(skip2&&r=="user"){skip2=false;return}_a(r,t)};
 const prev=ask;

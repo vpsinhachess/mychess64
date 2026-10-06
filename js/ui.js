@@ -18,7 +18,7 @@ FILES.forEach(([f,n])=>{if((0,eval)("typeof "+n)!="undefined"){addKB((0,eval)(n)
 /* ---- settings sheet ---- */
 const gear=E("button","ib","⚙");gear.title="Settings";$("vc").before(gear);
 const P=E("div");P.id="set";P.innerHTML='<div class="sh"><b>Settings</b><button class="ib" id="sx">✕</button></div><label>Language<span id="s1"></span></label><label>Level<span id="s2"></span></label><label>Voice<select id="sv"></select></label><label>Voice speed <output id="o1"></output><input id="sr" type="range" min=".6" max="1.6" step=".05"></label><label>Voice pitch <output id="o2"></output><input id="sp" type="range" min=".8" max="1.5" step=".05"></label><label>Text effect<select id="st"><option value="0.5">Fast</option><option value="1">Normal</option><option value="1.7">Slow</option></select></label><div class="row"><button id="stt">▶ Test voice</button><button id="simp">📥 Import knowledge</button></div><input id="sf" type="file" accept=".js,.json,.txt" hidden>';document.body.append(P);
-$("s1").append(document.querySelector('[title="Language / भाषा"]'));$("s2").append(document.querySelector('[title="Level"]'));document.querySelector('[title="Voice speed"]').remove();
+const mv=(s,to)=>{const x=document.querySelector(s);if(x)to.append(x)};mv('[title="Language / भाषा"]',$("s1"));mv('[title="Level"]',$("s2"));const vs0=document.querySelector('[title="Voice speed"]');if(vs0)vs0.remove();
 gear.onclick=()=>P.classList.toggle("open");$("sx").onclick=()=>P.classList.remove("open");
 const sr=$("sr"),sp=$("sp"),ss=$("st");
 sr.value=window.vr||.98;sp.value=window.vp||1.12;ss.value=S.ts||1;
@@ -37,10 +37,10 @@ $("sf").onchange=async()=>{const f=$("sf").files[0];if(!f)return;let a;try{const
  bot(n<0?"I couldn't read that file. It should contain a list of entries with topic, title, key, answer and ref.":"✅ Imported <b>"+n+"</b> new entries. I now know <b>"+DB.length+"</b> topics.",["📥 Knowledge import"],n>0?["Quiz me","Chess tip"]:null)};
 /* ---- suggestions + autocomplete ---- */
 const sg=E("div");sg.id="sg";const rb=E("div");rb.id="rp";document.querySelector(".cmp").before(sg);document.querySelector(".cmp").before(rb);
-const DEF=["Puzzle","Quiz me","Random opening","Chess tip","Top players"];let ctx=DEF;
+const POOL=["Puzzle","Mate in 1 puzzle","Fork puzzle","Pin puzzle","Back rank puzzle","Endgame puzzle","Quiz me","Random opening","Chess tip","Top players","Chess960","How to stop blundering","Castling","Zugzwang","Lucena position","Opening principles"],rand=()=>POOL.slice().sort(()=>Math.random()-.5).slice(0,5);const DEF=["Puzzle","Quiz me","Random opening","Chess tip","Top players"];let ctx=DEF;
 const setSg=l=>{sg.innerHTML="";l.slice(0,7).forEach(t=>{const b=E("button");b.textContent=t;b.onclick=()=>{q.value=t;send.click()};sg.append(b)})};setSg(DEF);
 q.addEventListener("input",()=>{const v=q.value.trim();if(v.length<2)return setSg(ctx);const ts=norm(v).split(" ").filter(w=>w.length>1);
- const m=DB.filter(e=>{const h=norm(e.title+" "+e.key);return ts.every(t=>h.includes(t))}).slice(0,6).map(e=>e.title);setSg(m.length?m:ctx)});
+ const m=DB.filter(e=>{const h=norm(e.title+" "+e.key);return ts.every(t=>h.includes(t))}).slice(0,6).map(e=>e.title);const tp=(window.CHESSA.themes||[]).filter(l=>norm(l).includes(norm(v))).slice(0,2).map(l=>l+" puzzle"),all=tp.concat(m);setSg(all.length?all:ctx)});
 /* ---- reply + message actions ---- */
 let rp=null;
 function setReply(t){rp=t.slice(0,160);rb.innerHTML="<span>↩</span><i>"+esc(rp)+"</i><button>✕</button>";rb.style.display="flex";rb.querySelector("button").onclick=()=>{rp=null;rb.style.display="none"};q.focus()}
@@ -53,15 +53,16 @@ function conf(){for(let i=0;i<26;i++){const s=E("i");s.textContent=["♛","♞",
 new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{
  if(n.nodeType==3){if(/Puzzle solved|पहेली हल/.test(n.textContent)&&n.parentNode&&n.parentNode.classList&&n.parentNode.classList.contains("pst"))conf();return}
  if(n.nodeType!=1||!n.classList.contains("msg")||!n.classList.contains("bot"))return;
- if(n.querySelector(".pz")){ctx=[...n.querySelectorAll(".kw")].map(x=>x.dataset.q).concat(["Next puzzle"]);setSg(ctx);return}
+ if(n.querySelector(".pz")){let r=[];try{r=JSON.parse(n.dataset.rel||"[]")}catch(x){}ctx=r.concat(["Next puzzle"]);setSg(ctx);return}
  const t=n.querySelector(".txt");if(!t||n.querySelector(".dots")||/Analyzing|reviewing/.test(t.textContent))return;
- const ch=[...n.querySelectorAll(".meta .rl")].map(x=>x.textContent.replace(/^↪ /,""));ctx=ch.length?ch.concat(DEF):DEF;setSg(ctx);acts(n,t)}))).observe(chat,{childList:true,subtree:true});
+ const ch=[...n.querySelectorAll(".meta .rl")].map(x=>x.textContent.replace(/^↪ /,""));ctx=ch.length?ch.concat(rand()):rand();setSg(ctx);acts(n,t)}))).observe(chat,{childList:true,subtree:true});
 /* ---- router ---- */
 let sk=false;const _a=add;add=(r,t)=>{if(sk&&r=="user"){sk=false;return}_a(r,t)};
 const prev=ask;
 ask=async function(v){const n=v.trim();
  if(rp&&n.split(/\s+/).length<=6){const c=rp.split(" ").slice(0,14).join(" ");rp=null;rb.style.display="none";add("user",v);sk=true;return prev(v+" "+c)}
  if(rp){rp=null;rb.style.display="none"}
- return prev(v)};
+ const tm=setTimeout(()=>{if(th){th.remove();th=null;bot("That took too long. Please try again.")}},45000);
+ try{return await prev(v)}catch(e){if(th){th.remove();th=null}bot("Sorry, something went wrong. Please try again.")}finally{clearTimeout(tm)}};
 })();
 

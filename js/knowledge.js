@@ -69,6 +69,7 @@ function kb(v){
  let h=esc(e.answer);const s=r.slice(1).find(x=>DB[x[1]]!==e&&DB[x[1]].title!=e.title);
  if(s&&b[0]-s[0]<5&&s[0]>=20){const f=DB[s[1]];h+="\n\n<b>Also relevant — "+esc(f.title)+" ("+esc(f.topic)+"):</b> "+esc(f.answer);seen.add(f.title)}
  const rel=[];for(const x of r.slice(1,14)){if(x[0]<10)break;const t=DB[x[1]].title;if(t!=e.title&&!rel.includes(t))rel.push(t);if(rel.length>=3)break}
+ {const pool=DB.filter(x=>x.topic==e.topic&&x.title!=e.title&&!rel.includes(x.title)).sort(()=>Math.random()-.5);while(rel.length<3&&pool.length)rel.push(pool.pop().title)}
  bot(h,["♟ "+esc(e.topic),"📚 "+esc(e.ref),"Match "+Math.round(Math.min(1,b[0]/55)*100)+"%"],rel)}
 ask=async function(v){
  if(!v)return;add("user",v);const n=norm(v);
