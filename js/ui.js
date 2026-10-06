@@ -37,7 +37,7 @@ $("sf").onchange=async()=>{const f=$("sf").files[0];if(!f)return;let a;try{const
  bot(n<0?"I couldn't read that file. It should contain a list of entries with topic, title, key, answer and ref.":"✅ Imported <b>"+n+"</b> new entries. I now know <b>"+DB.length+"</b> topics.",["📥 Knowledge import"],n>0?["Quiz me","Chess tip"]:null)};
 /* ---- suggestions + autocomplete ---- */
 const sg=E("div");sg.id="sg";const rb=E("div");rb.id="rp";document.querySelector(".cmp").before(sg);document.querySelector(".cmp").before(rb);
-const DEF=["Daily puzzle","Quiz me","Random opening","Chess tip","Top players"];let ctx=DEF;
+const DEF=["Puzzle","Quiz me","Random opening","Chess tip","Top players"];let ctx=DEF;
 const setSg=l=>{sg.innerHTML="";l.slice(0,7).forEach(t=>{const b=E("button");b.textContent=t;b.onclick=()=>{q.value=t;send.click()};sg.append(b)})};setSg(DEF);
 q.addEventListener("input",()=>{const v=q.value.trim();if(v.length<2)return setSg(ctx);const ts=norm(v).split(" ").filter(w=>w.length>1);
  const m=DB.filter(e=>{const h=norm(e.title+" "+e.key);return ts.every(t=>h.includes(t))}).slice(0,6).map(e=>e.title);setSg(m.length?m:ctx)});
@@ -53,7 +53,7 @@ function conf(){for(let i=0;i<26;i++){const s=E("i");s.textContent=["♛","♞",
 new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{
  if(n.nodeType==3){if(/Puzzle solved|पहेली हल/.test(n.textContent)&&n.parentNode&&n.parentNode.classList&&n.parentNode.classList.contains("pst"))conf();return}
  if(n.nodeType!=1||!n.classList.contains("msg")||!n.classList.contains("bot"))return;
- if(n.querySelector(".pz")){ctx=["Next puzzle","Daily puzzle","Quiz me"];setSg(ctx);return}
+ if(n.querySelector(".pz")){ctx=[...n.querySelectorAll(".kw")].map(x=>x.dataset.q).concat(["Next puzzle"]);setSg(ctx);return}
  const t=n.querySelector(".txt");if(!t||n.querySelector(".dots")||/Analyzing|reviewing/.test(t.textContent))return;
  const ch=[...n.querySelectorAll(".meta .rl")].map(x=>x.textContent.replace(/^↪ /,""));ctx=ch.length?ch.concat(DEF):DEF;setSg(ctx);acts(n,t)}))).observe(chat,{childList:true,subtree:true});
 /* ---- router ---- */

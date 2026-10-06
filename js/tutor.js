@@ -19,7 +19,7 @@ const PLAN=["Beginner plan: learn how the pieces move and the basic checkmates, 
 const say=(h,c)=>{document.body.classList.add("chat");bot(h,["🎓 "+LV[lvl]],c)};
 const M={Learn:()=>say("Pick a lesson, or ask me anything:",[...new Set(Array.from({length:8},()=>pick(DB).title))].slice(0,4)),
  Analyze:()=>say("Paste a <b>FEN</b> or a full <b>PGN</b> and Stockfish will give the best move, the evaluation and any blunders or mistakes.",["rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]),
- Puzzle:()=>{q.value="Daily puzzle";send.click()},Quiz:()=>{q.value="Quiz me";send.click()},
+ Puzzle:()=>{q.value="Puzzle";send.click()},Quiz:()=>{q.value="Quiz me";send.click()},
  Study:()=>say("<b>Study plan</b>\n"+PLAN[lvl],["Quiz me","Daily puzzle","Random opening"]),
  Coach:()=>say("Coach mode: what do you want to improve? I'll add a tip and the most common mistake to every answer.",["How to stop blundering","Lucena position","Zugzwang","Castling"])};
 Object.keys(M).forEach(k=>{const b=document.createElement("button");b.textContent=k;b.onclick=()=>{[...bar.children].forEach(x=>x.classList.remove("on"));b.classList.add("on");M[k]()};bar.append(b)});

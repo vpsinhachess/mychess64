@@ -3,7 +3,7 @@ const AV='<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><l
 const $=id=>document.getElementById(id),el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e};
 const chat=$("chat"),q=$("q"),send=$("send"),main=$("main");
 $("big").innerHTML=AV;$("mini").innerHTML=AV;
-const SAMPLE=["Daily puzzle","Quiz me","Random opening","Top players"];
+const SAMPLE=["Puzzle","Mate in 1 puzzle","Quiz me","Random opening"];
 SAMPLE.forEach(t=>{const b=el("button","chip");b.textContent=t;b.onclick=()=>{q.value=t;send.click()};$("sug").append(b)});
 const fx=$("fx");for(let i=0;i<14;i++){const s=el("i");s.textContent="♟♞♝♜♛♚"[i%6];s.style.cssText="left:"+(i*7.3%100)+"%;font-size:"+(26+i*4%40)+"px;animation-duration:"+(22+i*3%18)+"s;animation-delay:-"+(i*4%20)+"s";fx.append(s)}
 const G=s=>window.Intl&&Intl.Segmenter?[...new Intl.Segmenter(undefined,{granularity:"grapheme"}).segment(s)].map(x=>x.segment):[...s];
