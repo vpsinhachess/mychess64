@@ -2,9 +2,9 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MyChess64 – Learn. Play. Improve. Anytime, Anywhere.</title>
-<meta name="description" content="MyChess64: 26 chess tools in one place for training, live play, analysis, tournaments, books and news.">
+<meta name="description" content="MyChess64: 29 chess tools in one place for training, live play, analysis, tournaments, books and news.">
 <link rel="icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0060d6">
@@ -95,6 +95,30 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
 }
 @media(max-width:520px){.install{padding:0 12px;font-size:.82rem}.paths{grid-template-columns:1fr}.search{flex-basis:140px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.wrap{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+.eyebrow{color:var(--accent);font-weight:600;margin-bottom:10px}
+.floaters{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+.floaters span{position:absolute;font-size:clamp(2.4rem,7vw,5rem);color:var(--accent);opacity:.09;animation:fl 9s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-18px) rotate(7deg)}}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:26px}
+.tile{display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:14px;background:var(--panel);border:1px solid var(--line);border-bottom:4px solid var(--c);transition:transform .2s,box-shadow .2s}
+.tile:hover{transform:translateY(-3px);box-shadow:0 10px 24px var(--glow)}
+.tile i{font-style:normal;font-size:2.1rem;line-height:1;color:var(--c)}
+.tile b{font-weight:600;font-size:.93rem;line-height:1.2;margin-top:8px}
+.tile small{color:var(--mute);font-size:.8rem}
+.stats{margin-top:26px}
+.today{display:flex;align-items:center;gap:16px;margin-top:22px;padding:16px 20px;border-radius:14px;border:1px solid var(--line);border-left:6px solid var(--c,var(--accent));background:linear-gradient(90deg,color-mix(in srgb,var(--c,var(--accent)) 12%,var(--panel)),var(--panel))}
+.today>span:nth-child(2){flex:1;min-width:0}.today small{display:block;color:var(--mute);font-weight:600}.today b{font:700 1.25rem var(--serif);display:block}.today em{font-style:normal;color:var(--mute);font-size:.92rem}
+.today .go,.card .go{color:var(--accent);font-weight:600}.go:after{content:" →"}
+.card{border-top:4px solid var(--c,var(--accent))}
+.ic{background:color-mix(in srgb,var(--c,var(--accent)) 15%,var(--panel))}
+.piece{background:var(--c);color:#fff;border:0;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+.sec-head{position:relative}.wm{margin-left:auto;font-size:4.5rem;line-height:1;color:var(--c);opacity:.14;pointer-events:none}
+.sec-head h2{font-size:clamp(1.5rem,4vw,2rem)}
+@media(min-width:1500px){.wrap{max-width:1360px}.grid{grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}}
+@media(max-width:520px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.wm{display:none}.stats{gap:20px}.today .go{display:none}}
+@media(max-height:480px) and (orientation:landscape){header{position:static}.hero{padding:24px 0}html{scroll-padding-top:12px}}
 </style>
 </head>
 <body>
@@ -116,16 +140,13 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
 
 <main id="top"><div class="wrap">
  <section class="hero">
+  <div class="floaters" aria-hidden="true"><span style="left:2%;top:8%">♜</span><span style="left:46%;top:2%;animation-delay:-3s">♛</span><span style="left:88%;top:14%;animation-delay:-6s">♞</span><span style="left:40%;top:78%;animation-delay:-2s">♝</span><span style="left:92%;top:70%;animation-delay:-5s">♚</span></div>
   <div>
+   <p class="eyebrow" id="hi"></p>
    <h1>Learn. Play. Improve. Anytime, Anywhere.</h1>
    <p class="lead">MyChess64 brings everything together: practise the squares, play a friend, analyse your games, run a tournament and follow chess in India.</p>
-   <div class="paths">
-    <a class="path" href="#learn"><span>♞</span><div><b>I want to learn</b><small>Squares, pieces, videos</small></div></a>
-    <a class="path" href="#play"><span>♛</span><div><b>I want to play</b><small>Live, computer, clock</small></div></a>
-    <a class="path" href="#analyse"><span>♝</span><div><b>I want to study</b><small>Analysis and openings</small></div></a>
-    <a class="path" href="#organise"><span>♜</span><div><b>I teach or organise</b><small>Tracker and pairing</small></div></a>
-   </div>
-   <div class="stats"><div><b id="cnt">26</b><span>chess tools</span></div><div><b>6</b><span>categories</span></div><div><b>1</b><span>home for chess</span></div></div>
+   <div class="stats"><div><b id="cnt">29</b><span>chess tools</span></div><div><b id="ccnt">8</b><span>categories</span></div><div><b>♟</b><span>made in Bharat</span></div></div>
+   <div class="tiles" id="tiles"></div>
   </div>
   <div>
    <div id="board" role="img" aria-label="Chessboard with a knight touring all 64 squares" tabindex="0"></div>
@@ -134,6 +155,7 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
  </section>
 
  <div class="band" aria-hidden="true"></div>
+ <a class="today" id="today" href="#"></a>
  <section class="sec hidden" id="favs">
   <div class="sec-head"><div class="piece" aria-hidden="true">★</div><div><h2>Your favourites</h2><p>Tools you starred. Tap the star on any card to add or remove it.</p></div></div>
   <div class="grid" id="favgrid"></div>
@@ -159,53 +181,64 @@ footer{margin-top:72px;background:#09132a;color:#c4d1e6;padding:44px 0 24px}
 <script>
 /* ===== EDIT HERE: change each last item to the real path of your module ===== */
 const CATS=[
-{id:"learn",piece:"♞",name:"Learn & Practise",desc:"Build board vision and basics step by step.",tools:[
- ["Find the Squares","🎯","Spot the called square on the board as fast as you can.","find-the-squares.html"],
- ["Name the Squares","🏷️","Look at a highlighted square and name it correctly.","name-the-squares.html"],
- ["Identify the Chess Pieces","♟️","Learn every piece by its look, name and moves.","identify-the-chess-pieces.html"],
- ["Set the Chess Board","🧩","Practise placing all pieces on their starting squares.","set-the-chess-board.html"],
- ["Chess Training Board","🎓","A free board to set positions and practise ideas.","chess-training-board.html"],
- ["Chess Learning Videos","🎬","Watch lessons for beginners to advanced players.","chess-learning-videos.html"],
- ["Chess Rules & Theories","📜","Learn the rules of chess and the key ideas behind good play.","chess-rules"]]},
-{id:"play",piece:"♛",name:"Play",desc:"Play the computer, a friend or the community.",tools:[
- ["Live Game Play","⚡","Play live games with a real opponent.","live-game-play.html"],
- ["Play with Computer and Friend","🤝","Face the engine or play on one device with a friend.","play-with-computer-and-friend.html"],
- ["Online Chess Tournament","🏆","Join or host a tournament and play from home.","online-chess-tournament.html"],
- ["Digital Chess Clock","⏱️","A clean two-player clock with common time controls.","digital-chess-clock.html"]]},
-{id:"analyse",piece:"♝",name:"Analyse & Study",desc:"Understand your games and learn the key openings.",tools:[
- ["Analysis Board","🔍","Step through moves, test variations and find mistakes.","analysis-board.html"],
- ["Opening Explorer","📖","Browse openings and see the main lines and ideas.","opening-explorer.html"]]},
-{id:"organise",piece:"♜",name:"Coach & Organise",desc:"Tools for coaches, academies and organisers.",tools:[
- ["Student Tracker","📋","Track student progress, ratings and attendance.","student-tracker.html"],
- ["Chess Tournament Pairing","🧮","Create pairings and standings for your event.","chess-tournament-pairing.html"],
- ["Make Chess Pairing","🔀","Quickly make round-by-round pairings for your players.","chess-tournament-pairing"],
- ["Upcoming Chess Tournaments in India","📅","Find the next tournaments happening across India.","upcoming-chess-tournaments-in-india.html"]]},
-{id:"world",piece:"♚",name:"Chess World",desc:"Meet the champions and follow chess today.",tools:[
- ["World Chess Champions","👑","The story of every world champion, in order.","world-chess-champions.html"],
- ["Women World Chess Champions","👩","The women who have held the world title, in order.","women-champions"],
- ["Grand Masters of India","🇮🇳","Profiles of India's grandmasters and their journeys.","grand-masters-of-india.html"],
- ["India's Medals in International Chess","🥇","India's medals at Olympiads and other world events.","india-chess-medals"],
- ["Search FIDE Rating","📈","Look up a player's FIDE rating and details.","search-fide-rating"],
- ["Chess News","📰","Fresh headlines from the chess world.","chess-news.html"]]},
-{id:"resources",piece:"♟",name:"Free Resources",desc:"Software, books and websites at no cost.",tools:[
- ["Free Chess Softwares","💻","Engines, databases and GUIs worth downloading.","free-chess-softwares.html"],
- ["Free Chess Books","📚","Classic and modern books you can read for free.","free-chess-books.html"],
- ["Useful Chess Websites","🌐","A hand-picked list of the best chess sites.","useful-chess-websites.html"]]}
+{id:"play",piece:"\u265e",emoji:"\ud83c\udfae",color:"#0060d6",name:"Play Chess",desc:"Sit at the board and play, against the computer, a friend or live opponents.",tools:[
+ ["Play with Computer & Friend", "🤝", "Face the computer or play a friend on the same board.", "play-with-computer-and-friend.html"],
+ ["Live Game Play", "⚡", "Play live games with a real opponent.", "live-game-play.html"]]},
+{id:"learn",piece:"\u265f",emoji:"\ud83d\udcda",color:"#16a06a",name:"Learn Chess",desc:"Start here: board basics, pieces, openings and an AI helper.",tools:[
+ ["Ask CHESSA – AI Chess Assistant", "🤖", "Ask CHESSA your chess questions and get clear answers.", "ask-chessa.html"],
+ ["Find the Squares", "🎯", "Spot the called square on the board as fast as you can.", "find-the-squares.html"],
+ ["Name the Squares", "🏷️", "Look at a highlighted square and name it correctly.", "name-the-squares.html"],
+ ["Identify the Chess Pieces", "♟️", "Learn every piece by its look, name and moves.", "identify-the-chess-pieces.html"],
+ ["Set the Chess Board", "🧩", "Practise placing every piece on its starting square.", "set-the-chess-board.html"],
+ ["Opening Explorer", "📖", "Browse openings and see the main lines and ideas.", "opening-explorer.html"]]},
+{id:"knowledge",piece:"\u265d",emoji:"\ud83e\udde0",color:"#8a5cf5",name:"Chess Knowledge Base",desc:"Rules, books, software and websites to read, download and explore.",tools:[
+ ["Chess Rules & Theories", "📜", "Learn the rules of chess and the key ideas behind good play.", "chess-rules.html"],
+ ["Free Chess Books", "📚", "Classic and modern books you can read for free.", "free-chess-books.html"],
+ ["Free Chess Software", "💻", "Engines, databases and GUIs worth downloading.", "free-chess-softwares.html"],
+ ["Useful Chess Websites", "🌐", "A hand-picked list of the best chess sites.", "useful-chess-websites.html"]]},
+{id:"training",piece:"\u265c",emoji:"\ud83c\udfaf",color:"#e5532d",name:"Chess Training",desc:"Tools to practise, analyse and improve your game.",tools:[
+ ["Play Custom Position", "🎲", "Set up your own position and play it out.", "play-custom-position.html"],
+ ["Chess Training Board", "🎓", "A free board to set positions and practise ideas.", "chess-training-board.html"],
+ ["Analysis Board", "🔍", "Step through moves, test variations and find mistakes.", "analysis-board.html"],
+ ["Chess Scanner", "📷", "Scan a board or diagram and turn it into a position.", "chess-scanner.html"],
+ ["Student Tracker", "📋", "Track student progress, ratings and attendance.", "student-tracker.html"]]},
+{id:"tournaments",piece:"\u265b",emoji:"\ud83c\udfc6",color:"#e09a00",name:"Chess Tournaments",desc:"Find events, run your own and make pairings.",tools:[
+ ["Upcoming Chess Tournaments in India", "📅", "Find the next tournaments happening across India.", "upcoming-chess-tournaments-in-india.html"],
+ ["Online Chess Tournament", "🏆", "Join or host a tournament and play from home.", "online-chess-tournament.html"],
+ ["Chess Tournament Pairing", "🧮", "Create pairings and standings for your event.", "chess-tournament-pairing.html"]]},
+{id:"world",piece:"\u265a",emoji:"\ud83c\udf0d",color:"#d6336c",name:"Chess World",desc:"Indian chess players, achievements and world champions.",tools:[
+ ["Grandmasters of India", "🇮🇳", "Profiles of India's grandmasters and their journeys.", "grand-masters-of-india.html"],
+ ["India Chess Medals", "🥇", "India's medals at Olympiads and other world events.", "india-chess-medals.html"],
+ ["Chess Medals of India", "🏅", "Medal winners from India in international chess.", "medal-winners-india.html"],
+ ["World Chess Champions", "👑", "The story of every world champion, in order.", "world-chess-champions.html"],
+ ["Women World Chess Champions", "👩", "The women who have held the world title.", "women-champions.html"]]},
+{id:"news",piece:"\u2658",emoji:"\ud83d\udcf0",color:"#0891b2",name:"Chess News & Videos",desc:"Stay up to date and learn by watching.",tools:[
+ ["Chess News", "📰", "Fresh headlines from the chess world.", "chess-news.html"],
+ ["Chess Learning Videos", "🎬", "Watch lessons for beginners to advanced players.", "chess-learning-videos.html"]]},
+{id:"tools",piece:"\u2656",emoji:"\u23f1\ufe0f",color:"#5b6b86",name:"Chess Tools",desc:"Handy tools for players and coaches.",tools:[
+ ["Digital Chess Clock", "⏱️", "A clean two-player clock with common time controls.", "digital-chess-clock.html"],
+ ["Search FIDE Rating", "📈", "Look up a player's FIDE rating and details.", "search-fide-rating.html"]]}
 ];
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let favs=store.get('ch-favs',[]), active='all';
 
-const card=(t,fav)=>`<article class="card" data-s="${(t[0]+' '+t[2]).toLowerCase()}" data-k="${t[3]}">
+const colOf={};CATS.forEach(c=>c.tools.forEach(t=>colOf[t[3]]=c.color));
+const card=(t,fav)=>`<article class="card" style="--c:${colOf[t[3]]}" data-s="${(t[0]+' '+t[2]).toLowerCase()}" data-k="${t[3]}">
  <button class="star" aria-pressed="${fav}" aria-label="Favourite ${t[0]}" title="Add to favourites">${fav?'★':'☆'}</button>
- <div class="ic" aria-hidden="true">${t[1]}</div><h3><a href="${t[3]}">${t[0]}</a></h3><p>${t[2]}</p><span class="go">Open tool</span></article>`;
+ <div class="ic" aria-hidden="true">${t[1]}</div><h3><a href="${t[3]}">${t[0]}</a></h3><p>${t[2]}</p><span class="go">Open</span></article>`;
 const all=CATS.flatMap(c=>c.tools);
-$('#cnt').textContent=all.length;$('#q').placeholder='Search '+all.length+' tools';
+$('#cnt').textContent=all.length;$('#ccnt').textContent=CATS.length;
+$('#tiles').innerHTML=CATS.map(c=>`<a class="tile" href="#${c.id}" style="--c:${c.color}"><i aria-hidden="true">${c.piece}</i><b>${c.name}</b><small>${c.tools.length} tools</small></a>`).join('');
+{const h=new Date().getHours();$('#hi').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', chess player ♟';
+ const d=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5),t=all[d%all.length];
+ $('#today').href=t[3];$('#today').style.setProperty('--c',colOf[t[3]]);$('#today').innerHTML='<span class="ic" aria-hidden="true">'+t[1]+'</span><span><small>✨ Try today</small><b>'+t[0]+'</b><em>'+t[2]+'</em></span><span class="go">Open</span>';}
+$('#q').placeholder='Search '+all.length+' tools';
 
 function render(){
- $('#cats').innerHTML=CATS.map(c=>`<section class="sec" id="${c.id}" data-c="${c.id}">
-  <div class="sec-head"><div class="piece" aria-hidden="true">${c.piece}</div><div><h2>${c.name}</h2><p>${c.desc}</p></div></div>
+ $('#cats').innerHTML=CATS.map(c=>`<section class="sec" id="${c.id}" data-c="${c.id}" style="--c:${c.color}">
+  <div class="sec-head"><div class="piece" aria-hidden="true">${c.piece}</div><div><h2>${c.emoji} ${c.name}</h2><p>${c.desc}</p></div><span class="wm" aria-hidden="true">${c.piece}</span></div>
   <div class="grid">${c.tools.map(t=>card(t,favs.includes(t[3]))).join('')}</div></section>`).join('');
  const f=all.filter(t=>favs.includes(t[3]));
  $('#favgrid').innerHTML=f.map(t=>card(t,true)).join('');
@@ -223,7 +256,7 @@ function filter(){
  $('#none').classList.toggle('hidden',any);
  $('#favs').classList.toggle('hidden',!favs.length||active!=='all'||v!=='');
 }
-$('#chips').innerHTML=[['all','All tools'],...CATS.map(c=>[c.id,c.name])].map(([id,n])=>`<button class="chip" data-id="${id}" aria-pressed="${id==='all'}">${n}</button>`).join('');
+$('#chips').innerHTML=[['all','All tools'],...CATS.map(c=>[c.id,c.emoji+' '+c.name])].map(([id,n])=>`<button class="chip" data-id="${id}" aria-pressed="${id==='all'}">${n}</button>`).join('');
 $('#chips').addEventListener('click',e=>{
  const b=e.target.closest('.chip'); if(!b)return; active=b.dataset.id;
  $$('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b)); filter();
@@ -251,7 +284,7 @@ addEventListener('scroll',()=>$('#up').classList.toggle('hidden',scrollY<700),{p
 $('#up').onclick=()=>scrollTo({top:0});
 $('#yr').textContent=new Date().getFullYear();
 $('#flinks').innerHTML=CATS.map(c=>`<a href="#${c.id}">${c.name}</a>`).join('');
-document.addEventListener('click',e=>{if(e.target.closest('.path,.f-links a')){active='all';$$('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.id==='all'));filter()}});
+document.addEventListener('click',e=>{if(e.target.closest('.tile,.today,.f-links a')){active='all';$$('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.id==='all'));filter()}});
 render();
 
 /* knight's tour hero */
