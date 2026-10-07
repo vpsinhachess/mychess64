@@ -9,12 +9,52 @@ const st=E("style");st.textContent="body{background:radial-gradient(900px 520px 
 document.querySelector(".nm").after(E("div","wv","<i></i><i></i><i></i><i></i><i></i>"));
 /* ---- knowledge: auto-load files + import ---- */
 const FILES=window.KB_MANIFEST||[];
-function addKB(a,keep){let n=0;const seen=new Set(DB.map(e=>e.topic+"|"+e.title)),add2=[];
- (Array.isArray(a)?a:[]).forEach(e=>{if(e&&e.title&&e.answer&&e.key){const k=(e.topic||"")+"|"+e.title;if(!seen.has(k)){seen.add(k);const x={topic:e.topic||"Knowledge",title:e.title,key:e.key,answer:e.answer,ref:e.ref||"Custom KB"};DB.push(x);add2.push(x);n++}}});
- DB.forEach(e=>toks(e.key+" "+e.title).forEach(t=>window.cx.V.add(t)));
- if(keep&&n){try{const o=JSON.parse(localStorage.ckb||"[]");localStorage.ckb=JSON.stringify(o.concat(add2))}catch(e){}}return n}
+const KB_STATUS=window.chessaKBStatus={loaded:0,entries:0,failed:[]};
+const txt=v=>Array.isArray(v)?v.filter(Boolean).join(" "):v==null?"":String(v);
+const firstText=v=>Array.isArray(v)?txt(v[0]):txt(v);
+function getKBVar(n){try{return window[n]!==undefined?window[n]:(0,eval)("typeof "+n+"!='undefined'?"+n+":undefined")}catch(e){return undefined}}
+function asList(a){
+ if(Array.isArray(a))return a;
+ if(a&&Array.isArray(a.default))return a.default;
+ if(a&&Array.isArray(a.entries))return a.entries;
+ if(a&&Array.isArray(a.data))return a.data;
+ if(a&&Array.isArray(a.results))return a.results;
+ return [];
+}
+function asEntry(e,fb){
+ if(!e||typeof e!="object")return null;
+ const title=txt(e.title||firstText(e.questions)||e.name||e.id||e.key).trim();
+ const parts=[e.key,e.keywords,e.questions,e.category,e.subtopic,e.type,e.id,title].map(txt).filter(Boolean);
+ const key=parts.join(" ").replace(/\s+/g," ").trim();
+ const answer=[e.short_answer,e.answer,e.result,e.response,e.content,e.description,e.explanation,e.example&&("Example: "+e.example)]
+   .map(txt).filter(Boolean).join("\n").trim();
+ if(!title||!answer||!key)return null;
+ return {
+  topic:txt(e.topic||e.category||fb||"Knowledge").trim()||"Knowledge",
+  title,
+  key,
+  answer,
+  ref:txt(e.ref||e.source||"Custom KB").trim()||"Custom KB"
+ };
+}
+function refreshV(items){(items&&items.length?items:DB).forEach(e=>toks(e.key+" "+e.title).forEach(t=>window.cx.V.add(t)))}
+function addKB(a,keep,fb){let n=0;const seen=new Set(DB.map(e=>e.topic+"|"+e.title)),add2=[];
+ asList(a).forEach(raw=>{const e=asEntry(raw,fb);if(!e)return;const k=e.topic+"|"+e.title;if(!seen.has(k)){seen.add(k);DB.push(e);add2.push(e);n++}});
+ refreshV(add2);
+ if(keep&&n){try{const o=JSON.parse(localStorage.ckb||"[]");localStorage.ckb=JSON.stringify(o.concat(add2))}catch(e){}}KB_STATUS.entries+=n;return n}
+function loadScript(f,n){return new Promise(r=>{const s=E("script");s.src=f;s.onload=()=>r(addKB(getKBVar(n),false,n));s.onerror=()=>r(0);document.head.append(s)})}
+async function loadKBFile(f,n){
+ const ready=getKBVar(n);if(ready!==undefined){const c=addKB(ready,false,n);KB_STATUS.loaded++;return c}
+ try{
+  const mod=await import(new URL(f,document.baseURI).href);
+  const val=mod.default||mod[n]||Object.values(mod).find(Array.isArray)||getKBVar(n);
+  const c=addKB(val,false,n);if(c){KB_STATUS.loaded++;return c}
+ }catch(e){}
+ const c=await loadScript(f,n);if(c){KB_STATUS.loaded++;return c}
+ KB_STATUS.failed.push(f);return 0;
+}
 try{addKB(JSON.parse(localStorage.ckb||"[]"))}catch(e){}
-FILES.forEach(([f,n])=>{if((0,eval)("typeof "+n)!="undefined"){addKB((0,eval)(n));return}const s=E("script");s.src=f;s.onload=()=>{try{addKB((0,eval)("typeof "+n+"!='undefined'?"+n+":[]"))}catch(e){}};document.head.append(s)});
+window.chessaKBReady=Promise.allSettled(FILES.map(x=>loadKBFile(x[0],x[1])));
 /* ---- settings sheet ---- */
 const gear=E("button","ib","⚙");gear.title="Settings";$("vc").before(gear);
 const P=E("div");P.id="set";P.innerHTML='<div class="sh"><b>Settings</b><button class="ib" id="sx">✕</button></div><label>Language<span id="s1"></span></label><label>Level<span id="s2"></span></label><label>Voice<select id="sv"></select></label><label>Voice speed <output id="o1"></output><input id="sr" type="range" min=".6" max="1.6" step=".05"></label><label>Voice pitch <output id="o2"></output><input id="sp" type="range" min=".8" max="1.5" step=".05"></label><label>Text effect<select id="st"><option value="0.5">Fast</option><option value="1">Normal</option><option value="1.7">Slow</option></select></label><div class="row"><button id="stt">▶ Test voice</button></div>';document.body.append(P);
@@ -60,6 +100,5 @@ ask=async function(v){const n=v.trim();
  if(rp&&n.split(/\s+/).length<=6){const c=rp.split(" ").slice(0,14).join(" ");rp=null;rb.style.display="none";add("user",v);sk=true;return prev(v+" "+c)}
  if(rp){rp=null;rb.style.display="none"}
  const tm=setTimeout(()=>{if(th){th.remove();th=null;bot("That took too long. Please try again.")}},45000);
- try{return await prev(v)}catch(e){if(th){th.remove();th=null}bot("Sorry, something went wrong. Please try again.")}finally{clearTimeout(tm)}};
+ try{if(window.chessaKBReady)await Promise.race([window.chessaKBReady,new Promise(r=>setTimeout(r,6000))]);return await prev(v)}catch(e){if(th){th.remove();th=null}bot("Sorry, something went wrong. Please try again.")}finally{clearTimeout(tm)}};
 })();
-
