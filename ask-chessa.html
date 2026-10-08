@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0618"><title>CHESSA — MyChess64</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%9B%3C/text%3E%3C/svg%3E">
+<style>
+:root{--gold:#f5c65a;--cy:#5ee6ff;--pk:#ff7ad9;--line:#ffffff1a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;height:100dvh}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#f4f1ff;background:radial-gradient(1000px 600px at 20% -10%,#3b1d7a66,transparent),radial-gradient(900px 600px at 100% 100%,#0b4a6e66,transparent),#0a0618;overflow:hidden}
+button{font-family:inherit}:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+#fx i{position:absolute;bottom:-60px;font-style:normal;color:#ffffff10;animation:up linear infinite}
+@keyframes up{to{transform:translateY(-115vh) rotate(40deg)}}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.app{position:relative;height:100%;max-width:880px;margin:auto;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;z-index:5}
+.mini{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);box-shadow:0 0 18px #f5c65a66;background:#1a0f3a;flex:none}
+.nm{font-weight:900;letter-spacing:.18em;font-size:15px}
+.nm small{display:block;font-size:9px;letter-spacing:.1em;color:#7ef0b4;font-weight:600}
+.nm small::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#7ef0b4;margin-right:5px;animation:pl2 2s infinite}
+@keyframes pl2{50%{box-shadow:0 0 0 5px #7ef0b422}}
+.sp{flex:1}
+.ib{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#ffffff0d;color:#fff;font-size:18px;cursor:pointer;transition:.2s}
+.ib:hover{background:#ffffff1c}.ib:active{transform:scale(.92)}.ib.on{border-color:var(--gold);box-shadow:0 0 14px #f5c65a55}
+main{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:6px 14px 20px}
+body.chat #hero{display:none}
+#hero{text-align:center;padding-top:1vh}
+.stage{position:relative;width:min(190px,48vw);aspect-ratio:1;margin:auto}
+.stage::before{content:"";position:absolute;inset:-8%;border-radius:50%;background:conic-gradient(var(--cy),var(--pk),var(--gold),var(--cy));filter:blur(22px);opacity:.55;animation:spin 8s linear infinite}
+.stage::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid #ffffff30}
+.stage svg{position:relative;z-index:1;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 50% 30%,#3a2380,#120a2c);animation:fl 4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes fl{50%{transform:translateY(-6px)}}
+h1{margin:16px 0 2px;font-size:clamp(32px,9vw,48px);letter-spacing:.22em;font-weight:900;background:linear-gradient(90deg,#fff,var(--gold),var(--pk));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tg{color:#b9afdc;font-size:15px;margin:0 0 14px}
+#sug{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+#tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:18px auto 8px;max-width:660px}
+.tile{--c:#f5c65a;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border-radius:18px;border:1px solid #ffffff22;background:linear-gradient(145deg,#ffffff14,#ffffff06);box-shadow:inset 0 -3px 0 var(--c);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.tile span{font-size:30px}.tile:hover{transform:translateY(-3px);box-shadow:inset 0 -3px 0 var(--c),0 10px 24px #0006}.tile:active{transform:scale(.96)}
+.chip,.rl{border:1px solid #f5c65a55;background:#f5c65a14;color:#ffe4a3;border-radius:99px;padding:9px 14px;font-size:13px;cursor:pointer;transition:.2s}
+.chip:hover,.rl:hover{background:#f5c65a2e;transform:translateY(-2px)}.chip:active,.rl:active{transform:scale(.96)}
+.msg{display:flex;gap:9px;margin:14px 0;align-items:flex-end;animation:in .35s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.msg.user{justify-content:flex-end}
+.av{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#ffe08a,#c98a1a);color:#2a1700;font-size:17px;box-shadow:0 0 12px #f5c65a55}
+.bubble{max-width:90%;min-width:0;padding:13px 16px;border-radius:20px;line-height:1.65;font-size:16px;border:1px solid var(--line);overflow-wrap:anywhere}
+.user .bubble{background:linear-gradient(135deg,#7c4dff,#4b2fc9);border-bottom-right-radius:6px;box-shadow:0 8px 24px #4b2fc955}
+.bot .bubble{background:#ffffff12;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom-left-radius:6px;box-shadow:0 8px 28px #0006,inset 0 0 0 1px #5ee6ff14}
+.txt{white-space:pre-wrap}.txt>b{color:var(--gold)}
+.txt .w{display:inline-block;animation:in .4s both}
+.board{display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,360px);aspect-ratio:1;margin:6px auto 12px;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px #0008,0 0 0 3px #f5c65a66;white-space:normal}
+.board b{display:grid;place-items:center;font-size:clamp(20px,7.4vw,34px);line-height:1;min-width:0;user-select:none;font-weight:400}
+.board .l{background:#f0d9b5}.board .d{background:#b58863}
+.board .w{color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 3px #000}.board .k{color:#161616;text-shadow:0 1px 1px #fff6}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.meta .rl{padding:7px 12px;font-size:12px}
+.dots{display:flex;gap:5px;padding:6px 2px}.dots i{width:8px;height:8px;border-radius:50%;background:var(--cy);animation:bn 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes bn{50%{transform:translateY(-7px);opacity:.4}}
+#down{position:absolute;right:16px;bottom:120px;width:40px;height:40px;border-radius:50%;border:1px solid #f5c65a66;background:#1a0f3aee;color:var(--gold);font-size:18px;cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:6}
+#down.show{opacity:1;pointer-events:auto}
+footer{padding:4px 12px max(14px,env(safe-area-inset-bottom));z-index:5}
+#qa{display:none;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}body.chat #qa{display:flex}
+#qa .chip{flex:none;padding:8px 14px;white-space:nowrap}
+.cmp{display:flex;gap:6px;align-items:center;padding:6px;border-radius:30px;border:1px solid #ffffff26;background:#ffffff12;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 10px 40px #0008;transition:.25s}
+.cmp:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px #f5c65a22,0 10px 40px #0008}
+#q{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font-size:16px;padding:10px 12px;font-family:inherit}
+#q::placeholder{color:#a99fd0}
+.cmp button{width:44px;height:44px;border-radius:50%;border:0;cursor:pointer;font-size:18px;background:#ffffff14;color:#fff;transition:.2s;flex:none}
+.cmp button:active{transform:scale(.9)}
+#send{background:linear-gradient(135deg,#ffe08a,#e0a12a)!important;color:#241500!important;font-weight:900;box-shadow:0 4px 16px #f5c65a44}
+#send.idle{opacity:.45;box-shadow:none}
+#mic.rec{background:#ff3b6b!important;animation:pl 1s infinite}@keyframes pl{50%{box-shadow:0 0 0 8px #ff3b6b33}}
+#xq{display:none!important;width:30px!important;height:30px!important;font-size:13px!important}#xq.show{display:block!important}
+.eye{transform-box:fill-box;transform-origin:center;animation:bl 4.5s infinite}@keyframes bl{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.08)}}
+.mo{display:none;transform-box:fill-box;transform-origin:center}.talk .mo{display:block;animation:tk .28s infinite alternate}.talk .sm{display:none}@keyframes tk{from{transform:scaleY(.5)}to{transform:scaleY(2.6)}}
+.glow{animation:gw 2.5s ease-in-out infinite alternate}@keyframes gw{to{opacity:.55}}
+#toast{position:fixed;left:50%;top:max(70px,env(safe-area-inset-top));transform:translate(-50%,-20px) scale(.9);padding:10px 22px;border-radius:99px;font-weight:800;color:#241500;background:linear-gradient(135deg,#ffe08a,#f5a623);box-shadow:0 10px 40px #f5c65a88;opacity:0;pointer-events:none;transition:.4s cubic-bezier(.2,.9,.3,1.3);z-index:70}
+#toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
+::-webkit-scrollbar{width:0}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style></head><body>
+<div id="fx" aria-hidden="true"></div><canvas id="confetti" aria-hidden="true"></canvas><div id="toast" role="status"></div>
+<div class="app">
+<header><div class="mini" id="mini"></div><div class="nm">CHESSA<small>ONLINE</small></div><div class="sp"></div>
+<button class="ib on" id="vc" title="Voice on/off" aria-label="Voice on or off">🔊</button><button class="ib" id="clear" title="Home" aria-label="Home">🏠</button></header>
+<main id="main">
+ <section id="hero"><div class="stage" id="big"></div><h1>CHESSA</h1><p class="tg">Hi! Ask me anything about chess ♟️</p><div id="sug"></div><div id="tiles"></div></section>
+ <div id="chat" aria-live="polite"></div>
+</main>
+<button id="down" aria-label="Scroll to latest">↓</button>
+<footer>
+ <div id="qa"><button class="chip" id="qa-p">🧩 Puzzle</button><button class="chip" id="qa-s">🎲 Surprise me</button><button class="chip" id="qa-h">🏠 Menu</button></div>
+ <div class="cmp">
+  <input id="q" maxlength="700" placeholder="Type your chess question…" autocomplete="off" enterkeyhint="send" aria-label="Message CHESSA">
+  <button id="xq" title="Clear" aria-label="Clear text">✕</button><button id="mic" title="Speak" aria-label="Speak">🎤</button><button id="send" class="idle" title="Send" aria-label="Send">➤</button>
+ </div>
+</footer>
+</div>
+<noscript><p style="position:fixed;top:50%;width:100%;text-align:center;color:#ffe4a3">Please enable JavaScript to use CHESSA.</p></noscript>
+<script src="js/core.js?v=4"></script>
+<script src="data/kb-data.js?v=4"></script>
+<script src="data/kb-extra.js?v=4"></script>
+<script src="data/manifest.js?v=4"></script>
+<script src="data/puzzles.js?v=4"></script>
+<script src="js/kb.js?v=4"></script>
+<script src="js/puzzles.js?v=4"></script>
+<script src="js/ui.js?v=4"></script>
+</body></html>
