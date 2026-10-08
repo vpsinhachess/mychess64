@@ -47,11 +47,11 @@ h1{margin:16px 0 2px;font-size:clamp(32px,9vw,48px);letter-spacing:.22em;font-we
 .user .bubble{background:linear-gradient(135deg,#7c4dff,#4b2fc9);border-bottom-right-radius:6px;box-shadow:0 8px 24px #4b2fc955}
 .bot .bubble{background:#ffffff12;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom-left-radius:6px;box-shadow:0 8px 28px #0006,inset 0 0 0 1px #5ee6ff14}
 .txt{white-space:pre-wrap}.txt>b{color:var(--gold)}
-.txt .w{display:inline-block;animation:in .4s both}
+.txt .wd{display:inline-block;animation:in .4s both}
 .board{display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,360px);aspect-ratio:1;margin:6px auto 12px;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px #0008,0 0 0 3px #f5c65a66;white-space:normal}
 .board b{display:grid;place-items:center;font-size:clamp(20px,7.4vw,34px);line-height:1;min-width:0;user-select:none;font-weight:400}
 .board .l{background:#f0d9b5}.board .d{background:#b58863}
-.board .w{color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 3px #000}.board .k{color:#161616;text-shadow:0 1px 1px #fff6}
+.board .pw{color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 3px #000}.board .pk{color:#161616;text-shadow:0 1px 1px #fff6}
 .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.meta .rl{padding:7px 12px;font-size:12px}
 .dots{display:flex;gap:5px;padding:6px 2px}.dots i{width:8px;height:8px;border-radius:50%;background:var(--cy);animation:bn 1s infinite}
 .dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
@@ -59,7 +59,7 @@ h1{margin:16px 0 2px;font-size:clamp(32px,9vw,48px);letter-spacing:.22em;font-we
 #down{position:absolute;right:16px;bottom:120px;width:40px;height:40px;border-radius:50%;border:1px solid #f5c65a66;background:#1a0f3aee;color:var(--gold);font-size:18px;cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:6}
 #down.show{opacity:1;pointer-events:auto}
 footer{padding:4px 12px max(14px,env(safe-area-inset-bottom));z-index:5}
-#qa{display:none;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}body.chat #qa{display:flex}
+#qa{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
 #qa .chip{flex:none;padding:8px 14px;white-space:nowrap}
 .cmp{display:flex;gap:6px;align-items:center;padding:6px;border-radius:30px;border:1px solid #ffffff26;background:#ffffff12;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 10px 40px #0008;transition:.25s}
 .cmp:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px #f5c65a22,0 10px 40px #0008}
@@ -78,18 +78,47 @@ footer{padding:4px 12px max(14px,env(safe-area-inset-bottom));z-index:5}
 #toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
 ::-webkit-scrollbar{width:0}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ===== v5 upgrade: responsive, answer box, suggestion lines, puzzle board ===== */
+#lg{font-size:12px;font-weight:800;letter-spacing:.02em}
+.sl{display:flex;flex-direction:column;margin:10px auto 0;max-width:520px;border:1px solid #ffffff1f;border-radius:16px;background:#ffffff0a;overflow:hidden;text-align:left}
+.sl .row{background:none;border:0;border-bottom:1px solid #ffffff1a;color:#ffe4a3;padding:13px 16px;font-size:15px;text-align:left;cursor:pointer;transition:.15s;width:100%}
+.sl .row:last-child{border-bottom:0}.sl .row::before{content:"➜ ";opacity:.6}.sl .row:hover,.sl .row:active{background:#f5c65a22}
+#sug{display:block}
+.ans{border:1px solid #f5c65a55;border-radius:14px;background:linear-gradient(160deg,#f5c65a14,#ffffff08);overflow:hidden}
+.ah{padding:9px 14px;font-weight:800;color:#2a1700;background:linear-gradient(135deg,#ffe08a,#f5a623);font-size:14px;letter-spacing:.02em}
+.ab{padding:12px 14px;white-space:pre-wrap}
+.ex{margin:0 12px 12px;padding:9px 12px;border-radius:10px;background:#5ee6ff14;border:1px dashed #5ee6ff66;color:#bff4ff;font-size:14px;white-space:pre-wrap}
+.board.pz b{position:relative;cursor:pointer}
+.board .sel{box-shadow:inset 0 0 0 4px #5ee6ff}.board .last{box-shadow:inset 0 0 0 100px #f5c65a55}
+.board .mv::after{content:"";position:absolute;width:30%;height:30%;border-radius:50%;background:#2a9d5acc}
+.board .cap{box-shadow:inset 0 0 0 4px #ff5a7a}
+.board .hint{animation:hp .9s infinite alternate;box-shadow:inset 0 0 0 4px #7ef0b4}@keyframes hp{to{background-color:#7ef0b4aa}}
+.board .chk{background:radial-gradient(circle,#ff3b6b,#ff3b6b00 75%)!important}
+.pb.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.st{margin-top:2px;font-size:14px;min-height:20px}
+.meta .rl{font-size:13px;padding:8px 13px}
+@media(max-width:600px){
+ header{padding-left:10px;padding-right:10px;gap:7px}.ib{width:38px;height:38px;font-size:16px}.mini{width:40px;height:40px}
+ main{padding:4px 10px 14px}.bubble{max-width:96%;padding:11px 12px;font-size:15px}.av{display:none}
+ #tiles{grid-template-columns:repeat(2,1fr);gap:8px}.tile{padding:12px 6px;font-size:13px}.tile span{font-size:26px}
+ h1{letter-spacing:.14em}.board{width:100%}.sl .row{padding:12px 13px;font-size:14px}
+ footer{padding:2px 8px max(10px,env(safe-area-inset-bottom))}#qa .chip{padding:8px 12px;font-size:12.5px}
+ .cmp button{width:40px;height:40px}#down{bottom:150px}}
+@media(max-height:680px){.stage{width:104px}h1{margin-top:8px;font-size:30px}.tg{margin-bottom:8px}#tiles{margin-top:10px}}
+@media(min-width:900px){.bubble{max-width:80%}.board{width:min(100%,420px)}}
 </style></head><body>
 <div id="fx" aria-hidden="true"></div><canvas id="confetti" aria-hidden="true"></canvas><div id="toast" role="status"></div>
 <div class="app">
 <header><div class="mini" id="mini"></div><div class="nm">CHESSA<small>ONLINE</small></div><div class="sp"></div>
-<button class="ib on" id="vc" title="Voice on/off" aria-label="Voice on or off">🔊</button><button class="ib" id="clear" title="Home" aria-label="Home">🏠</button></header>
+<button class="ib" id="lg" title="Language / भाषा" aria-label="Change language">EN</button><button class="ib on" id="vc" title="Voice on/off" aria-label="Voice on or off">🔊</button><button class="ib" id="clear" title="Home" aria-label="Home">🏠</button></header>
 <main id="main">
  <section id="hero"><div class="stage" id="big"></div><h1>CHESSA</h1><p class="tg">Hi! Ask me anything about chess ♟️</p><div id="sug"></div><div id="tiles"></div></section>
  <div id="chat" aria-live="polite"></div>
 </main>
 <button id="down" aria-label="Scroll to latest">↓</button>
 <footer>
- <div id="qa"><button class="chip" id="qa-p">🧩 Puzzle</button><button class="chip" id="qa-s">🎲 Surprise me</button><button class="chip" id="qa-h">🏠 Menu</button></div>
+ <div id="qa" aria-label="Puzzles and shortcuts"></div>
  <div class="cmp">
   <input id="q" maxlength="700" placeholder="Type your chess question…" autocomplete="off" enterkeyhint="send" aria-label="Message CHESSA">
   <button id="xq" title="Clear" aria-label="Clear text">✕</button><button id="mic" title="Speak" aria-label="Speak">🎤</button><button id="send" class="idle" title="Send" aria-label="Send">➤</button>
@@ -97,12 +126,14 @@ footer{padding:4px 12px max(14px,env(safe-area-inset-bottom));z-index:5}
 </footer>
 </div>
 <noscript><p style="position:fixed;top:50%;width:100%;text-align:center;color:#ffe4a3">Please enable JavaScript to use CHESSA.</p></noscript>
-<script src="js/core.js?v=4"></script>
-<script src="data/kb-data.js?v=4"></script>
-<script src="data/kb-extra.js?v=4"></script>
-<script src="data/manifest.js?v=4"></script>
-<script src="data/puzzles.js?v=4"></script>
-<script src="js/kb.js?v=4"></script>
-<script src="js/puzzles.js?v=4"></script>
-<script src="js/ui.js?v=4"></script>
+<script src="js/core.js?v=5"></script>
+<script src="data/kb-data.js?v=5"></script>
+<script src="data/kb-extra.js?v=5"></script>
+<script src="data/manifest.js?v=5"></script>
+<script src="data/puzzles.js?v=5"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js" onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.js';document.head.appendChild(s)"></script>
+<script src="js/kb.js?v=5"></script>
+<script src="js/engine.js?v=5"></script>
+<script src="js/puzzles.js?v=5"></script>
+<script src="js/ui.js?v=5"></script>
 </body></html>
