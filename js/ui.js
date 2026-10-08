@@ -21,7 +21,7 @@ const pzChips=p=>[...shuf(p.opts).map(o=>chip(o,()=>ask(o))),chip('💡 Hint',()
 function puzzle(daily){const p=Puz.next(daily),side=p.fen.split(' ')[1]=='b'?'Black':'White';
  say(board(p.fen)+'<b>🧩 '+esc(p.title)+'</b>\n'+side+' to move. Find the checkmate in 1! Tap an answer 👇',pzChips(p),side+' to move. Find the checkmate in one.')}
 function answer(t,e){
- if(KB.entries.length<10){const m='⚠️ My knowledge files did not load ('+KB.loaded.length+' loaded, '+KB.failed.length+' failed). Please press Ctrl+Shift+R to refresh. If it still fails, check that the data folder has all the .js files.';return say(m,[],'My knowledge files did not load. Please refresh the page.')}
+ if(KB.entries.length<10){const m='⚠️ My knowledge files did not load ('+KB.loaded.length+' loaded, '+KB.failed.length+' failed). Press Ctrl+Shift+R to refresh.'+(Object.keys(KB.errors).length?'\n\nTechnical detail: '+Object.entries(KB.errors).slice(0,2).map(x=>x[0]+' → '+x[1]).join('\n'):'\n\nNo errors were reported, so the files loaded but no questions/answers were found in them.');return say(m,[],'My knowledge files did not load. Please refresh the page.')}
  if(e)return show(e,KB.related(e));
  const z=Puz.answer(t);
  if(z){if(z.ok){const p=Puz.cur;Puz.cur=null;celebrate('🎉 Correct!');return say('🎉 <b>Correct!</b> '+esc(p.sol)+' is checkmate!\n'+esc(p.why),[chip('➡ Next puzzle',()=>puzzle())],'Correct! '+p.why)}
@@ -33,7 +33,12 @@ function answer(t,e){
 function ask(text,e){text=text.trim();if(!text)return;add('user',esc(text));q.value='';sync();
  const d=add('bot','<div class="dots"><i></i><i></i><i></i></div>');
  KB.ready.then(()=>setTimeout(()=>{d.remove();answer(text,e)},450))}
-function openCat(c){add('user',c.e+' '+c.n);KB.ready.then(()=>{const l=KB.byFiles(c.f);say('Great choice! Pick a topic 👇',topics(l),'Pick a topic')})}
+function pickList(l){
+ if(l.length<=18)return say('Pick a topic 👇',topics(l),'Pick a topic');
+ const subs=[...new Set(l.map(e=>e.sub).filter(Boolean))];
+ if(subs.length>1&&subs.length<=24)return say('Pick a group 👇',subs.map(s=>chip(s,()=>{add('user',s);pickList(l.filter(e=>e.sub===s))})),'Pick a group');
+ say('Here are some topics 👇',[...topics(shuf(l).slice(0,16)),chip('🔀 More',()=>pickList(l))],'Pick a topic')}
+function openCat(c){add('user',c.e+' '+c.n);KB.ready.then(()=>pickList(KB.byFiles(c.f)))}
 function home(){chat.innerHTML='';document.body.classList.remove('chat');speechSynthesis&&speechSynthesis.cancel();Puz.cur=null;main.scrollTo(0,0)}
 /* home tiles + suggestions */
 const tiles=[{e:'🧩',n:'Daily Puzzle',c:'#ff7ad9',f:()=>{add('user','🧩 Daily Puzzle');puzzle(1)}},{e:'🎲',n:'Surprise Me',c:'#5ee6ff',f:()=>ask('Surprise me')},
