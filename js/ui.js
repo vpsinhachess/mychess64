@@ -21,6 +21,7 @@ const pzChips=p=>[...shuf(p.opts).map(o=>chip(o,()=>ask(o))),chip('💡 Hint',()
 function puzzle(daily){const p=Puz.next(daily),side=p.fen.split(' ')[1]=='b'?'Black':'White';
  say(board(p.fen)+'<b>🧩 '+esc(p.title)+'</b>\n'+side+' to move. Find the checkmate in 1! Tap an answer 👇',pzChips(p),side+' to move. Find the checkmate in one.')}
 function answer(t,e){
+ if(KB.entries.length<10){const m='⚠️ My knowledge files did not load ('+KB.loaded.length+' loaded, '+KB.failed.length+' failed). Please press Ctrl+Shift+R to refresh. If it still fails, check that the data folder has all the .js files.';return say(m,[],'My knowledge files did not load. Please refresh the page.')}
  if(e)return show(e,KB.related(e));
  const z=Puz.answer(t);
  if(z){if(z.ok){const p=Puz.cur;Puz.cur=null;celebrate('🎉 Correct!');return say('🎉 <b>Correct!</b> '+esc(p.sol)+' is checkmate!\n'+esc(p.why),[chip('➡ Next puzzle',()=>puzzle())],'Correct! '+p.why)}
@@ -28,7 +29,7 @@ function answer(t,e){
  if(/puzzle|पहेली/i.test(t))return puzzle();
  if(/surprise|random|fun fact/i.test(t)){const e=KB.sample(1,['chess-facts','chess-history','chessai-tech'])[0];return show(e,KB.related(e))}
  const r=KB.ask(t);
- r.best?show(r.best,r.rel):say("Hmm, I don't know that one yet 🤔\nTry one of these:",topics(KB.sample(5)))}
+ r.best?show(r.best,r.rel):say("Hmm, I don't know that one yet 🤔\nTry one of these:",topics(KB.sample(5)),"Hmm, I don't know that one yet. Try one of these.")}
 function ask(text,e){text=text.trim();if(!text)return;add('user',esc(text));q.value='';sync();
  const d=add('bot','<div class="dots"><i></i><i></i><i></i></div>');
  KB.ready.then(()=>setTimeout(()=>{d.remove();answer(text,e)},450))}
