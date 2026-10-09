@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0b1220">
 <meta name="description" content="MyChess64 latest chess news — world chess, Indian chess, tournaments, Grandmasters, technology and more.">
 <title>MyChess64 — Latest Chess News</title>
+<link rel="icon" type="image/png" href="mychess64-favicon.png">
 <style>
 :root{--bg:#0a0f1a;--card:#121a2b;--card2:#18223a;--text:#eef2f9;--muted:#93a1b8;--gold:#f0b95a;--gold2:#ffd98e;--line:#243049;--green:#4ade80}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
@@ -19,7 +20,19 @@ a{color:inherit;text-decoration:none}.container{width:min(1280px,94%);margin:aut
 header{position:sticky;top:0;z-index:30;background:rgba(10,15,26,.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
 .nav{height:64px;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .brand{display:flex;align-items:center;gap:11px;font-weight:900;font-size:1.2rem;letter-spacing:-.03em}
-.logo{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#ffd98e,#b97820);color:#111;font-size:23px}
+.logo{width:clamp(132px,16vw,205px);height:44px;display:flex;align-items:center;flex:none}
+.logo img{width:100%;height:100%;object-fit:contain;object-position:left center}
+.footer-brand{display:block;width:min(300px,70%);height:auto;max-height:105px;object-fit:contain;object-position:left center;margin:0 0 14px}
+.news-modal{position:fixed;inset:0;z-index:1000;background:rgba(2,6,14,.82);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px)}
+.news-modal.open{display:flex}
+.modal-panel{width:min(1100px,100%);height:min(88dvh,850px);display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 24px 80px #0009}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.modal-title{font-size:.95rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-actions{display:flex;gap:8px;flex:none}.modal-actions a,.modal-actions button{font-size:.8rem;padding:8px 11px}
+.modal-frame{border:0;width:100%;flex:1;background:#fff}
+.modal-note{display:none;padding:14px 18px;color:var(--muted);font-size:.85rem;line-height:1.5;border-top:1px solid var(--line)}
+.modal-note.show{display:block}
+@media(max-width:620px){.logo{width:132px;height:36px}.nav{gap:8px}.nav-right{gap:7px}.nav-right button{padding:8px 10px;font-size:.78rem}.modal-panel{height:94dvh;border-radius:12px}.modal-head{padding:9px}.modal-title{max-width:38vw}.modal-actions a,.modal-actions button{padding:8px;font-size:.72rem}}
 .nav-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.82rem}
 .status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite}
 @keyframes pulse{50%{opacity:.35}}
@@ -85,7 +98,7 @@ footer{margin-top:56px;padding:28px 0 44px;border-top:1px solid var(--line);colo
 <body>
 <div class="ticker"><span class="tk-label">LATEST</span><div class="tk-track" id="ticker"></div></div>
 <header><div class="container nav">
-  <a class="brand" href="#"><span class="logo">♟</span><span>MyChess64 <small style="color:var(--muted);font-weight:600">News</small></span></a>
+  <a class="brand" href="#" aria-label="MyChess64 Chess News home"><span class="logo"><img src="mychess64-header-logo.png" alt="MyChess64 — Learn. Play. Improve. Anytime, Anywhere."></span></a>
   <div class="nav-right"><span class="status-dot"></span><span id="liveText">Updating feeds…</span><button class="primary" id="refreshBtn">↻ Refresh</button></div>
 </div></header>
 <main>
@@ -112,8 +125,9 @@ footer{margin-top:56px;padding:28px 0 44px;border-top:1px solid var(--line);colo
 </section>
 </main>
 <footer><div class="container">
+  <img class="footer-brand" src="mychess64-footer-logo.png" alt="MyChess64 — Learn. Play. Improve. Anytime, Anywhere." loading="lazy">
   <strong>MyChess64 Chess News</strong> — an independent news aggregator. Headlines, excerpts and images belong to their publishers; each story links to the original source.
-  <br>Auto-updates every 10 minutes from FIDE, AICF, ChessBase (India &amp; World), New in Chess, Chess.com, Chessdom, Lichess, Indian media and more.
+  <br>Checks news feeds every 10 minutes while this page is open, and refreshes when you return to the tab. Feed access depends on source and relay availability.
 </div></footer>
 <script>
 /* ============ CONFIG ============ */
@@ -147,6 +161,8 @@ const SOURCES = [
   {name:"Candidates & WCC",category:"Tournaments", rss:gn("chess \"world championship\" OR \"Candidates Tournament\" OR \"Grand Chess Tour\" OR \"Tata Steel Chess\" OR \"Norway Chess\"")},
   {name:"Grandmasters",    category:"Grandmasters", rss:gn("chess grandmaster OR Carlsen OR Nakamura OR Caruana OR Firouzja OR Ding")},
   {name:"Women's Chess",   category:"Grandmasters", rss:gn("women's chess OR \"Women's World Chess\" OR \"Judit Polgar\" OR \"Hou Yifan\" OR \"Ju Wenjun\"")},
+  {name:"Young Players",   category:"Young Players", rss:gn("young chess players OR junior chess championship OR youth chess grandmaster")},
+  {name:"Chess Training",  category:"Chess Training", rss:gn("chess training OR chess opening lessons OR chess tactics OR chess books")},
   {name:"Chess Technology",category:"Technology", rss:gn("chess AI OR Stockfish OR Lichess OR Leela OR \"chess engine\"")}
 ];
 
@@ -265,7 +281,7 @@ function renderFilters(){
   $("filters").innerHTML=["All",...cats].map(c=>`<button class="filter ${c===active?"active":""}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
 }
 $("filters").addEventListener("click",e=>{const b=e.target.closest(".filter");if(b){active=b.dataset.c;shown=24;renderFilters();render();}});
-const CAT_COL={FIDE:"#f0b95a",India:"#ff9b6b","Online Chess":"#4ade80",World:"#7eb4ff",Tournaments:"#c69cff",Grandmasters:"#7dd3fc",Technology:"#5eead4"};
+const CAT_COL={FIDE:"#f0b95a",India:"#ff9b6b","Online Chess":"#4ade80",World:"#7eb4ff",Tournaments:"#c69cff",Grandmasters:"#7dd3fc",Technology:"#5eead4","Young Players":"#fb7185","Chess Training":"#fbbf24"};
 const col=c=>CAT_COL[c]||"#f0b95a";
 const hasImg=x=>x.image&&x.image!=="#";
 function vis(x){
@@ -278,7 +294,7 @@ function card(x){
     <div class="row"><span class="badge">${esc(x.category)}</span><span class="src">${esc(x.source)}</span></div>
     <h3><a target="_blank" rel="noopener" href="${esc(x.url)}">${esc(x.title)}</a></h3>
     ${x.excerpt?`<p class="excerpt">${esc(x.excerpt)}</p>`:""}
-    <div class="card-footer"><span>${ago(x.date)}</span><a class="read" target="_blank" rel="noopener" href="${esc(x.url)}">READ →</a></div>
+    <div class="card-footer"><span>${ago(x.date)}</span><a class="read more-link" href="${esc(x.url)}" data-url="${esc(x.url)}" data-title="${esc(x.title)}" target="_blank" rel="noopener">MORE →</a></div>
    </div>
  </article>`;
 }
@@ -293,7 +309,7 @@ function render(){
  $("featured").innerHTML=top.map(x=>`
   <a class="feature" style="--c:${col(x.category)}" target="_blank" rel="noopener" href="${esc(x.url)}">
    ${vis(x)}
-   <div class="shade"></div><div class="feature-content"><span class="badge">${esc(x.category)} · ${esc(x.source)}</span><h3>${esc(x.title)}</h3><div class="meta">${ago(x.date)} · READ →</div></div>
+   <div class="shade"></div><div class="feature-content"><span class="badge">${esc(x.category)} · ${esc(x.source)}</span><h3>${esc(x.title)}</h3><div class="meta">${ago(x.date)} · <span style="color:var(--gold2);font-weight:900">MORE →</span></div></div>
   </a>`).join("");
  const rest=list.filter(x=>!top.includes(x));
  $("moreBtn").hidden=rest.length<=shown;
@@ -314,6 +330,37 @@ function tickerFill(){
   const h=allNews.slice(0,15).map(x=>`<a target="_blank" rel="noopener" href="${esc(x.url)}"><b>${esc(x.category)}</b>${esc(x.title)}</a>`).join("");
   $("ticker").innerHTML=h+h;
 }
+/* ============ ARTICLE PREVIEW ============ */
+const newsModal=$("newsModal"), articleFrame=$("articleFrame"), modalNote=$("modalNote");
+let frameFallbackTimer=null;
+function openArticlePreview(url,title){
+  if(!/^https?:\/\//i.test(url||"")) return;
+  $("modalTitle").textContent=title||"Read the original story";
+  $("openOriginal").href=url;
+  modalNote.classList.remove("show");
+  newsModal.classList.add("open"); newsModal.setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+  articleFrame.src="about:blank";
+  // Some publishers disallow iframe embedding. Keep a direct article link visible as fallback.
+  clearTimeout(frameFallbackTimer);
+  articleFrame.src=url;
+  frameFallbackTimer=setTimeout(()=>modalNote.classList.add("show"),2200);
+}
+function closeArticlePreview(){
+  newsModal.classList.remove("open"); newsModal.setAttribute("aria-hidden","true");
+  document.body.style.overflow="";
+  clearTimeout(frameFallbackTimer); articleFrame.src="about:blank";
+}
+$("grid").addEventListener("click",e=>{
+  const a=e.target.closest(".more-link");
+  if(!a)return;
+  // Open a reader popup first; the direct publisher link is always available in the popup.
+  e.preventDefault(); openArticlePreview(a.dataset.url||a.href,a.dataset.title||"");
+});
+$("closeModal").addEventListener("click",closeArticlePreview);
+newsModal.addEventListener("click",e=>{if(e.target===newsModal)closeArticlePreview();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&newsModal.classList.contains("open"))closeArticlePreview();});
+
 /* ============ AUTO-UPDATE ============ */
 // 1) show saved news instantly, 2) fetch fresh, 3) repeat on a timer, 4) refresh when tab is reopened
 const saved=store.get("mychess64-news");
