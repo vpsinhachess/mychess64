@@ -123,6 +123,9 @@ dialog[open]{animation:pop .22s ease-out}@keyframes pop{from{opacity:0;transform
 .et{flex:1;min-width:0}.et b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.95rem}.et span{font-size:.78rem;color:var(--mut)}
 .eb{position:relative;flex:1;background:#fff}.eb iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .en{padding:8px 14px;font-size:.78rem;color:var(--mut);border-top:1px solid var(--line)}
+.eb{background:var(--pop)}.eb iframe[hidden],.en[hidden]{display:none}
+.ep{position:absolute;inset:0;display:grid;align-content:center;justify-items:center;gap:12px;text-align:center;padding:24px;background:var(--pop);overflow:auto}.ep[hidden]{display:none}
+.ep .stage{--ch:250px;width:min(320px,100%)}.ep h3{font:700 1.5rem/1.2 var(--serif);margin:4px 0 0}.ep p{max-width:46ch;color:var(--tx2);margin:0}.ep .acts{justify-content:center;border:0;padding-top:6px}
 footer{padding:0 0 56px;color:var(--mut);font-size:.9rem}
 footer::before{content:"";display:block;height:16px;margin:48px 0 44px;background:repeating-conic-gradient(var(--chk) 0 25%,transparent 0 50%) 0 0/32px 32px}
 footer .plate img{height:96px}.ft{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}footer h4{margin:0 0 6px;color:var(--tx)}footer p{margin:0 0 8px;max-width:72ch}
@@ -183,7 +186,7 @@ footer .plate img{height:96px}.ft{display:grid;grid-template-columns:auto 1fr;ga
  <div><h4>Link &amp; copyright policy</h4><p>Free download means the linked source presents the material as legitimately free or openly available. Paid books point to publisher, retailer or catalogue pages; previews use official samples where they exist. MyChess64 hosts no book files and never links to pirated copies.</p><p>Links open in a new tab. Retailer and catalogue searches may show different editions over time.</p></div></div></footer>
 
 <dialog id="ext" aria-label="External page"><div class="eh"><div class="et"><b id="etitle"></b><span id="ehost"></span></div><a id="eopen" class="btn g" href="#" target="_blank" rel="noopener noreferrer">Open in new tab ↗</a><button class="ex" id="eclose" aria-label="Close popup">×</button></div>
- <div class="eb"><iframe id="eframe" title="External page" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"></iframe></div>
+ <div class="eb"><div class="ep" id="ep" hidden></div><iframe id="eframe" title="External page" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"></iframe></div>
  <div class="en">Some sites block embedded viewing. If the page above stays blank, use “Open in new tab”.</div></dialog>
 <button class="up" id="up" aria-label="Back to top" hidden>↑</button>
 <dialog id="dlg" aria-labelledby="dt"></dialog>
@@ -360,7 +363,7 @@ BOOKS.forEach((b,i)=>{b.i=i;b.h=hue(b.category);b.pc=PIECES[hue(b.title)%6];b.ha
 const main=BOOKS.filter(b=>!b.classic),classics=BOOKS.filter(b=>b.classic);
 const S={q:"",cat:"",lvl:"",acc:"",srt:"rec",n:24,saved:false},PAGE=24;
 
-const link=(b,href,label,cls,verb)=>`<a class="btn ${cls}" href="${esc(href)}" target="_blank" rel="noopener noreferrer" data-ext data-t="${verb}: ${esc(b.title)}" aria-label="${verb} ${esc(b.title)} (opens in a new tab)">${label}</a>`;
+const link=(b,href,label,cls,verb)=>`<a class="btn ${cls}" href="${esc(href)}" target="_blank" rel="noopener noreferrer" data-ext data-bi="${b.i}" data-t="${verb}: ${esc(b.title)}" aria-label="${verb} ${esc(b.title)} (opens in a new tab)">${label}</a>`;
 function actions(b){
  if(b.access==="paid")return link(b,b.url,"Buy","p","Buy")+(b.preview?link(b,b.preview,"Preview","g","Preview"):"");
  if(b.access==="sample")return link(b,b.preview||b.url,"Preview","p","Preview");
@@ -423,7 +426,7 @@ function openBook(b){
  dlg.showModal();covers(dlg);document.documentElement.style.overflow="hidden";
 }
 document.addEventListener("click",e=>{
- const ln=e.target.closest("a[data-ext]");if(ln&&!(e.metaKey||e.ctrlKey||e.shiftKey||e.button)){e.preventDefault();return openExt(ln.href,ln.dataset.t)}
+ const ln=e.target.closest("a[data-ext]");if(ln&&!(e.metaKey||e.ctrlKey||e.shiftKey||e.button)){e.preventDefault();return openExt(ln.href,ln.dataset.t,+ln.dataset.bi)}
  const h=e.target.closest("[data-h]");
  if(h){const k=BOOKS[+h.dataset.h].title;SV.has(k)?SV.delete(k):SV.add(k);try{localStorage.setItem("mc64saved",JSON.stringify([...SV]))}catch(x){}
   document.querySelectorAll(`[data-h="${h.dataset.h}"]`).forEach(x=>x.setAttribute("aria-pressed",SV.has(k)));return S.saved?render():post()}
@@ -472,10 +475,18 @@ function covers(root){if(io)root.querySelectorAll(".cv[data-b]").forEach(el=>io.
 const up=$("#up");addEventListener("scroll",()=>{up.hidden=scrollY<700},{passive:true});up.onclick=()=>scrollTo({top:0});
 /* ---- in-page link popup + theme ---- */
 const ext=$("#ext"),ef=$("#eframe");
-function openExt(href,title){let h="";try{h=new URL(href).hostname.replace(/^www\./,"")}catch(e){}
- $("#etitle").textContent=title;$("#ehost").textContent=h;$("#eopen").href=href;ef.src=href;ext.showModal();document.documentElement.style.overflow="hidden"}
+const EMBED=/(^|\.)(gutenberg\.org|archive\.org|openlibrary\.org)$/;
+function openExt(href,title,bi){let h="";try{h=new URL(href).hostname.replace(/^www\./,"")}catch(e){}
+ const b=BOOKS[bi],ep=$("#ep"),emb=EMBED.test(h)||!b;
+ $("#etitle").textContent=title;$("#ehost").textContent=h;$("#eopen").href=href;
+ ef.hidden=!emb;ep.hidden=emb;$(".en").hidden=!emb;
+ if(emb)ef.src=href;else{ef.src="about:blank";
+  ep.innerHTML=`${cover(b)}<div class="row" style="justify-content:center"><span class="badge b-${b.access}">${ACC[b.access]}</span><span class="lvl">${LI[b.level]||""} ${esc(b.level)}</span></div><h3>${esc(b.title)}</h3><div class="au">${esc(b.author)}</div>
+  <p>${esc(h)} doesn’t allow its pages to be shown inside other websites, so it opens in a new tab. Your place in the library stays right here.</p>
+  <div class="acts"><a class="btn p" href="${esc(href)}" target="_blank" rel="noopener noreferrer">Continue to ${esc(h)} ↗</a><button class="btn g" data-xc>Stay here</button></div>`;covers(ep)}
+ ext.showModal();document.documentElement.style.overflow="hidden"}
 ext.addEventListener("close",()=>{ef.src="about:blank";if(!dlg.open)document.documentElement.style.overflow=""});
-ext.addEventListener("click",e=>{if(e.target===ext)ext.close()});$("#eclose").onclick=()=>ext.close();
+ext.addEventListener("click",e=>{if(e.target===ext)ext.close()});$("#eclose").onclick=()=>ext.close();ext.addEventListener("click",e=>{if(e.target.closest("[data-xc]"))ext.close()});
 const thm=$("#thm");
 function applyTheme(t){document.documentElement.dataset.theme=t;thm.textContent=t==="dark"?"☀":"☾";thm.setAttribute("aria-label",t==="dark"?"Switch to light theme":"Switch to dark theme");document.querySelector('meta[name=theme-color]').content=t==="dark"?"#060b19":"#f2f5fb"}
 applyTheme(document.documentElement.dataset.theme||"dark");
