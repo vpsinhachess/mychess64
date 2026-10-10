@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chess Tournament Manager</title>
+<meta name="description" content="Chess tournament pairing: Swiss, round robin, knockout, team and league">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f7f6f2;--fg:#1d1d1b;--card:#fff;--bd:#d9d7cf;--ac:#2f5d3a;--mu:#6b6a63;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171815;--fg:#ecebe5;--card:#22231f;--bd:#3a3b35;--ac:#7fc08f;--mu:#9a9990}}
+:root[data-theme="dark"]{--bg:#171815;--fg:#ecebe5;--card:#22231f;--bd:#3a3b35;--ac:#7fc08f;--mu:#9a9990}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0 0 12px}h2{font-size:16px;margin:18px 0 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--mu);margin:8px 0 3px}
+input,select,textarea,button{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 8px}
+textarea{width:100%;min-height:150px;box-sizing:border-box}
+button{cursor:pointer}button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.on{background:var(--ac);color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}th{color:var(--mu);font-weight:600}
+.msg{color:#b3261e;min-height:20px;font-size:14px}.ok{color:var(--ac);font-weight:600}.mu{color:var(--mu);font-size:13px}
+:root{--on:#fff;--hd:#1f4a2c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--on:#10210f;--hd:#1d2a1b}}
+:root[data-theme="dark"]{--on:#10210f;--hd:#1d2a1b}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--hd);color:#fff;padding:10px 16px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+header h1{margin:0;color:#fff;font-size:18px}
+header button{background:rgba(255,255,255,.16);color:#fff;border-color:transparent}
+button{padding:8px 14px;border-radius:8px;font-weight:600}button:hover{filter:brightness(.93)}
+button.p,button.on{color:var(--on)}
+.card{box-shadow:0 1px 3px rgba(0,0,0,.08);border-radius:12px}
+.tabs button{border-radius:999px;padding:5px 14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bar b{margin-right:4px}
+tr:nth-child(even) td{background:rgba(127,127,127,.06)}
+#st tr:nth-child(2) td:first-child{color:#c9a227;font-weight:700}#st tr:nth-child(3) td:first-child{color:#9a9a9a;font-weight:700}#st tr:nth-child(4) td:first-child{color:#b0713b;font-weight:700}
+#pairs select{min-width:92px;font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+.toast.show{opacity:1}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+button:active{transform:translateY(1px)}button:disabled{opacity:.5;cursor:default}
+button.d{color:#b3261e;border-color:#b3261e}.card:empty{display:none}
+.org{display:none}.os .org{display:inline-block}
+.chip{display:inline-block;background:var(--ac);color:var(--on);border-radius:999px;padding:2px 12px;font-weight:700;letter-spacing:.4px;margin-top:4px}
+header button.on{background:#fff;color:#1f4a2c}
+</style></head><body><header><h1>♟ Chess Tournament Manager</h1><span class="row"><button class="org" onclick="$('imp').hidden=!$('imp').hidden">⬆ Import</button><button class="org" id="nO" onclick="ORG&&vback()">Organiser</button><button class="org" id="nP" onclick="prevw()">Participants</button><button onclick="theme()">◐</button></span></header><div id="toast" class="toast"></div>
+<main>
+<div id="imp" class="card" hidden><b>Import saved data</b><p class="mu">Choose an exported .json file, or paste its contents, to continue a tournament.</p><input type="file" accept=".json,application/json" onchange="fileIn(this)"><textarea id="ip" style="min-height:70px;margin-top:8px" placeholder="…or paste JSON here"></textarea><div class="row" style="margin-top:8px"><button class="p" onclick="imp($('ip').value)">Load</button><button onclick="$('imp').hidden=true">Cancel</button></div><div class="msg" id="ie"></div></div>
+
+<div id="gate" class="card"><h2 style="margin-top:0">Welcome</h2>
+ <div class="row" style="gap:12px;align-items:stretch">
+  <div class="card" style="flex:1;min-width:230px"><b>Organiser zone</b><p class="mu">Password protected. Every tournament gets its own unique ID.</p>
+   <button class="p" onclick="$('gate').hidden=true;$('setup').hidden=false">＋ Create tournament</button>
+   <label>Organiser login</label><input id="li" placeholder="Tournament ID"><input id="lw" type="password" placeholder="Password" style="margin-top:6px"><br><button onclick="login()" style="margin-top:6px">Login</button><div class="msg" id="le"></div></div>
+  <div class="card" style="flex:1;min-width:230px"><b>Participants</b><p class="mu">No password needed. Enter the ID given by the organiser.</p>
+   <label>Tournament ID</label><input id="pi" placeholder="CT-XXXXXX"><br><button class="p" onclick="enterP()" style="margin-top:6px">View live status</button><div class="msg" id="pe"></div></div></div>
+ <p class="mu" id="gm"></p></div>
+<div id="setup" class="card" hidden>
+ <div class="row">
+  <div style="flex:1;min-width:180px"><label>Tournament name</label><input id="tn" placeholder="e.g. Patna Open 2026" style="width:100%;box-sizing:border-box"></div><div><label>Format</label><select id="fmt" onchange="fmtUI()">
+   <option value="swiss">Swiss (FIDE Dutch-style)</option>
+   <option value="rr">Round Robin</option>
+   <option value="league">League (double round robin)</option>
+   <option value="ko">Knockout</option>
+   <option value="team">Team event (Swiss, match points)</option></select></div>
+  <div id="rW"><label>Rounds</label><input id="rounds" type="number" min="1" style="width:70px" placeholder="auto"></div>
+  <div id="bW" hidden><label>Boards per team</label><input id="boards" type="number" min="1" max="12" value="4" style="width:70px"></div>
+ </div>
+ <label>Organiser password (needed to log in again)</label><input id="pw" type="password" placeholder="minimum 4 characters" style="width:100%;box-sizing:border-box">
+ <label>Players / teams — one per line: <b>Name, rating</b></label>
+ <textarea id="pl">Aarav, 2150
+Bhavna, 2080
+Chirag, 2010
+Divya, 1950
+Esha, 1900
+Farhan, 1850
+Gauri, 1790
+Harsh, 1700</textarea>
+ <div class="row" style="margin-top:10px"><button class="p" onclick="start()">Start tournament</button><button onclick="home()">Back</button></div>
+ <label>…or continue from an exported .json file (uses the password above)</label><input type="file" accept=".json,application/json" onchange="newFromFile(this)">
+ <div class="msg" id="e1"></div>
+</div>
+
+<div id="app" hidden>
+ <div class="row" style="justify-content:space-between;margin-bottom:8px">
+  <div><b id="ttl"></b> <span class="mu" id="sub"></span><br><span class="chip" id="tid"></span> <button onclick="navigator.clipboard.writeText(TID).then(()=>toast('ID copied'),()=>toast('ID: '+TID))">📋 Copy ID</button> <span class="mu" id="sv"></span></div>
+  <span class="row"><button class="d" onclick="delT()">🗑 Delete</button><button onclick="reset()">⎋ Exit</button></span></div>
+ <div class="card bar"><b>Export</b><select id="xr"></select><button onclick="xPDF()">📄 PDF</button><button onclick="xCSV()">📊 CSV (round)</button><button onclick="xST()">📈 CSV (standings)</button><button onclick="xJSON()">💾 Data (.json)</button><button id="ud" class="d" onclick="undo()">↩ Undo last round</button></div>
+ <div class="card bar"><b>Live page</b><button class="p" onclick="pubP()">📢 Publish pairings</button><button class="p" onclick="pubR()">🏁 Publish results</button><button class="d" onclick="unpub()">🚫 Unpublish</button><span class="mu" id="pst"></span><span class="mu">Uses the round chosen in Export.</span><div class="mu" style="width:100%">Participants page: in the Share menu give people <b>Viewer</b> access to this link — they open straight onto the Participants page. You can open it yourself with the Participants tab above.</div></div>
+ <div class="tabs" id="tabs"></div>
+ <div class="card sc" id="pairs"></div>
+ <div class="row"><button class="p" id="nx" onclick="next()">Generate next round</button><span class="msg" id="e2"></span><span class="ok" id="ch"></span></div>
+ <div class="card sc" id="pm" hidden><b>Players &amp; attendance</b> <span class="mu">(applies to the next round)</span>
+  <div class="bar" style="margin:8px 0"><b>Late entry</b><input id="ln" placeholder="Name" style="width:140px"><input id="lr" type="number" placeholder="Rating" style="width:84px"><select id="lp"><option value="0">0 pt</option><option value="0.5">½ pt</option><option value="1">1 pt</option></select><button class="p" onclick="addP()">＋ Add player</button></div>
+  <div class="bar" style="margin-bottom:8px"><b>Withdraw from round</b><input id="wr" type="number" min="1" style="width:70px"><span class="mu">then press Withdraw on a player</span></div>
+  <table><thead><tr><th>Player</th><th>Rtg</th><th>Status</th><th>Next round</th><th>Withdraw</th></tr></thead><tbody id="pmb"></tbody></table>
+  <p class="mu">+ = present, − = absent (not paired; receives the chosen points). In a result, “Black absent” / “White absent” records a forfeit and marks that player − for the next round.</p></div>
+ <div class="row" style="justify-content:space-between;align-items:center"><h2>Standings</h2><label style="margin:0">Tie-break <select id="tb" onchange="S.tb=+this.value;save();render()"><option value="0">Buch-1 → Buch → SB → Wins</option><option value="1">Wins → Buch-1 → Buch → SB</option><option value="2">SB → Buch → Buch-1 → Wins</option></select></label></div><div class="card sc" id="st"></div>
+ <p class="mu" id="note"></p>
+ <details class="card"><summary><b>FIDE rules applied (Swiss)</b></summary><ul class="mu"><li>Two players never meet twice; forfeited games do not count as played.</li><li>Pairing inside score groups: top half (S1) against bottom half (S2) by rating. The search first minimises the number of players floated to another score group, then the number of players who do not get their colour preference. If no legal pairing exists, colour rules are relaxed and you are told.</li><li>Buchholz ignores unplayed rounds (no virtual opponents).</li><li>Pairing-allocated bye (1 pt) goes to the lowest-ranked player of the lowest score group who has no bye or forfeit win yet.</li><li>Colours: nobody gets the same colour 3 times in a row or a colour difference above 2; two players with the same absolute preference are not paired; the stronger preference is served first; colour is alternated otherwise.</li><li>Last round: players scoring above 50% may be given an unfavourable colour (top-scorer exception).</li><li>Forfeits give the full point to the present player, no colours and no Buchholz credit.</li><li>Late entrants receive 0, ½ or 1 entry point and are paired from the next round. Absent players are not paired and receive 0, ½ or 1 point (arbiter's choice). Withdrawn players are never paired again.</li></ul></details>
+</div>
+<div id="vw" hidden>
+ <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px"><div><b id="vt"></b> <span class="mu" id="vs"></span> <span class="ok">● Live</span></div><button id="vb" hidden onclick="vback()">← Organizer</button></div>
+ <div class="msg" id="vmsg"></div>
+ <div class="tabs" id="vtabs"></div>
+ <input id="vf" placeholder="🔍 Find a player to see all their games" oninput="vfind()" style="width:100%;box-sizing:border-box;margin-bottom:8px"><div class="card sc" id="vmy"></div>
+ <div class="card sc" id="vpairs"></div>
+ <div class="card bar"><b>Export</b><select id="vxr"></select><button onclick="xPDF()">📄 PDF</button><button onclick="xCSV()">📊 CSV (round)</button><button onclick="xST()">📈 CSV (standings)</button></div>
+ <h2>Players</h2><div class="card sc" id="vpl"></div>
+ <h2 id="vh">Standings</h2><div class="card sc" id="vst"></div></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);let S=null;
+const nm=i=>S.ps[i].name;
+function fmtUI(){const f=$('fmt').value;$('rW').hidden=!(f==='swiss'||f==='team');$('bW').hidden=f!=='team'}
+let sv;function save(now){if(!TID||!dbh||!S||S.vo)return;clearTimeout(sv);S.rev=(S.rev||0)+1;const id=TID,j=JSON.stringify(S);
+ const w=()=>dbh.doc('s/'+id).set({j}).then(()=>{$('sv').textContent='Saved '+new Date().toLocaleTimeString()}).catch(()=>{$('sv').textContent='\u26a0 Not saved';toast('Autosave failed. Check your connection.')});
+ if(now)return w();$('sv').textContent='Saving\u2026';sv=setTimeout(w,500)}
+function load(){try{const s=localStorage.getItem('chessT');if(s){S=JSON.parse(s);S.pend=S.pend||{};S.pub=S.pub||{pair:0,res:0}}}catch(e){}}
+function reset(){home()}
+
+/* ---------- Round robin (Berger / circle method) ---------- */
+function rrRounds(n,dbl){
+ const ids=[...Array(n).keys()];if(n%2)ids.push(null);const m=ids.length,out=[];let a=ids.slice();
+ for(let r=0;r<m-1;r++){const rd=[];
+  for(let i=0;i<m/2;i++){let x=a[i],y=a[m-1-i];if(i===0&&r%2)[x,y]=[y,x];rd.push([x,y])}
+  out.push(rd);a=[a[0],a[m-1],...a.slice(1,m-1)]}
+ const mk=(rd,sw)=>rd.map(([x,y])=>{if(sw)[x,y]=[y,x];return y===null?{w:x,b:null,s:null}:x===null?{w:y,b:null,s:null}:{w:x,b:y,s:null}});
+ let res=out.map(rd=>mk(rd,false));
+ if(dbl)res=res.concat(out.map(rd=>mk(rd,true)));
+ return res}
+
+/* ---------- Knockout ---------- */
+function koFirst(n){
+ let P=1;while(P<n)P*=2;let o=[1];
+ while(o.length<P){const L=o.length*2+1;o=o.flatMap(s=>[s,L-s])}
+ const g=[];for(let i=0;i<P;i+=2){const a=o[i],b=o[i+1];
+  if(b>n)g.push({w:a-1,b:null,s:null});else if(a>n)g.push({w:b-1,b:null,s:null});else g.push({w:Math.min(a,b)-1,b:Math.max(a,b)-1,s:null})}
+ return {g,R:Math.log2(P)}}
+function koNext(){
+ const prev=S.rounds[S.rounds.length-1];
+ const win=prev.map(g=>g.b===null?g.w:(g.s===1?g.w:g.b));const g=[];
+ for(let i=0;i<win.length;i+=2)g.push({w:win[i],b:win[i+1],s:null});
+ return g}
+
+/* ---------- Standings ---------- */
+function stats(rs=S.rounds){
+ const {fmt,ps,boards}=S,team=fmt==='team',lg=fmt==='league';
+ const st=ps.map(p=>({p,pts:(p.init||0)*(team?2:1),gp:(p.init||0)*(team?boards:1),w:0,opp:[],col:[],bye:p.init===1?1:0,res:[]}));
+ const val=(x,y)=>team?(x>y?2:x===y?1:0):lg?(x>y?3:x===y?1:0):x;
+ for(const rd of rs)for(const g of rd){
+  const a=st[g.w];
+  if(g.b===null){if(g.u===undefined){a.pts+=team?2:lg?3:1;a.gp+=team?boards/2:1;a.w++;a.bye++}else{a.pts+=g.u*(team?2:lg?3:1);a.gp+=g.u*(team?boards:1);if(g.u===1){a.w++;a.bye++}}a.col.push(null);continue}
+  if(g.s===null)continue;
+  const b=st[g.b];if(g.f){const wn=g.s===1?a:b;wn.pts+=team?2:lg?3:1;wn.gp+=team?boards:1;wn.w++;wn.bye++;continue}a.col.push('W');b.col.push('B');a.opp.push(g.b);b.opp.push(g.w);
+  const sa=g.s,sb=(team?boards:1)-g.s;const wt=(x,y)=>team?(x>y?1:x===y?.5:0):x;a.res.push([g.b,wt(sa,sb)]);b.res.push([g.w,wt(sb,sa)]);
+  a.pts+=val(sa,sb);b.pts+=val(sb,sa);a.gp+=sa;b.gp+=sb;
+  if(sa>sb)a.w++;if(sb>sa)b.w++}
+ for(const x of st){const o=x.opp.map(i=>st[i].pts).sort((m,n)=>m-n);
+  x.buch=o.reduce((s,v)=>s+v,0);x.cut1=x.buch-(o[0]||0);x.sb=x.res.reduce((s,r)=>s+st[r[0]].pts*r[1],0)}
+ return st}
+
+/* ---------- Swiss (Dutch-style: score groups, S1/S2 halves, backtracking) ---------- */
+function swissNext(){
+ const st=stats(),rn=S.rounds.length+1;
+ const order=st.filter(x=>!(x.p.wd&&rn>=x.p.wd)&&!(x.p.id in S.pend)).sort((a,b)=>b.pts-a.pts||b.p.rating-a.p.rating||a.p.id-b.p.id);
+ const n=order.length;if(n<2)return null;
+ const had=new Set();for(const x of st)for(const o of x.opp)had.add(x.p.id+'-'+o);
+ const pref=x=>{const c=x.col.filter(k=>k),d=c.filter(k=>k==='W').length-c.filter(k=>k==='B').length,l=c.slice(-2);
+  if(d>=2||(l.length===2&&l[0]==='W'&&l[1]==='W'))return{c:'B',s:2,d};
+  if(d<=-2||(l.length===2&&l[0]==='B'&&l[1]==='B'))return{c:'W',s:2,d};
+  if(d===1)return{c:'B',s:1,d};if(d===-1)return{c:'W',s:1,d};
+  if(c.length)return{c:c[c.length-1]==='W'?'B':'W',s:1,d};
+  return{c:null,s:0,d:0}};
+ const lastR=rn===S.R,tm=S.fmt==='team',P=new Map(st.map(x=>{const r={...pref(x)};if(lastR&&r.s===2&&x.pts>(tm?S.R:S.R/2))r.s=1;return[x,r]}));
+ const ok=(a,b)=>{if(had.has(a.p.id+'-'+b.p.id))return false;const pa=P.get(a),pb=P.get(b);
+  return relax||!(pa.s===2&&pb.s===2&&pa.c===pb.c)};
+ let steps=0,relax=false,T=0;const CAP=60000,INF=1e9;
+ const cc=(p,q)=>{const a=P.get(p),b=P.get(q);return a.c&&a.c===b.c};
+ function solve(L,fl,cl){
+  if(!L.length)return[];
+  if(++steps>CAP)return null;
+  const p=L[0],rest=L.slice(1);
+  const g=rest.filter(x=>x.pts===p.pts),lo=rest.filter(x=>x.pts!==p.pts);
+  const k=Math.max(0,Math.floor((g.length+1)/2)-1);
+  for(const q of [...g.slice(k),...g.slice(0,k).reverse(),...lo]){
+   if(!ok(p,q))continue;
+   const f=p.pts!==q.pts?1:0,c=cc(p,q)?1:0;
+   if(f>fl||c>cl)continue;
+   const r=solve(rest.filter(x=>x!==q),fl-f,cl-c);
+   if(r)return[[p,q],...r];
+   if(steps>CAP)return null}
+  return null}
+ function best(L){const m=Math.floor(L.length/2);
+  steps=0;let r1=solve(L,INF,INF);if(!r1)return null;
+  let f1=INF;for(let f=0;f<=m&&Date.now()<T;f++){steps=0;const r=solve(L,f,INF);if(r){r1=r;f1=f;break}}
+  for(let c=0;c<=m&&Date.now()<T;c++){steps=0;const r=solve(L,f1,c);if(r)return r}
+  return r1}
+ let pairs=null,byeP=null;
+ const run=()=>{T=Date.now()+1500;pairs=null;byeP=null;
+  if(n%2){const c=[...order].reverse(),pool=c.filter(x=>x.bye===0);
+   for(const b of(pool.length?pool:c)){const r=best(order.filter(x=>x!==b));if(r){pairs=r;byeP=b;break}}}
+  else pairs=best(order)};
+ delete S.warn;run();
+ if(!pairs){relax=true;run();if(pairs)S.warn='Colour rules had to be relaxed in this round.'}
+ if(!pairs)return null;
+ pairs.sort((A,B)=>Math.max(B[0].pts,B[1].pts)-Math.max(A[0].pts,A[1].pts)||(B[0].pts+B[1].pts)-(A[0].pts+A[1].pts)||Math.min(A[0].p.id,A[1].p.id)-Math.min(B[0].p.id,B[1].p.id));
+ const out=pairs.map(([a,b],i)=>{
+  const pa=P.get(a),pb=P.get(b);let wa;
+  if(pa.c&&pb.c&&pa.c!==pb.c)wa=pa.c==='W';
+  else{const win=pa.s>pb.s?a:pb.s>pa.s?b:Math.abs(pa.d)>=Math.abs(pb.d)?a:b,pw=P.get(win);
+   const wW=pw.c?pw.c==='W':(win===a?i%2===0:i%2===1);
+   wa=win===a?wW:!wW}
+  return wa?{w:a.p.id,b:b.p.id,s:null}:{w:b.p.id,b:a.p.id,s:null}});
+ if(byeP)out.push({w:byeP.p.id,b:null,s:null});
+ for(const id in S.pend)out.push({w:+id,b:null,s:null,u:S.pend[id]});
+ return out}
+
+/* ---------- Control ---------- */
+async function start(){
+ const f=$('fmt').value,e=$('e1');e.textContent='';
+ const ps=$('pl').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const i=l.lastIndexOf(',');
+  return i<0?{name:cl(l),rating:0}:{name:cl(l.slice(0,i)),rating:parseInt(l.slice(i+1))||0}});
+ const n=ps.length;
+ if(n<2||ps.some(p=>!p.name)){e.textContent='Enter at least 2 players/teams, each with a name.';return}
+ if(new Set(ps.map(p=>p.name.toLowerCase())).size!==n){e.textContent='Names must be unique.';return}
+ ps.sort((a,b)=>b.rating-a.rating||a.name.localeCompare(b.name));ps.forEach((p,i)=>p.id=i);
+ const boards=f==='team'?Math.max(1,parseInt($('boards').value)||4):1;
+ S={fmt:f,ps,boards,rounds:[],R:0,view:0,pend:{},tb:0,pub:{pair:0,res:0},name:cl($('tn').value)};
+ if(f==='swiss'||f==='team'){
+  const R=parseInt($('rounds').value)||Math.ceil(Math.log2(n));
+  if(R>n-1||R<1){e.textContent='Rounds must be between 1 and '+(n-1)+' (no repeat pairings allowed).';S=null;return}
+  S.R=R;S.rounds=[swissNext()];
+  if(!S.rounds[0]){e.textContent='Could not pair round 1.';S=null;return}
+ }else if(f==='rr'||f==='league'){S.rounds=rrRounds(n,f==='league');S.R=S.rounds.length}
+ else{const k=koFirst(n);S.rounds=[k.g];S.R=k.R}
+ if(!await mkT()){S=null;return}
+ save();watch();render()}
+
+function next(){
+ const e=$('e2');e.textContent='';
+ const last=S.rounds[S.rounds.length-1];
+ if(!last.every(g=>g.b===null||g.s!==null)){e.textContent='Enter all results first.';return}
+ if(S.rounds.length>=S.R)return;
+ const g=S.fmt==='ko'?koNext():swissNext();
+ if(!g){e.textContent='No valid pairing found (fewer than 2 active players, or search limit reached).';return}
+ S.rounds.push(g);S.pend={};S.view=S.rounds.length-1;if(S.warn){toast(S.warn);delete S.warn}save();render()}
+
+function setRes(r,i,v){const g=S.rounds[r][i],fo=v[0]==='f';g.f=fo?1:0;g.s=v===''?null:fo?+v.slice(1):+v;
+ if(r===S.rounds.length-1&&(S.fmt==='swiss'||S.fmt==='team')){delete S.pend[g.w];delete S.pend[g.b];if(fo){S.pend[g.s===1?g.b:g.w]=0;toast('Absent player is set to − for the next round.')}}
+ save();render()}
+
+function render(){
+ $('setup').hidden=!!S;$('app').hidden=!S;if(!S)return;
+ const names={swiss:'Swiss',rr:'Round Robin',league:'League',ko:'Knockout',team:'Team Swiss'};
+ const v=Math.min(S.view,S.rounds.length-1),rd=S.rounds[v],t=S.fmt==='team',ko=S.fmt==='ko';
+ $('ttl').textContent=(S.name?S.name+' · ':'')+names[S.fmt];$('tid').textContent='Tournament ID: '+TID+'  (share with participants)';
+ $('xr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===v?'selected':''}>Round ${i+1}</option>`).join('');
+ $('ud').hidden=S.rounds.length<2||S.fmt==='rr'||S.fmt==='league';
+ $('tb').value=S.tb||0;rp();pst();nav(0);
+ $('sub').textContent=S.ps.length+(t?' teams':' players')+' · round '+(v+1)+' of '+S.R+' · results '+rd.filter(g=>g.b===null||g.s!==null).length+'/'+rd.length;
+ $('tabs').innerHTML=S.rounds.map((_,i)=>`<button class="${i===v?'on':''}" onclick="S.view=${i};render()">${ko&&i===S.R-1?'Final':'R'+(i+1)}</button>`).join('');
+ const opts=g=>opts0(g)+`<option value="f1" ${g.f&&g.s===1?'selected':''}>+ / − Black absent</option><option value="f0" ${g.f&&g.s===0?'selected':''}>− / + White absent</option>`;const opts0=g=>{
+  if(t){let o='<option value="">–</option>';for(let x=0;x<=S.boards;x+=.5)o+=`<option value="${x}" ${g.s===x?'selected':''}>${x} – ${S.boards-x}</option>`;return o}
+  const a=[['1','1 – 0'],['0.5','½ – ½'],['0','0 – 1']].filter(x=>!(ko&&x[0]==='0.5'));
+  return '<option value="">–</option>'+a.map(x=>`<option value="${x[0]}" ${g.s===+x[0]?'selected':''}>${x[1]}</option>`).join('')};
+ $('pairs').innerHTML='<table><tr><th>Bd</th><th>White</th><th>Result</th><th>Black</th></tr>'+rd.map((g,i)=>
+  `<tr><td>${i+1}</td><td>${nm(g.w)}</td><td>${g.b===null?(g.u===undefined?'<i>bye (full point)</i>':'<i>absent (−) · '+g.u+' pt</i>'):`<select onchange="setRes(${v},${i},this.value)">${opts(g)}</select>`}</td><td>${g.b===null?'—':nm(g.b)}</td></tr>`).join('')+'</table>'+
+  (ko?'<p class="mu">Knockout: a draw is not allowed — record the winner of the tiebreak as 1–0 or 0–1.</p>':'');
+ const auto=S.fmt==='rr'||S.fmt==='league';
+ $('nx').hidden=auto||S.rounds.length>=S.R;
+ const st=stats().sort(cmp);
+ $('st').innerHTML='<table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+
+  st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd R'+x.p.wd+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table>';
+ const done=S.rounds.length>=S.R&&rd===S.rounds[S.R-1]&&rd.every(g=>g.b===null||g.s!==null);
+ $('ch').textContent=done?(ko?'Champion: '+nm(rd[0].b===null||rd[0].s===1?rd[0].w:rd[0].b):'Tournament complete — winner: '+st[0].p.name):'';
+ $('note').textContent={swiss:'Dutch-style Swiss: no repeat pairings, colour preferences (max 2 same colour in a row, colour difference ≤ 2), bye to the lowest-ranked player without a bye. Choose the tie-break order above the standings.',
+  rr:'Berger tables; colours alternate, odd fields get a rotating bye.',league:'Double round robin: 3 pts win, 1 draw; second half reverses colours.',
+  ko:'Standard seeding (1 v N); byes go to the top seeds.',team:'Match points 2/1/0, then game points. Colours alternate by board; team bye = 2 MP.'}[S.fmt];
+}
+/* ---------- Export / Import / UI helpers ---------- */
+const NAMES={swiss:'Swiss',rr:'Round Robin',league:'League',ko:'Knockout',team:'Team Swiss'};
+let tt;function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),3200)}
+function theme(){const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark'}
+async function dl(filename,data){if(/\.csv$/i.test(filename))data='\ufeff'+data.replace(/(^|,|\n)"([=+@-])/g,"$1\"'$2");
+ const b=data instanceof Blob?data:new Blob([data]),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Saved '+filename)}
+const N=()=>+($('vw').hidden?$('xr'):$('vxr')).value,fn=x=>S.fmt+'_'+x+'_'+new Date().toISOString().slice(0,10);
+const rt=g=>g.b===null?(g.u===undefined?'bye':'absent '+g.u):g.s===null?'':g.f?(g.s===1?'+/-':'-/+'):S.fmt==='team'?g.s+'-'+(S.boards-g.s):g.s===1?'1-0':g.s===0?'0-1':'1/2-1/2';
+function snap(n){const c=JSON.parse(JSON.stringify(S));delete c.view;
+ if(S.fmt==='rr'||S.fmt==='league')c.rounds=c.rounds.map((r,i)=>i<n?r:r.map(g=>({...g,s:null})));else c.rounds=c.rounds.slice(0,n);return c}
+function xJSON(){const n=N();dl(fn('through-R'+n)+'.json',JSON.stringify({app:'chess-tm',v:1,through:n,exported:new Date().toISOString(),t:snap(n)},null,1))}
+function xCSV(){const n=N()-1,q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+ const rows=[['Round','Board','White','White rating','Result','Black','Black rating']];
+ S.rounds[n].forEach((g,i)=>rows.push([n+1,i+1,nm(g.w),S.ps[g.w].rating,rt(g),g.b===null?'':nm(g.b),g.b===null?'':S.ps[g.b].rating]));
+ dl(fn('round'+(n+1))+'.csv',rows.map(r=>r.map(q).join(',')).join('\n'))}
+function xPDF(){
+ if(!window.jspdf){toast('PDF library failed to load.');return}
+ if(S.ps.some(p=>/[^\x00-\xff]/.test(p.name)))toast('PDF supports Latin letters only. Use CSV for other scripts.');
+ const n=N(),t=S.fmt==='team',doc=new window.jspdf.jsPDF(),W=doc.internal.pageSize.getWidth();let y=18;
+ const cut=s=>String(s).slice(0,30);
+ const row=(c,x,b)=>{if(y>282){doc.addPage();y=18}doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(10);c.forEach((v,i)=>doc.text(cut(v),x[i],y));y+=6.5;if(b)doc.line(14,y-4.8,W-14,y-4.8)};
+ doc.setFontSize(17);doc.setFont('helvetica','bold');doc.text((S.name||'Chess Tournament')+' - '+NAMES[S.fmt],14,y);y+=7;
+ doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text(S.ps.length+(t?' teams':' players')+'  |  Round '+n+' of '+S.R+'  |  '+new Date().toLocaleDateString(),14,y);y+=10;
+ doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text('Pairings - Round '+n,14,y);y+=8;
+ const px=[14,24,92,124];row(['Bd','White','Result','Black'],px,1);
+ S.rounds[n-1].forEach((g,i)=>row([i+1,nm(g.w),rt(g)||'-',g.b===null?'-':nm(g.b)],px));
+ y+=6;doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text('Standings after round '+n,14,y);y+=8;
+ const sx=[14,24,76,94,110,126,144,162,182],hd=['#','Name','Rtg',t?'MP':'Pts',t?'GP':'','Buch-1','Buch','SB','Wins'];row(hd,sx,1);
+ stats(S.rounds.slice(0,S.vo?Math.min(n,S.pub.res):n)).sort(cmp)
+  .forEach((x,i)=>row([i+1,x.p.name,x.p.rating||'',x.pts,t?x.gp:'',x.cut1,x.buch,+x.sb.toFixed(2),x.w],sx));
+ dl(fn('round'+n)+'.pdf',doc.output('blob'))}
+async function fileIn(el){const f=el.files[0];if(f)imp(await f.text())}
+function parseT(txt){const o=JSON.parse(txt),t=o.t||o;
+ if(!t||!Array.isArray(t.ps)||!Array.isArray(t.rounds)||!t.rounds.length||!['swiss','rr','league','ko','team'].includes(t.fmt))throw 'This is not a tournament data file.';
+ const n=t.ps.length;if(n<2)throw 'No players in file.';
+ for(const r of t.rounds){if(!Array.isArray(r))throw 'Invalid round data.';for(const g of r){if(!Number.isInteger(g.w)||g.w<0||g.w>=n||(g.b!==null&&(!Number.isInteger(g.b)||g.b<0||g.b>=n||g.b===g.w)))throw 'Invalid pairing data.';if(g.s!==null&&typeof g.s!=='number')throw 'Invalid result data.'}}
+ const ps=t.ps.map((p,i)=>({id:i,name:cl(p.name)||'Player '+(i+1),rating:+p.rating||0,wd:+p.wd||0,init:+p.init||0})),k=t.rounds.findIndex(r=>r.some(g=>g.b!==null&&g.s===null));
+ return{k,S:{fmt:t.fmt,ps,boards:+t.boards||1,rounds:t.rounds,pend:t.pend||{},name:cl(t.name),pub:t.pub||{pair:0,res:0},tb:+t.tb||0,R:+t.R||t.rounds.length,view:k<0?t.rounds.length-1:k}}}
+function imp(txt){try{if(!TID)throw 'Log in or create a tournament first.';const o=parseT(txt),rv=S?S.rev||0:0;S=o.S;S.rev=rv;save();$('imp').hidden=true;$('ie').textContent='';render();toast('Imported - continue from round '+(o.k<0?S.rounds.length:o.k+1)+'.')}catch(e){$('ie').textContent=typeof e==='string'?e:'Invalid or corrupted file.'}}
+async function newFromFile(el){const f=el.files[0];if(!f)return;const e=$('e1');e.textContent='';
+ try{S=parseT(await f.text()).S;S.pub={pair:0,res:0}}catch(x){S=null;e.textContent=typeof x==='string'?x:'Invalid or corrupted file.';return}
+ if(!await mkT()){S=null;return}save();watch();render()}
+let ud=0;function undo(){if(!ud){ud=1;toast('Press Undo again to remove round '+S.rounds.length+'.');setTimeout(()=>ud=0,4000);return}ud=0;S.rounds.pop().forEach(g=>{if(g.b===null&&g.u!==undefined)S.pend[g.w]=g.u});const op=S.pub.pair,or=S.pub.res;S.pub.pair=Math.min(S.pub.pair,S.rounds.length);S.pub.res=Math.min(S.pub.res,S.rounds.length);S.view=S.rounds.length-1;save();render();if(S.pub.pair<op||S.pub.res<or)pubSend('Live page updated.')}
+const TB=[['cut1','buch','sb','w'],['w','cut1','buch','sb'],['sb','buch','cut1','w']];
+const cmp=(a,b)=>{let d=b.pts-a.pts;if(d)return d;if(S.fmt==='team'){d=b.gp-a.gp;if(d)return d}for(const k of TB[S.tb||0]){d=b[k]-a[k];if(d)return d}return b.p.rating-a.p.rating};
+function rp(){const ok=S.fmt==='swiss'||S.fmt==='team';$('pm').hidden=!ok;if(!ok)return;
+ const nr=S.rounds.length+1;if(!$('wr').value||+$('wr').value<nr)$('wr').value=Math.min(nr,S.R);
+ $('pmb').innerHTML=S.ps.map(p=>{const wd=p.wd&&nr>=p.wd,ab=p.id in S.pend;
+  const stt=wd?'<span class="mu">Withdrawn (R'+p.wd+')</span>':ab?'<b style="color:#b3261e">− Absent</b>':'<b class="ok">+ Present</b>'+(p.wd?' <span class="mu">(leaves R'+p.wd+')</span>':'');
+  const act=wd?'':`<button onclick="tg(${p.id})">${ab?'Mark +':'Mark −'}</button>`+(ab?` <select onchange="S.pend[${p.id}]=+this.value;save()">${[0,.5,1].map(v=>`<option ${S.pend[p.id]===v?'selected':''}>${v}</option>`).join('')}</select> pt`:'');
+  return `<tr><td>${p.name}</td><td>${p.rating||''}</td><td>${stt}</td><td>${act}</td><td><button onclick="wdr(${p.id},${p.wd?0:1})">${p.wd?'Reinstate':'Withdraw'}</button></td></tr>`}).join('')}
+function tg(id){if(id in S.pend)delete S.pend[id];else S.pend[id]=0;save();render()}
+function wdr(id,on){const p=S.ps[id];if(!on){delete p.wd;save();render();return}
+ const r=+$('wr').value,nr=S.rounds.length+1;
+ if(!(r>=nr&&r<=S.R))return toast('Choose a round from '+nr+' to '+S.R+'. For the current round use "absent" in the result.');
+ p.wd=r;delete S.pend[id];save();render();toast(p.name+' withdrawn from round '+r+'.')}
+function addP(){const n=cl($('ln').value);
+ if(!n)return toast('Enter a name.');
+ if(S.ps.some(p=>p.name.toLowerCase()===n.toLowerCase()))return toast('That name already exists.');
+ if(S.rounds.length>=S.R)return toast('The last round is already paired.');
+ S.ps.push({id:S.ps.length,name:n,rating:parseInt($('lr').value)||0,init:+$('lp').value});
+ $('ln').value='';$('lr').value='';save();render();toast(n+' added, paired from round '+(S.rounds.length+1)+'.')}
+/* ---------- Live publishing (organiser) and participant page ---------- */
+let ORG=null,dbh=null,TID=null,unsub=null,unsubS=null,lf=0,lk=0;
+function pubData(){const P=S.pub;return{name:S.name||'',fmt:S.fmt,boards:S.boards,R:S.R,tb:S.tb||0,pub:{pair:P.pair,res:P.res},upd:Date.now(),
+ ps:S.ps.map(p=>({id:p.id,name:p.name,rating:p.rating,wd:p.wd||0,init:p.init||0})),
+ rounds:S.rounds.slice(0,P.pair).map((r,i)=>r.map(g=>i<P.res?g:{w:g.w,b:g.b,s:null,u:g.u}))}}
+function sig(){const d=pubData();delete d.upd;return JSON.stringify(d)}
+function pst(){const P=S.pub;$('pst').textContent=(P.pair?'Live: pairings R1\u2013'+P.pair+(P.res?', results R1\u2013'+P.res:', no results yet')+'.':'Nothing published yet.')+(P.pair&&S.psig!==sig()?' \u26a0 Unpublished changes: publish again.':'')}
+async function pubSend(m){save();pst();
+ if(!dbh)return toast('Live publishing is not available in this view.');
+ try{await dbh.doc('t/'+TID).set({j:JSON.stringify(pubData())});S.psig=sig();save();pst();toast(m)}catch(e){toast('Publish failed: '+((e&&e.message)||'error'))}}
+function pubP(){const n=N();S.pub.pair=Math.max(S.pub.pair,n);pubSend('Round '+n+' pairings are live.')}
+function pubR(){const n=N();
+ for(let i=0;i<n;i++)if(!S.rounds[i].every(g=>g.b===null||g.s!==null))return toast('Enter all results of round '+(i+1)+' first.');
+ S.pub.res=Math.max(S.pub.res,n);S.pub.pair=Math.max(S.pub.pair,n);pubSend('Results up to round '+n+' are live.')}
+async function unpub(){S.pub={pair:0,res:0};save();pst();try{if(dbh)await dbh.doc('t/'+TID).set({j:JSON.stringify(pubData())});toast('Unpublished.')}catch(e){toast('Could not unpublish.')}}
+function prevw(){if(ORG)return;if(!S)return toast('Start a tournament first.');
+ ORG=S;S=pubData();S.vo=1;nav(1);$('setup').hidden=true;$('app').hidden=true;$('vb').hidden=false;$('vb').textContent='← Organiser';vrender()}
+function nav(p){$('nP').classList.toggle('on',!!p);$('nO').classList.toggle('on',!p)}
+function vback(){if(!ORG){home();return}S=ORG;ORG=null;$('vw').hidden=true;$('vb').hidden=true;render()}
+function vrender(){const P=S.pub,t=S.fmt==='team',nr=S.rounds.length;
+ $('vw').hidden=false;$('vmsg').textContent='';$('vt').textContent=S.name||NAMES[S.fmt];
+ $('vpl').innerHTML='<table><tr><th>#</th><th>Name</th><th>Rating</th><th>Status</th></tr>'+S.ps.map((p,i)=>`<tr><td>${i+1}</td><td>${p.name}</td><td>${p.rating||''}</td><td>${p.wd?'Withdrawn (R'+p.wd+')':'Active'}</td></tr>`).join('')+'</table>';
+ if(!nr){$('vs').textContent='';$('vtabs').innerHTML=$('vxr').innerHTML=$('vst').innerHTML='';$('vpairs').innerHTML='<p class="mu">Pairings are not published yet.</p>';return}
+ const v=Math.min(S.vv==null?nr-1:S.vv,nr-1);S.vv=v;
+ $('vs').textContent=S.ps.length+(t?' teams':' players')+' · '+nr+' of '+S.R+' rounds published'+(S.upd?' · updated '+new Date(S.upd).toLocaleTimeString():'');
+ $('vtabs').innerHTML=S.rounds.map((_,i)=>`<button class="${i===v?'on':''}" onclick="S.vv=${i};vrender()">R${i+1}</button>`).join('');
+ $('vxr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===v?'selected':''}>Round ${i+1}</option>`).join('');
+ const rl=g=>nm(g)+' <span class="mu">'+(S.ps[g].rating||'')+'</span>';
+ $('vpairs').innerHTML='<table><tr><th>Bd</th><th>White</th><th>Result</th><th>Black</th></tr>'+S.rounds[v].map((g,i)=>`<tr><td>${i+1}</td><td>${rl(g.w)}</td><td><b>${g.b===null||v<P.res?(rt(g)||'–'):'–'}</b></td><td>${g.b===null?'—':rl(g.b)}</td></tr>`).join('')+'</table>'+(v<P.res?'':'<p class="mu">Results of this round are not published yet.</p>');
+ $('vh').textContent=P.res?'Standings after round '+P.res:'Standings (no results published yet)';
+ const st=stats(S.rounds.slice(0,P.res)).sort(cmp);
+ $('vst').innerHTML='<table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd R'+x.p.wd+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table>';vfind()}
+function viewerStart(id){if(unsub){unsub();unsub=null}$('gate').hidden=true;$('vb').hidden=false;$('vb').textContent='← Home';$('setup').hidden=true;$('app').hidden=true;$('vw').hidden=false;$('vt').textContent='Live tournament';
+ if(!dbh){$('vmsg').textContent='Please sign in to view the live results.';return}
+ unsub=dbh.doc('t/'+id).onSnapshot(s=>{let d=null;try{d=s.exists?JSON.parse(s.data().j):null}catch(e){}
+  if(!d){S=null;$('vmsg').textContent='Tournament not found, or nothing published yet. This page updates automatically.';$('vtabs').innerHTML=$('vpairs').innerHTML=$('vst').innerHTML='';return}
+  if(!Array.isArray(d.rounds)||!Array.isArray(d.ps)||!d.pub)return;d.ps.forEach(p=>p.name=cl(p.name));d.name=cl(d.name);const prev=S;S=d;S.vo=1;S.vv=prev&&prev.pub.pair===d.pub.pair?prev.vv:undefined;vrender()},()=>{$('vmsg').textContent='Could not load the live data.'})}
+const rid=n=>{const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=crypto.getRandomValues(new Uint8Array(n));return[...a].map(v=>c[v%c.length]).join('')};
+async function hash(p,s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s+':'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function mkT(){const e=$('e1'),pw=$('pw').value;
+ if(pw.length<4){e.textContent='Choose a password of at least 4 characters.';return false}
+ if(!dbh){e.textContent='Sign in with Contributor access (and open this page in Claude) to create a tournament.';return false}
+ try{let id,k=0;do{id='CT-'+rid(6);k++}while((await dbh.doc('a/'+id).get()).exists&&k<10);
+  const salt=rid(12);await dbh.doc('a/'+id).set({salt,h:await h2(pw,salt),v:2});
+  TID=id;await dbh.doc('t/'+id).set({j:JSON.stringify(pubData())});S.psig=sig();
+  try{localStorage.setItem('lastTid',id)}catch(x){}
+  document.body.classList.add('os');toast('Tournament created. ID: '+id);return true}
+ catch(x){e.textContent='Could not create the tournament: '+((x&&x.message)||'error');return false}}
+async function login(){const e=$('le'),id=$('li').value.trim().toUpperCase(),pw=$('lw').value;e.textContent='';
+ if(!id||!pw){e.textContent='Enter the tournament ID and password.';return}
+ if(Date.now()<lk){e.textContent='Too many attempts. Wait '+Math.ceil((lk-Date.now())/1000)+'s.';return}
+ if(!dbh){e.textContent='Sign in with Contributor access to log in as organiser.';return}
+ try{const a=await dbh.doc('a/'+id).get();
+  if(!a.exists||!await authOK(id,await hashV(pw,a.data().salt,a.data().v))){await new Promise(r=>setTimeout(r,700));if(++lf>=5){lk=Date.now()+30000;lf=0}e.textContent='Wrong tournament ID or password.';return}lf=0;
+  const s=await dbh.doc('s/'+id).get();if(!s.exists)throw{message:'saved data not found'};
+  S=JSON.parse(s.data().j);S.pend=S.pend||{};S.pub=S.pub||{pair:0,res:0};S.ps.forEach(p=>p.name=cl(p.name));TID=id;watch();
+  try{localStorage.setItem('lastTid',id)}catch(x){}
+  document.body.classList.add('os');$('gate').hidden=true;$('lw').value='';render()}
+ catch(x){e.textContent='Login failed: '+((x&&x.message)||'error')}}
+function enterP(){const id=$('pi').value.trim().toUpperCase();$('pe').textContent='';
+ if(!id){$('pe').textContent='Enter the tournament ID.';return}
+ if(!dbh){$('pe').textContent='Please sign in to view live results.';return}
+ viewerStart(id)}
+function home(){if(TID&&S&&!S.vo)save(true);if(unsub){unsub();unsub=null}if(unsubS){unsubS();unsubS=null}S=null;TID=null;ORG=null;document.body.classList.remove('os');
+ ['setup','app','vw','imp'].forEach(i=>$(i).hidden=true);$('gate').hidden=false;$('vb').hidden=true}
+const cl=s=>String(s==null?'':s).replace(/[<>&"'`]/g,'').trim().slice(0,60);
+async function h2(p,s){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);const b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(s),iterations:150000,hash:'SHA-256'},k,256);return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const hashV=(p,s,v)=>v===2?h2(p,s):hash(p,s);
+function watch(){if(unsubS)unsubS();unsubS=dbh.doc('s/'+TID).onSnapshot(sn=>{if(!sn.exists||!S||S.vo||ORG)return;let d;try{d=JSON.parse(sn.data().j)}catch(e){return}
+ if((d.rev||0)>(S.rev||0)){S=d;S.pend=S.pend||{};S.pub=S.pub||{pair:0,res:0};render();toast('Updated from another device.')}})}
+let dd=0;async function delT(){if(!dd){dd=1;toast('Press Delete again to permanently remove this tournament.');setTimeout(()=>dd=0,4000);return}dd=0;
+ try{const id=TID;clearTimeout(sv);await dbh.doc('t/'+id).delete();await dbh.doc('s/'+id).delete();await dbh.doc('a/'+id).delete();S=null;home();toast('Tournament '+id+' deleted.')}catch(e){toast('Delete failed.')}}
+function xST(){const n=N(),t=S.fmt==='team',lim=S.vo?Math.min(n,S.pub.res):n,q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+ const rows=[['Rank','Name','Rating',t?'Match pts':'Points',t?'Game pts':'','Buchholz-1','Buchholz','Sonneborn-Berger','Wins']];
+ stats(S.rounds.slice(0,lim)).sort(cmp).forEach((x,i)=>rows.push([i+1,x.p.name,x.p.rating,x.pts,t?x.gp:'',x.cut1,x.buch,+x.sb.toFixed(2),x.w]));
+ dl(fn('standings-R'+lim)+'.csv',rows.map(r=>r.map(q).join(',')).join('\n'))}
+function vfind(){const q=$('vf').value.trim().toLowerCase(),el=$('vmy');if(!q||!S){el.innerHTML='';return}
+ const rows=[];S.rounds.forEach((rd,r)=>rd.forEach(g=>{if(nm(g.w).toLowerCase().includes(q)||(g.b!==null&&nm(g.b).toLowerCase().includes(q)))
+  rows.push(`<tr><td>R${r+1}</td><td>${nm(g.w)}</td><td><b>${g.b===null||r<S.pub.res?(rt(g)||'\u2013'):'\u2013'}</b></td><td>${g.b===null?'\u2014':nm(g.b)}</td></tr>`)}));
+ el.innerHTML=rows.length?'<table><tr><th>Rd</th><th>White</th><th>Result</th><th>Black</th></tr>'+rows.join('')+'</table>':'<p class="mu">No games found.</p>'}
+let TOKEN='';
+async function api(o){const r=await fetch('api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...o,token:o.token!==undefined?o.token:TOKEN})});
+ let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw{message:j.error||'Server error ('+r.status+')'};return j}
+async function authOK(id,h){const j=await api({op:'verify',path:'a/'+id,token:h});if(j.ok)TOKEN=h;return j.ok}
+const mkDoc=p=>({
+ get:async()=>{const j=await api({op:'get',path:p});return{exists:j.exists,data:()=>j.data}},
+ set:async d=>{await api({op:'set',path:p,data:d});if(p[0]==='a')TOKEN=d.h},
+ delete:async()=>{await api({op:'del',path:p})},
+ onSnapshot:(cb,err)=>{let last=null,stop=false;const tick=async()=>{if(stop)return;
+  try{const j=await api({op:'get',path:p}),s=JSON.stringify(j);if(s!==last){last=s;cb({exists:j.exists,data:()=>j.data})}}catch(e){err&&err(e)}
+  setTimeout(tick,4000)};tick();return()=>{stop=true}}});
+async function boot(){fmtUI();let ok=true;
+ dbh={doc:mkDoc};
+ addEventListener('pagehide',()=>{if(TID&&S&&!S.vo)save(true)});home();try{$('li').value=localStorage.getItem('lastTid')||''}catch(e){}if(!dbh)$('gm').textContent='Online features need this page opened in Claude, signed in.'}
+boot();
+</script></body></html>
