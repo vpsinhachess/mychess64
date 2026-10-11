@@ -19,9 +19,22 @@
 7. Upload `index.html` and `config.js` to your GitHub repository folder (Add file > Upload files > Commit).
    GitHub Pages updates in about a minute. Open `https://<user>.github.io/<repo>/pairing/`.
 
+## Branding
+The MyChess64 header logo, footer logo, favicon and the footer text ("Designed and Developed by: Ved Prakash Sinha")
+are built into `index.html`, so there are no extra image files to upload. The PDFs also carry the logo and footer line.
+
+## After uploading a new version
+Press **Ctrl+F5** (hard refresh) on every open tab. From version 4 onwards the page checks for updates itself and shows an
+"A new version is available - Update now" bar (GitHub can take up to 10 minutes to publish a new upload). GitHub Pages and browsers keep the old page for a few minutes.
+The footer shows the version number (**Version 4.0**) so you can confirm you are on the new version.
+
 ## What's new in this version
 * **View Live Pairing & Result** (player/parent page): tournament name box, details (date, venue, organiser, arbiter),
   tabs *View Pairing* / *Standing* / *List of Players*, ratings and points next to names, PDF export only.
+* **Round-wise standings** in both organiser and viewer: one entry per round ("Standing of Round 02"). Publishing a round's
+  pairing automatically publishes the previous round's results and standing.
+* **Pairing table columns**: Bd, White, Rtg, Pts, Result, Black, Rtg, Pts (organiser, viewer and PDF).
+* **PDF export**: *Pairing PDF* and *Standing PDF* for any round (organiser and viewer).
 * **Copy Tournament / WhatsApp**: shares a direct link `...?t=CT-XXXXXX`; players open the live page with one tap.
 * **Edit tournament details**: updates the live page instantly.
 * **Pairing rules (customise)**: round-1 colour, bye points, top-scorer colour exception, repeated-float minimisation, colour relaxation.
