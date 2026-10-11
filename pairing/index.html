@@ -48,10 +48,15 @@ button.d{color:#b3261e;border-color:#b3261e}.card:empty{display:none}
 .tbox{display:block;max-width:92%;margin:4px auto 6px;text-align:center;font-weight:800;font-size:22px;background:var(--hl);border:3px solid var(--ac);border-radius:12px;padding:10px 16px}
 .tbox:empty{display:none}.tdet{text-align:right;margin:2px 0 10px;line-height:1.55;font-size:14px}
 details>summary{cursor:pointer;padding:2px 0}details.card{padding:10px 14px}
+main{max-width:1040px}.card{padding:16px}
+th{background:rgba(127,127,127,.08);font-size:13px}td,th{padding:7px 10px}
+button.p{box-shadow:0 1px 2px rgba(0,0,0,.25)}.tabs button{font-weight:600}.bar select{min-width:120px}
+.tag{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:700;background:var(--ac);color:var(--on);margin-left:6px}
+h2{margin:20px 0 8px}summary b{font-size:15px}
 .org{display:none}.os .org{display:inline-block}
 .chip{display:inline-block;background:var(--ac);color:var(--on);border-radius:999px;padding:2px 12px;font-weight:700;letter-spacing:.4px;margin-top:4px}
 header button.on{background:#fff;color:#1f4a2c}
-</style></head><body><header><h1>♟ Chess Tournament Manager</h1><span class="row"><button class="org" onclick="$('imp').hidden=!$('imp').hidden">⬆ Import</button><button class="org" id="nO" onclick="ORG&&vback()">Organiser</button><button class="org" id="nP" onclick="prevw()">View Live Pairing &amp; Result</button><button onclick="theme()">◐</button></span></header><div id="toast" class="toast"></div>
+</style></head><body><header><h1>♟ Chess Tournament Manager <small style="opacity:.65;font-size:11px;font-weight:400">v3</small></h1><span class="row"><button class="org" onclick="$('imp').hidden=!$('imp').hidden">⬆ Import</button><button class="org" id="nO" onclick="ORG&&vback()">Organiser</button><button class="org" id="nP" onclick="prevw()">View Live Pairing &amp; Result</button><button onclick="theme()">◐</button></span></header><div id="toast" class="toast"></div>
 <main>
 <div id="imp" class="card" hidden><b>Import saved data</b><p class="mu">Choose an exported .json file, or paste its contents, to continue a tournament.</p><input type="file" accept=".json,application/json" onchange="fileIn(this)"><textarea id="ip" style="min-height:70px;margin-top:8px" placeholder="…or paste JSON here"></textarea><div class="row" style="margin-top:8px"><button class="p" onclick="imp($('ip').value)">Load</button><button onclick="$('imp').hidden=true">Cancel</button></div><div class="msg" id="ie"></div></div>
 
@@ -93,7 +98,7 @@ Harsh, 1700</textarea>
 
 <div id="app" hidden>
  <div class="tbox" id="oname"></div><div class="tdet" id="odet"></div>
- <details class="card"><summary><b>✏ Edit tournament details</b> <span class="mu">(updates the live page instantly)</span></summary>
+ <details class="card" id="dpan" open><summary><b>✏ Edit tournament details</b> <span class="mu">(updates the live page instantly)</span></summary>
   <div class="row" style="margin-top:8px"><div style="flex:2;min-width:200px"><label>Tournament name</label><input id="dn" style="width:100%;box-sizing:border-box"></div><div style="flex:1;min-width:150px"><label>Date</label><input id="dd" style="width:100%;box-sizing:border-box"></div></div>
   <div class="row"><div style="flex:2;min-width:200px"><label>Venue</label><input id="dv" style="width:100%;box-sizing:border-box"></div><div style="flex:1;min-width:160px"><label>Organiser</label><input id="do" style="width:100%;box-sizing:border-box"></div><div style="flex:1;min-width:160px"><label>Arbiter</label><input id="da" style="width:100%;box-sizing:border-box"></div></div>
   <div class="row" style="margin-top:10px"><button class="p" onclick="saveDet()">Update &amp; publish details</button></div></details>
@@ -107,8 +112,15 @@ Harsh, 1700</textarea>
  <div class="row" style="justify-content:space-between;margin-bottom:8px">
   <div><b id="ttl"></b> <span class="mu" id="sub"></span><br><span class="chip" id="tid"></span> <button class="p" onclick="copyT()">📋 Copy Tournament</button> <button onclick="waT()">🟢 WhatsApp</button> <span class="mu" id="sv"></span></div>
   <span class="row"><button class="d" onclick="delT()">🗑 Delete</button><button onclick="reset()">⎋ Exit</button></span></div>
- <div class="card bar"><b>Export</b><select id="xr"></select><button onclick="xPDF()">📄 PDF</button><button onclick="xCSV()">📊 CSV (round)</button><button onclick="xST()">📈 CSV (standings)</button><button onclick="xFull()">💾 Full backup (.json)</button><button onclick="xJSON()">💾 Through selected round</button><button id="ud" class="d" onclick="undo()">↩ Undo last round</button></div>
- <div class="card bar"><b>Live page</b><button class="p" onclick="pubP()">📢 Publish pairings</button><button class="p" onclick="pubR()">🏁 Publish results</button><button class="d" onclick="unpub()">🚫 Unpublish</button><span class="mu" id="pst"></span><span class="mu">Uses the round chosen in Export.</span><div class="mu" style="width:100%">Share with players: press <b>Copy Tournament</b> or <b>WhatsApp</b>. The link opens <b>View Live Pairing &amp; Result</b> directly.</div></div>
+ <div class="card"><b>📤 Export &amp; backup</b>
+  <div class="bar" style="margin-top:8px"><select id="xr"></select>
+   <button onclick="xPDF('pair')">📄 Pairing PDF</button><button onclick="xPDF('stand')">📄 Standing PDF</button>
+   <button onclick="xCSV()">📊 Pairing CSV</button><button onclick="xST()">📈 Standing CSV</button>
+   <button onclick="xFull()">💾 Full backup</button><button onclick="xJSON()">💾 Up to selected round</button>
+   <button id="ud" class="d" onclick="undo()">↩ Undo last round</button></div></div>
+ <div class="card"><b>📡 Live page</b> <span class="mu" id="pst"></span>
+  <div class="bar" style="margin-top:8px"><button class="p" onclick="pubP()">📢 Publish Pairing</button><button class="p" onclick="pubR()">🏁 Publish Results</button><button class="d" onclick="unpub()">🚫 Unpublish</button></div>
+  <div class="mu" style="margin-top:6px">Works on the round chosen in <b>Export &amp; backup</b>. Publishing a round's pairing also publishes the <b>standing of the previous round</b> and its results. Share the link with <b>Copy Tournament</b> or <b>WhatsApp</b> (top of page).</div></div>
  <div class="tabs" id="tabs"></div>
  <div class="card sc" id="pairs"></div>
  <div class="row"><button class="p" id="nx" onclick="next()">Generate next round</button><span class="msg" id="e2"></span><span class="ok" id="ch"></span></div>
@@ -118,7 +130,7 @@ Harsh, 1700</textarea>
   <table><thead><tr><th>Player</th><th>Rtg</th><th>Status</th><th>Next round</th><th>Withdraw</th></tr></thead><tbody id="pmb"></tbody></table>
   <p class="mu">+ = present, − = absent (not paired; receives the chosen points). In a result, “Black absent” / “White absent” records a forfeit and marks that player − for the next round.</p></div>
  <div class="card sc" id="wl" hidden><b>Withdrawn players</b><table><thead><tr><th>Player</th><th>Rtg</th><th>Withdrawn from</th><th>Include in tournament</th></tr></thead><tbody id="wlb"></tbody></table></div>
- <div class="row" style="justify-content:space-between;align-items:center"><h2 id="sth">Standings</h2><label style="margin:0">Tie-break <select id="tb" onchange="S.tb=+this.value;save();render()"><option value="0">Buch-1 → Buch → SB → Wins</option><option value="1">Wins → Buch-1 → Buch → SB</option><option value="2">SB → Buch → Buch-1 → Wins</option></select></label></div><div class="card sc" id="st"></div>
+ <div class="row" style="justify-content:space-between;align-items:center"><h2 id="sth">Standings (round wise)</h2><label style="margin:0">Tie-break <select id="tb" onchange="S.tb=+this.value;save();render()"><option value="0">Buch-1 → Buch → SB → Wins</option><option value="1">Wins → Buch-1 → Buch → SB</option><option value="2">SB → Buch → Buch-1 → Wins</option></select></label></div><div id="st"></div>
  <p class="mu" id="note"></p>
  <details class="card"><summary><b>FIDE rules applied (Swiss)</b></summary><ul class="mu"><li>Two players never meet twice; forfeited games do not count as played.</li><li>Pairing inside score groups: top half (S1) against bottom half (S2) by rating. The search first minimises the number of players floated to another score group, then the number of players who do not get their colour preference. If no legal pairing exists, colour rules are relaxed and you are told.</li><li>Buchholz ignores unplayed rounds (no virtual opponents).</li><li>Pairing-allocated bye (1 pt) goes to the lowest-ranked player of the lowest score group who has no bye or forfeit win yet.</li><li>Colours: nobody gets the same colour 3 times in a row or a colour difference above 2; two players with the same absolute preference are not paired; the stronger preference is served first; colour is alternated otherwise.</li><li>Last round: players scoring above 50% may be given an unfavourable colour (top-scorer exception).</li><li>Forfeits give the full point to the present player, no colours and no Buchholz credit.</li><li>Late entrants receive 0, ½ or 1 entry point and are paired from the next round. Absent players are not paired and receive 0, ½ or 1 point (arbiter's choice). Withdrawn players are never paired again.</li></ul></details>
 </div>
@@ -130,7 +142,7 @@ Harsh, 1700</textarea>
  <div class="tabs"><button id="vt1" class="on" onclick="VT=1;vrender()">View Pairing</button><button id="vt2" onclick="VT=2;vrender()">Standing</button><button id="vt3" onclick="VT=3;vrender()">List of Players</button></div>
  <div id="vp1"><input id="vf" placeholder="🔍 Find a player to see all their games" oninput="vfind()" style="width:100%;box-sizing:border-box;margin-bottom:8px"><div class="card sc" id="vmy"></div><div id="vrl"></div></div>
  <div id="vp2" hidden></div><div id="vp3" hidden></div>
- <div class="card bar"><b>Export</b><select id="vxr"></select><button onclick="xPDF()">📄 PDF</button></div>
+ <div class="card bar"><b>Export</b><select id="vxr"></select><button onclick="xPDF('pair')">📄 Pairing PDF</button><button onclick="xPDF('stand')">📄 Standing PDF</button></div>
 </div>
 </main>
 <script>
@@ -289,23 +301,22 @@ function render(){
  const names={swiss:'Swiss',rr:'Round Robin',league:'League',ko:'Knockout',team:'Team Swiss'};
  const v=Math.min(S.view,S.rounds.length-1),rd=S.rounds[v],t=S.fmt==='team',ko=S.fmt==='ko';
  $('ttl').textContent=(S.name?S.name+' · ':'')+names[S.fmt];$('tid').textContent='Tournament ID: '+TID+'  (share with participants)';hdr('oname','odet');if(FD!==TID){fillDet();FD=TID}$('orp').hidden=!(S.fmt==='swiss'||S.fmt==='team');
- PRE=stats(S.rounds.slice(0,v));$('xr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===v?'selected':''}>${RN(i+1)}</option>`).join('');$('sth').textContent='Standing of '+RN(v+1);
+ PRE=stats(S.rounds.slice(0,v));$('xr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===v?'selected':''}>${RN(i+1)}</option>`).join('');
  $('ud').hidden=S.rounds.length<2||S.fmt==='rr'||S.fmt==='league';
  $('tb').value=S.tb||0;rp();pst();nav(0);
  $('sub').textContent=S.ps.length+(t?' teams':' players')+' · round '+(v+1)+' of '+S.R+' · results '+rd.filter(g=>g.b===null||g.s!==null).length+'/'+rd.length;
- $('tabs').innerHTML=S.rounds.map((_,i)=>`<button class="${i===v?'on':''}" onclick="S.view=${i};render()">${ko&&i===S.R-1?'Final':RN(i+1)+' - Pairing'}</button>`).join('');
+ $('tabs').innerHTML=S.rounds.map((_,i)=>`<button class="${i===v?'on':''}" onclick="S.view=${i};render()">${ko&&i===S.R-1?'Final':RN(i+1)+' - Pairing'+(i<S.pub.pair?' ●':'')}</button>`).join('');
  const opts=g=>opts0(g)+`<option value="f1" ${g.f&&g.s===1?'selected':''}>+ / − Black absent</option><option value="f0" ${g.f&&g.s===0?'selected':''}>− / + White absent</option>`;const opts0=g=>{
   if(t){let o='<option value="">–</option>';for(let x=0;x<=S.boards;x+=.5)o+=`<option value="${x}" ${g.s===x?'selected':''}>${x} – ${S.boards-x}</option>`;return o}
   const a=[['1','1 – 0'],['0.5','½ – ½'],['0','0 – 1']].filter(x=>!(ko&&x[0]==='0.5'));
   return '<option value="">–</option>'+a.map(x=>`<option value="${x[0]}" ${g.s===+x[0]?'selected':''}>${x[1]}</option>`).join('')};
- $('pairs').innerHTML='<table><tr><th>Bd</th><th>White</th><th>Result</th><th>Black</th></tr>'+rd.map((g,i)=>
-  `<tr><td>${i+1}</td><td>${pl(g.w)}</td><td>${g.b===null?(g.u===undefined?'<i>bye (full point)</i>':'<i>absent (−) · '+g.u+' pt</i>'):`<select onchange="setRes(${v},${i},this.value)">${opts(g)}</select>`}</td><td>${g.b===null?'—':pl(g.b)}</td></tr>`).join('')+'</table>'+
+ $('pairs').innerHTML='<table>'+PH(t)+pairRows(rd,PRE,(g,i)=>g.b===null?(g.u===undefined?'<i>Bye (full point)</i>':'<i>Absent (−) · '+g.u+' pt</i>'):`<select onchange="setRes(${v},${i},this.value)">${opts(g)}</select>`)+'</table>'+
   (ko?'<p class="mu">Knockout: a draw is not allowed — record the winner of the tiebreak as 1–0 or 0–1.</p>':'');
  const auto=S.fmt==='rr'||S.fmt==='league';
  $('nx').hidden=auto||S.rounds.length>=S.R;
- const st=stats(S.rounds.slice(0,v+1)).sort(cmp);
- $('st').innerHTML='<table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+
-  st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd R'+x.p.wd+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table>';
+ {let o='',first=true;for(let i=S.rounds.length-1;i>=0;i--){if(!S.rounds[i].some(g=>g.s!==null))continue;
+  o+=`<details class="card" ${first?'open':''}><summary><b>Standing of ${RN(i+1)}</b>${i<S.pub.res?' <span class="tag">live</span>':''}</summary><div class="sc">${stHTML(i+1)}</div></details>`;first=false}
+  $('st').innerHTML=o||'<p class="mu">Standings appear here as soon as results are entered.</p>'}
  const done=S.rounds.length>=S.R&&rd===S.rounds[S.R-1]&&rd.every(g=>g.b===null||g.s!==null);
  $('ch').textContent=done?(ko?'Champion: '+nm(rd[0].b===null||rd[0].s===1?rd[0].w:rd[0].b):'Tournament complete — winner: '+st[0].p.name):'';
  $('note').textContent={swiss:'Dutch-style Swiss: no repeat pairings, colour preferences (max 2 same colour in a row, colour difference ≤ 2), bye to the lowest-ranked player without a bye. Choose the tie-break order above the standings.',
@@ -330,24 +341,26 @@ function xCSV(){const n=N()-1,q=s=>'"'+String(s).replace(/"/g,'""')+'"';
  const rows=[['Round','Board','White','White rating','Result','Black','Black rating']];
  S.rounds[n].forEach((g,i)=>rows.push([n+1,i+1,nm(g.w),S.ps[g.w].rating,rt(g),g.b===null?'':nm(g.b),g.b===null?'':S.ps[g.b].rating]));
  dl(fn('round'+(n+1))+'.csv',rows.map(r=>r.map(q).join(',')).join('\n'))}
-function xPDF(){
+function xPDF(mode){mode=mode||'both';
  if(!window.jspdf){toast('PDF library failed to load.');return}
  if(S.ps.some(p=>/[^\x00-\xff]/.test(p.name)))toast('PDF supports Latin letters only.');
- const n=N(),t=S.fmt==='team',lim=S.vo?Math.min(n,S.pub.res):n,d=S.det||{},doc=new window.jspdf.jsPDF(),W=doc.internal.pageSize.getWidth();let y=16;
- const row=(c,x,b)=>{if(y>284){doc.addPage();y=16}doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(9);c.forEach((v,i)=>doc.text(String(v).slice(0,44),x[i],y));y+=6;if(b)doc.line(14,y-4.5,W-14,y-4.5)};
+ const n=N(),t=S.fmt==='team',lim=S.vo?Math.min(n,S.pub.res):n,d=S.det||{},doc=new window.jspdf.jsPDF({orientation:'landscape'}),W=doc.internal.pageSize.getWidth();let y=14;
+ const row=(c,x,b)=>{if(y>196){doc.addPage();y=14}doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(9);c.forEach((v,i)=>doc.text(String(v).slice(0,34),x[i],y));y+=6;if(b)doc.line(10,y-4.5,W-10,y-4.5)};
  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text(S.name||'Chess Tournament',W/2,y,{align:'center'});y+=8;
  doc.setFontSize(10);doc.setFont('helvetica','normal');
- [['Date',d.date],['Venue',d.venue],['Organiser',d.org],['Arbiter',d.arb]].filter(x=>x[1]).forEach(x=>{doc.text(x[0]+': '+x[1],W-14,y,{align:'right'});y+=5});
- y+=4;doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text(RN(n)+' - Pairing',14,y);y+=8;
- const pre=stats(S.rounds.slice(0,Math.min(n-1,lim))),px=[14,24,98,126],pn=id=>nm(id)+(S.ps[id].rating?' ('+S.ps[id].rating+')':'')+'  ['+pre[id].pts+']';
- row(['Bd','White [pts]','Result','Black [pts]'],px,1);
- S.rounds[n-1].forEach((g,i)=>row([i+1,pn(g.w),g.b===null||n<=lim?(rt(g)||'-'):'-',g.b===null?'-':pn(g.b)],px));
- y+=6;doc.setFontSize(13);doc.setFont('helvetica','bold');
- if(!lim){doc.text('No results published yet.',14,y)}else{
-  doc.text('Standing of '+RN(lim),14,y);y+=8;
-  const sx=[14,24,80,98,114,130,148,166,184];row(['#','Name','Rtg',t?'MP':'Pts',t?'GP':'','Buch-1','Buch','SB','Wins'],sx,1);
-  stats(S.rounds.slice(0,lim)).sort(cmp).forEach((x,i)=>row([i+1,x.p.name,x.p.rating||'',x.pts,t?x.gp:'',x.cut1,x.buch,+x.sb.toFixed(2),x.w],sx))}
- dl(fn('round'+n)+'.pdf',doc.output('blob'))}
+ [['Date',d.date],['Venue',d.venue],['Organiser',d.org],['Arbiter',d.arb]].filter(x=>x[1]).forEach(x=>{doc.text(x[0]+': '+x[1],W-12,y,{align:'right'});y+=5});
+ y+=3;
+ if(mode!=='stand'){doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text(RN(n)+' - Pairing',12,y);y+=8;
+  const pre=stats(S.rounds.slice(0,Math.min(n-1,lim))),px=[12,22,92,108,124,150,220,236],pt=t?'MP':'Pts';
+  row(['Bd','White','Rtg',pt,'Result','Black','Rtg',pt],px,1);
+  S.rounds[n-1].forEach((g,i)=>{const w=S.ps[g.w],b=g.b===null?null:S.ps[g.b];
+   row([i+1,w.name,w.rating||'',pre[g.w].pts,g.b===null?(g.u===undefined?'Bye':'Absent'):(n<=lim?(rt(g)||'-'):'-'),b?b.name:'-',b?(b.rating||''):'',b?pre[g.b].pts:''],px)});y+=6}
+ if(mode!=='pair'){doc.setFontSize(13);doc.setFont('helvetica','bold');
+  if(!lim)doc.text('No results published yet.',12,y);else{
+   doc.text('Standing of '+RN(lim),12,y);y+=8;
+   const sx=[12,22,100,120,138,156,176,196,216];row(['#','Name','Rtg',t?'MP':'Pts',t?'GP':'','Buch-1','Buch','SB','Wins'],sx,1);
+   stats(S.rounds.slice(0,lim)).sort(cmp).forEach((x,i)=>row([i+1,x.p.name,x.p.rating||'',x.pts,t?x.gp:'',x.cut1,x.buch,+x.sb.toFixed(2),x.w],sx))}}
+ dl(fn((mode==='stand'?'standing-R':'pairing-R')+n)+'.pdf',doc.output('blob'))}
 async function fileIn(el){const f=el.files[0];if(f)imp(await f.text())}
 function parseT(t){
  if(!t||!Array.isArray(t.ps)||!Array.isArray(t.rounds)||!t.rounds.length||!['swiss','rr','league','ko','team'].includes(t.fmt))throw 'This is not a tournament data file.';
@@ -403,10 +416,13 @@ function pst(){const P=S.pub;$('pst').textContent=(P.pair?'Live: pairings R1\u20
 async function pubSend(m){save();pst();
  if(!dbh)return toast('Live publishing is not available in this view.');
  try{await dbh.doc('t/'+TID).set({j:JSON.stringify(pubData())});S.psig=sig();save();pst();toast(m)}catch(e){toast('Publish failed: '+((e&&e.message)||'error'))}}
-function pubP(){const n=N();S.pub.pair=Math.max(S.pub.pair,n);pubSend('Round '+n+' pairings are live.')}
+function pubP(){const n=N(),dn=g=>g.b===null||g.s!==null;let k=0;
+ for(let i=0;i<n-1;i++){if(!S.rounds[i].every(dn))break;k=i+1}
+ S.pub.pair=Math.max(S.pub.pair,n);S.pub.res=Math.max(S.pub.res,k);
+ pubSend(k<n-1?RN(n)+' pairing is live. '+RN(k+1)+' results are incomplete, so standings stop at '+RN(k)+'.':RN(n)+' pairing is live'+(n>1?' with the standing of '+RN(n-1)+'.':'.'))}
 function pubR(){const n=N();
- for(let i=0;i<n;i++)if(!S.rounds[i].every(g=>g.b===null||g.s!==null))return toast('Enter all results of round '+(i+1)+' first.');
- S.pub.res=Math.max(S.pub.res,n);S.pub.pair=Math.max(S.pub.pair,n);pubSend('Results up to round '+n+' are live.')}
+ for(let i=0;i<n;i++)if(!S.rounds[i].every(g=>g.b===null||g.s!==null))return toast('Enter all results of '+RN(i+1)+' first.');
+ S.pub.res=Math.max(S.pub.res,n);S.pub.pair=Math.max(S.pub.pair,n);pubSend('Results and standing up to '+RN(n)+' are live.')}
 async function unpub(){S.pub={pair:0,res:0};save();pst();try{if(dbh)await dbh.doc('t/'+TID).set({j:JSON.stringify(pubData())});toast('Unpublished.')}catch(e){toast('Could not unpublish.')}}
 function prevw(){if(ORG)return;if(!S)return toast('Start a tournament first.');
  ORG=S;S=pubData();S.vo=1;nav(1);$('setup').hidden=true;$('app').hidden=true;$('vb').hidden=false;$('vb').textContent='← Organiser';vrender()}
@@ -420,13 +436,11 @@ function vrender(){const P=S.pub,t=S.fmt==='team',nr=S.rounds.length;
  $('vp3').innerHTML='<div class="card sc"><table><tr><th>#</th><th>Name</th><th>Rating</th><th>Status</th></tr>'+S.ps.map((p,i)=>`<tr><td>${i+1}</td><td>${p.name}</td><td>${p.rating||''}</td><td>${p.wd?'Withdrawn ('+RN(p.wd)+')':'Active'}</td></tr>`).join('')+'</table></div>';
  $('vxr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===nr-1?'selected':''}>${RN(i+1)}</option>`).join('');
  if(!nr)$('vrl').innerHTML='<p class="mu">Pairings are not published yet.</p>';
- else{let o='';for(let r=nr-1;r>=0;r--){const st=stats(S.rounds.slice(0,Math.min(r,P.res))),pp=id=>rl(S.ps[id])+' · <b>'+st[id].pts+'</b>';
-  o+=`<details class="card" ${r===nr-1?'open':''}><summary><b>${RN(r+1)} - Pairing</b>${r<P.res?' <span class="ok">· result published</span>':''}</summary><div class="sc"><table><tr><th>Bd</th><th>White</th><th>Result</th><th>Black</th></tr>`+
-  S.rounds[r].map((g,i)=>`<tr><td>${i+1}</td><td>${pp(g.w)}</td><td><b>${g.b===null||r<P.res?(rt(g)||'–'):'–'}</b></td><td>${g.b===null?'—':pp(g.b)}</td></tr>`).join('')+'</table></div></details>'}
+ else{let o='';for(let r=nr-1;r>=0;r--){const pts=stats(S.rounds.slice(0,Math.min(r,P.res)));
+  o+=`<details class="card" ${r===nr-1?'open':''}><summary><b>${RN(r+1)} - Pairing</b>${r<P.res?' <span class="tag">result published</span>':''}</summary><div class="sc"><table>${PH(t)}${pairRows(S.rounds[r],pts,g=>g.b===null?(g.u===undefined?'<i>Bye</i>':'<i>Absent</i>'):(r<P.res?'<b>'+(rt(g)||'–')+'</b>':'–'))}</table></div></details>`}
   $('vrl').innerHTML=o}
- if(!P.res)$('vp2').innerHTML='<p class="mu">No results published yet.</p>';
- else{const n=Math.min(Math.max(+VS||P.res,1),P.res),st=stats(S.rounds.slice(0,n)).sort(cmp);
-  $('vp2').innerHTML='<div class="bar" style="margin-bottom:8px"><b>Standing of '+RN(n)+'</b><select onchange="VS=+this.value;vrender()">'+Array.from({length:P.res},(_,i)=>`<option value="${i+1}" ${i+1===n?'selected':''}>${RN(i+1)}</option>`).join('')+'</select></div><div class="card sc"><table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd '+RN(x.p.wd)+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table></div>'}
+ if(!P.res)$('vp2').innerHTML='<p class="mu">Standings appear after the first round result is published.</p>';
+ else{let o='';for(let n=P.res;n>=1;n--)o+=`<details class="card" ${n===P.res?'open':''}><summary><b>Standing of ${RN(n)}</b></summary><div class="sc">${stHTML(n)}</div></details>`;$('vp2').innerHTML=o}
  vfind()}
 function viewerStart(id){if(unsub){unsub();unsub=null}$('gate').hidden=true;$('vb').hidden=false;$('vb').textContent='← Home';$('setup').hidden=true;$('app').hidden=true;$('vw').hidden=false;
  if(!dbh){$('vmsg').textContent='Backend not configured. Open config.js and set FIREBASE_URL (see README).';return}
@@ -506,6 +520,11 @@ function recent(){const el=$('rec');if(!el)return;let o='';
   o+=`<button onclick="$('li').value='${id}';$('lw').focus()">${id}${n?' \u00b7 '+n:''}</button> `}}catch(e){}
  el.innerHTML=o?'<b>Tournaments saved on this device</b><br>'+o:''}
 const RN=i=>'Round '+String(i).padStart(2,'0');
+const PH=t=>'<tr><th>Bd</th><th>White</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th><th>Result</th><th>Black</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th></tr>';
+function pairRows(rd,pts,res){return rd.map((g,i)=>{const w=S.ps[g.w],b=g.b===null?null:S.ps[g.b];
+ return `<tr><td>${i+1}</td><td><b>${w.name}</b></td><td>${w.rating||''}</td><td>${pts[g.w]?pts[g.w].pts:0}</td><td>${res(g,i)}</td>`+(b?`<td><b>${b.name}</b></td><td>${b.rating||''}</td><td>${pts[g.b]?pts[g.b].pts:0}</td>`:'<td colspan="3" class="mu">—</td>')+'</tr>'}).join('')}
+function stHTML(n){const t=S.fmt==='team',st=stats(S.rounds.slice(0,n)).sort(cmp);
+ return '<table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd '+RN(x.p.wd)+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table>'}
 const cl2=s=>String(s==null?'':s).replace(/[<>&"'`]/g,'').trim().slice(0,120);
 const sdet=o=>({date:cl2(o&&o.date),venue:cl2(o&&o.venue),org:cl2(o&&o.org),arb:cl2(o&&o.arb)});
 const O=()=>({init:'W',bye:1,topExc:true,fh:true,relax:true,...((typeof S!=='undefined'&&S&&S.opt)||{})});
