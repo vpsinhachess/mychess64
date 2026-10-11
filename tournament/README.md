@@ -14,6 +14,8 @@ players, games and clocks are stored in a free **Firebase Firestore** database, 
 - Resume from the cloud after rejoining · offline cache · auto log-off after idle · reconnect protection
 - Export PGN and PDF for any game, plus a standings/results PDF
 - Responsive: phone, tablet, laptop (portrait and landscape)
+- Lichess-style board and pieces (Classic, Merida, Alpha), board colours, move list, captured pieces, move review (buttons or arrow keys)
+- Start manually or schedule a date and time; the tournament starts by itself at that time
 
 ## Files
 ```
@@ -56,3 +58,12 @@ Firebase console → Authentication → Settings → **Authorized domains** → 
 - Clocks use each device's own time, so a device with a wrong clock can shift timing slightly.
 - Swiss pairing is a simplified Dutch system and is not FIDE-certified software.
 - Firebase's free plan is plenty for small and medium events. Keep an eye on usage if you run many large Arena events.
+
+## Scheduled start
+Choose **Scheduled** when creating a tournament. At the chosen time the tournament starts automatically as soon as at least
+2 players have joined. GitHub Pages has no server, so the start is triggered by any browser that has the tournament open
+at that moment (players or the host). The host can also press **Start tournament** at any time.
+
+## Credits
+Chess piece images are loaded from the open-source Lichess piece sets (cburnett by Colin M. L. Burnett, GPLv2+; Merida; Alpha)
+through the jsDelivr CDN. If they cannot load, the app falls back to Unicode symbols.
