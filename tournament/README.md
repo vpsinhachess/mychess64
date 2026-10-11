@@ -15,6 +15,9 @@ players, games and clocks are stored in a free **Firebase Firestore** database, 
 - Export PGN and PDF for any game, plus a standings/results PDF
 - Responsive: phone, tablet, laptop (portrait and landscape)
 - Lichess-style board and pieces (Classic, Merida, Alpha), board colours, move list, captured pieces, move review (buttons or arrow keys)
+- Break between rounds with an on-screen countdown; games open automatically for both players when it reaches 0
+- Time controls from ½+0 to 90+30 plus custom minutes and increment; custom number of rounds, Arena duration and break length
+- Organiser name, conditions/notes, maximum players, draw offers on/off
 - Start manually or schedule a date and time; the tournament starts by itself at that time
 
 ## Files

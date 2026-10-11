@@ -65,10 +65,14 @@ table{width:100%;border-collapse:collapse;font-size:15px}th{font-size:12px;text-
 #tz{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#111;color:#fff;padding:10px 18px;border-radius:999px;display:none;z-index:30;font-size:14px;max-width:90%;text-align:center}
 #idw{position:fixed;left:0;right:0;top:0;background:var(--ac2);color:#000;text-align:center;padding:10px;display:none;z-index:40;font-weight:700}
 .ft{text-align:center;padding:10px 10px calc(24px + env(safe-area-inset-bottom,0px))}.ft img{width:130px;border-radius:12px;background:#fff}.ft p{font-size:12px;color:var(--mut);margin:8px 0 0}
+textarea.in{min-height:84px;resize:vertical;font-family:inherit}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.grid2 .in{margin:0}
+#cdwn{position:fixed;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:25;display:none;width:min(92%,380px)}
+#cdwn .cw{background:var(--hdr);color:#fff;border-radius:16px;padding:16px 18px;text-align:center;box-shadow:0 12px 40px #0008;border:2px solid var(--ac2)}
+#cdwn .big{font:800 64px/1 ui-monospace,Consolas,monospace;color:var(--ac2);margin:4px 0}#cdwn .big small{font-size:24px;margin-left:4px}#cdwn .m2{color:#c7d2e3;font-size:14px}#cdwn .btn{margin-top:10px}
 </style></head><body>
 <header class="hd"><button class="ib" id="bk" onclick="goBack()" style="display:none" aria-label="Back">‹</button><img src="assets/favicon.png" alt=""><b>MyChess64</b><span class="sp"></span><button class="ib" onclick="menu=true;render()" aria-label="Settings">⚙</button></header>
-<div id="idw"></div><main id="app"></main>
-<footer class="ft" id="ft"><img src="assets/Footer_Logo.png" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere. · v2.0</p></footer>
+<div id="idw"></div><div id="cdwn"></div><main id="app"></main>
+<footer class="ft" id="ft"><img src="assets/Footer_Logo.png" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere. · v2.1</p></footer>
 <div id="sheet" onclick="menu=false;render()"></div><div id="tz"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -76,6 +80,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}th{font-size:12px;text-
 <script src="firebase-config.js"></script>
 <script id="core">
 const FL='abcdefgh',START='rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR',GL={K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟'};
+const tcl=(m,i)=>(m==.5?'½':m==.25?'¼':m==.75?'¾':m)+'+'+i;
 const isW=q=>q!='.'&&q==q.toUpperCase();
 /* ----- FIDE rules engine ----- */
 function gen(b,i,ep=-1){const p=b[i],w=isW(p),r=i>>3,c=i&7,t=p.toLowerCase(),o=[];
@@ -143,7 +148,7 @@ function pgn(g,T,wn,bn){const d=new Date(g.ct||Date.now()),p2=n=>String(n).padSt
  const t=(k,v)=>'['+k+' "'+String(v).replace(/["\\\r\n]/g,'')+'"]';
  let mv='';(g.mv||[]).forEach((m,i)=>{mv+=(i%2?'':(i/2+1)+'. ')+m+' '});mv+=res;
  const lines=[];let cur='';for(const w of mv.split(' ')){if((cur+' '+w).trim().length>80){lines.push(cur);cur=w}else cur=(cur+' '+w).trim()}lines.push(cur);
- return[t('Event',T.name),t('Site','MyChess64'),t('Date',ds),t('Round',(T.fmt=='arena'?'-':g.r)+'.'+bd),t('White',wn),t('Black',bn),t('Result',res),t('TimeControl',T.m*60+'+'+T.i),t('Termination',g.why=='time forfeit'||g.why=='no move made'?'time forfeit':g.res?'normal':'unterminated')].join('\n')+'\n\n'+lines.join('\n')+'\n\n'}
+ return[t('Event',T.name),t('Site','MyChess64'),t('Date',ds),t('Round',(T.fmt=='arena'?'-':g.r)+'.'+bd),t('White',wn),t('Black',bn),t('Result',res),t('TimeControl',Math.round(T.m*60)+'+'+T.i),t('Termination',g.why=='time forfeit'||g.why=='no move made'?'time forfeit':g.res?'normal':'unterminated')].join('\n')+'\n\n'+lines.join('\n')+'\n\n'}
 /* ----- minimal PDF writer (Helvetica, WinAnsi) ----- */
 function pe(s){let o='';for(const ch of String(s)){const c=ch.charCodeAt(0);if(c>=32&&c<127)o+=(ch=='('||ch==')'||ch=='\\')?'\\'+ch:ch;else if(c>=160&&c<256)o+='\\'+c.toString(8).padStart(3,'0');else o+='?'}return o}
 const ptx=(x,y,s,t,b,c)=>'BT /F'+(b?2:1)+' '+s+' Tf '+(c||'0 0 0')+' rg '+x+' '+y+' Td ('+pe(t)+') Tj ET\n';
@@ -155,7 +160,7 @@ function mkPdf(pgs){const o=[];o[1]='<< /Type /Catalog /Pages 2 0 R >>';o[2]='<<
  const x=s.length;s+='xref\n0 '+o.length+'\n0000000000 65535 f \n'+off.slice(1).map(v=>String(v).padStart(10,'0')+' 00000 n \n').join('')+'trailer\n<< /Size '+o.length+' /Root 1 0 R >>\nstartxref\n'+x+'\n%%EOF';
  return new TextEncoder().encode(s)}
 function pdfGame(g,T,wn,bn){const res=!g.res?'*':g.res=='d'?'½-½':g.res=='w'?'1-0':'0-1',bd=+String(g.id||'0_0').split('_')[1]||'-';
- let c=ptx(50,795,20,'Chess Game',1)+ptx(50,772,11,T.name+' · '+(T.fmt=='arena'?'Arena':'Round '+g.r+' · Board '+bd)+' · '+T.m+'+'+T.i,0)
+ let c=ptx(50,795,20,'Chess Game',1)+ptx(50,772,11,T.name+' · '+(T.fmt=='arena'?'Arena':'Round '+g.r+' · Board '+bd)+' · '+tcl(T.m,T.i),0)
   +ptx(50,745,15,'White: '+wn,1)+ptx(50,724,15,'Black: '+bn,1)+ptx(330,745,15,'Result: '+res,1)+ptx(330,724,11,g.res?(g.res=='d'?'Draw':(g.res=='w'?wn:bn)+' wins')+(g.why?' by '+g.why:''):'In progress',0);
  const sz=40,x0=138,y0=690;
  for(let r=0;r<8;r++)for(let f=0;f<8;f++){const x=x0+f*sz,y=y0-(r+1)*sz;c+=((r+f)%2?'0.71 0.533 0.388':'0.941 0.851 0.71')+' rg '+x+' '+y+' '+sz+' '+sz+' re f\n';
@@ -166,15 +171,16 @@ function pdfGame(g,T,wn,bn){const res=!g.res?'*':g.res=='d'?'½-½':g.res=='w'?'
  c+=ptx(50,318,12,'Moves',1);const pages=[];let y=300,cap=18;
  lines.forEach(l=>{if(y<60){pages.push(c);c='';y=790}c+=ptx(50,y,10.5,l,0);y-=14});
  pages.push(c);return mkPdf(pages.map(p=>p+ptx(50,28,8,'Generated by MyChess64',0,'0.5 0.5 0.5')))}
-function pdfReport(T,rows,results){let pages=[],c=ptx(50,795,20,T.name,1)+ptx(50,775,11,{swiss:'Swiss',rr:'Round Robin',arena:'Arena'}[T.fmt]+' · '+T.m+'+'+T.i+' · '+(T.status=='done'?'Final standings':'Standings'),0),y=745;
+function pdfReport(T,rows,results){let pages=[],c=ptx(50,795,20,T.name,1)+ptx(50,775,11,{swiss:'Swiss',rr:'Round Robin',arena:'Arena'}[T.fmt]+' · '+tcl(T.m,T.i)+' · '+(T.status=='done'?'Final standings':'Standings'),0),y=745;
  const X=[50,75,290,345,430],nl=()=>{if(y<60){pages.push(c);c='';y=790}};
  rows.forEach((r,i)=>{nl();r.forEach((t,j)=>c+=ptx(X[j],y,11,t,i==0));y-=17});y-=10;nl();c+=ptx(50,y,13,'Results',1);y-=18;
  results.forEach(t=>{nl();c+=ptx(50,y,10,t,0);y-=14});pages.push(c);return mkPdf(pages.map(p=>p+ptx(50,28,8,'Generated by MyChess64',0,'0.5 0.5 0.5')))}
 </script>
 <script>
 const IDLE=5*60*1000,IDLE_LIVE=15*60*1000,FM={swiss:'Swiss',rr:'Round Robin',arena:'Arena'},PB='https://cdn.jsdelivr.net/gh/lichess-org/lila@master/public/piece/';
-let usr=null,db,me,tid=null,T=null,players={},games=[],subs=[],view=null,sel=null,promo=null,rv=null,fl=null,vr=0,err='',lockMsg='',adv=false,lastAct=Date.now(),tc=0,net='',openOnce=false,psig='',prev={},tab='st',screen='home',menu=false,rsg=0,starting=0,usePC=true;
-const cf={fmt:'swiss',tc:'5+0',rounds:'5',dur:'30',when:'now',at:''};
+let usr=null,db,me,tid=null,T=null,players={},games=[],subs=[],view=null,sel=null,promo=null,rv=null,fl=null,vr=0,err='',lockMsg='',adv=false,lastAct=Date.now(),tc=0,net='',openOnce=false,psig='',prev={},tab='st',screen='home',menu=false,rsg=0,starting=0,usePC=true,cdLast=0;
+const opened=new Set();
+const cf={fmt:'swiss',tc:'5+0',cm:'10',ci:'0',rounds:'5',rc:'',dur:'30',dc:'',brk:'30',bc:'',when:'now',at:'',draws:'1'};
 const $=id=>document.getElementById(id),flagged=new Set(),app=$('app'),nm=id=>(players[id]&&players[id].name)||'Player',esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const ls={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
 const cfg=Object.assign({board:'brown',pieces:'cburnett',sound:1},ls.get('cfg')||{});
@@ -212,14 +218,13 @@ function sub(){subs.forEach(u=>{try{u()}catch(e){}});const bad=()=>{if(!tid)retu
  subs=[db.doc(base()).onSnapshot(s=>{if(!tid||!s.exists)return;ok();T=s.data();render();advance();saveCache()},bad),
   db.collection(base()+'/players').onSnapshot(s=>{if(!tid)return;ok();players={};s.docs.forEach(d=>players[d.id]=d.data());const g=Object.keys(players).sort().map(k=>k+players[k].name).join('|');if(g!=psig||net){psig=g;render()}saveCache()},bad),
   db.collection(base()+'/games').onSnapshot(s=>{if(!tid)return;ok();games=s.docs.map(d=>({id:d.id,...d.data()}));
-   if(openOnce){openOnce=false;const l=games.find(g=>!g.res&&!g.bye&&(g.w==me||g.b==me));if(l)view=l.id}
    games.forEach(g=>{const n=(g.mv||[]).length,p=prev[g.id];if(p!=null&&n>p&&(g.w==me||g.b==me)&&g[g.turn=='w'?'b':'w']!=me)beep();prev[g.id]=n});
    render();advance();saveCache()},bad)]}
 async function enter(id){id=(id||'').trim().toUpperCase();if(!id){err='Enter a tournament ID.';return render()}
  try{const s=await tmo(db.doc('tournaments/'+id).get());if(!s.exists){err='Tournament "'+id+'" not found.';return render()}
-  tid=id;T=s.data();err='';lockMsg='';lastAct=Date.now();view=null;rv=null;vr=0;tab='st';openOnce=true;net='';screen='home';sub();beat();ls.set('tid',id);addRec(id,T.name)}
- catch(e){const c=ls.get('cache_'+id);if(c){tid=id;T=c.T;players=c.players;games=c.games;net='lost';openOnce=true;render();sub()}else fail(e)}}
-function logoff(auto){subs.forEach(u=>{try{u()}catch(e){}});subs=[];tid=null;T=null;players={};games=[];view=null;sel=null;promo=null;rv=null;prev={};menu=false;ls.del('tid');
+  tid=id;T=s.data();err='';lockMsg='';lastAct=Date.now();view=null;rv=null;vr=0;tab='st';opened.clear();net='';screen='home';sub();beat();ls.set('tid',id);addRec(id,T.name)}
+ catch(e){const c=ls.get('cache_'+id);if(c){tid=id;T=c.T;players=c.players;games=c.games;net='lost';opened.clear();render();sub()}else fail(e)}}
+function logoff(auto){subs.forEach(u=>{try{u()}catch(e){}});subs=[];tid=null;T=null;players={};games=[];view=null;sel=null;promo=null;rv=null;prev={};opened.clear();menu=false;ls.del('tid');
  lockMsg=auto?'Logged off after inactivity. Your game is saved — enter the tournament ID to resume.':'';history.replaceState(null,'',location.pathname);render()}
 async function leave(){if(T.status=='reg'&&players[me]){try{await db.doc(base()+'/players/'+me).delete()}catch(e){}}logoff(false)}
 const beat=()=>{if(tid&&players[me])db.doc(base()+'/players/'+me).update({seen:Date.now()}).catch(()=>{})};
@@ -257,12 +262,12 @@ function roundList(r){const S=stats();let pr=[],bye=null;
  const l=pr.map((p,i)=>['r'+r+'_'+pad(i+1),newGame({r,w:p.w,b:p.b})]);if(bye)l.push(['r'+r+'_'+pad(pr.length+1),newGame({r,w:bye,b:'',res:'w',bye:true})]);return l}
 const canStart=()=>T.host==me||(!!players[me]&&!onl(T.host));
 async function launch(){const n=Object.keys(players).length;if(n<2||T.status!='reg'||starting)return;starting=1;render();
- const rounds=T.fmt=='rr'?(n%2?n:n-1):Math.max(1,Math.min(T.rounds,n<=2?1:n-1)),up={status:'running',round:1,rounds,startedAt:Date.now()};if(T.fmt=='arena')up.endAt=Date.now()+T.dur*60000;
+ const rounds=T.fmt=='rr'?(n%2?n:n-1):T.rounds,up={status:'running',round:1,rounds,startedAt:Date.now(),nextAt:Date.now()};if(T.fmt=='arena')up.endAt=Date.now()+T.dur*60000;
  const list=T.fmt=='arena'?[]:roundList(1),tref=db.doc(base());
  try{await db.runTransaction(async tx=>{const s=await tx.get(tref);if(!s.exists||s.data().status!='reg')return;list.forEach(([id,d])=>tx.set(gref(id),d));tx.update(tref,up)})}catch(e){toast('Could not start — try again')}
  setTimeout(()=>{starting=0;render()},3000)}
 async function nextRound(r){const list=roundList(r),tref=db.doc(base());
- await db.runTransaction(async tx=>{const s=await tx.get(tref),d=s.data();if(d.status!='running'||d.round!=r-1)return;list.forEach(([id,g])=>tx.set(gref(id),g));tx.update(tref,{round:r})})}
+ await db.runTransaction(async tx=>{const s=await tx.get(tref),d=s.data();if(d.status!='running'||d.round!=r-1)return;list.forEach(([id,g])=>tx.set(gref(id),g));tx.update(tref,{round:r,nextAt:Date.now()+(T.brk||0)*1000})})}
 async function putGames(list){for(const[id,d]of list){const ref=gref(id);if(!(await ref.get()).exists)await ref.set(d)}}
 async function arenaPair(idle){const S=stats();idle.sort((a,b)=>S[b].pts-S[a].pts||(a<b?-1:1));const used=new Set(),list=[];
  for(const p of idle){if(used.has(p))continue;const q=idle.find(x=>x!=p&&!used.has(x)&&x!=S[p].last)||idle.find(x=>x!=p&&!used.has(x));if(!q)continue;used.add(p);used.add(q);
@@ -276,23 +281,39 @@ async function advance(){if(adv||!T||net)return;
    if(Date.now()>=T.endAt){if(!busy.size)await db.doc(base()).update({status:'done'})}
    else{const idle=Object.keys(players).filter(x=>!busy.has(x)&&onl(x)).sort();if(idle.length>=2&&idle[0]==me)await arenaPair(idle)}}
   else{const cur=games.filter(g=>g.r==T.round);if(cur.length&&!cur.some(g=>!g.res)){if(T.round>=T.rounds)await db.doc(base()).update({status:'done'});else await nextRound(T.round+1)}}}catch(e){}adv=false}
+const gs=g=>g.r==T.round&&T.fmt!='arena'?(T.nextAt||0):0;
+function skipBreak(){if(T&&T.host==me)wr(db.doc(base()).update({nextAt:Date.now()}))}
+function cdPopup(){const e=$('cdwn'),left=T&&T.status=='running'&&T.fmt!='arena'&&T.nextAt?T.nextAt-Date.now():0;
+ if(left<=0){e.style.display='none';e.dataset.k='';cdLast=0;return}
+ const g=games.find(x=>x.r==T.round&&(x.w==me||x.b==me)),k=T.round+':'+(g?g.id:'');
+ if(e.dataset.k!=k){e.dataset.k=k;const mine=g?(g.bye?'You have a bye this round':'You play <b>'+(g.w==me?'White':'Black')+'</b> vs <b>'+esc(nm(g.w==me?g.b:g.w))+'</b>'):'';
+  e.innerHTML='<div class="cw"><div class="m2">Round '+T.round+' of '+T.rounds+' starts in</div><div class="big"><span id="cdn"></span><small>s</small></div><div class="m2">'+mine+'</div>'+(T.host==me?'<button class="btn sm" onclick="skipBreak()">Start now</button>':'')+'</div>'}
+ const sec=Math.ceil(left/1000);$('cdn').textContent=sec;e.style.display='block';if(sec<=3&&sec!=cdLast){cdLast=sec;beep()}}
+function autoOpen(){if(T.status!='running'||net)return;const m=games.find(g=>!g.res&&!g.bye&&(g.w==me||g.b==me)&&gs(g)<=Date.now()&&!opened.has(g.id));
+ if(m){opened.add(m.id);view=m.id;sel=null;promo=null;rv=null;fl=null;rsg=0;beep();render();window.scrollTo(0,0)}}
 const rem=(g,c)=>{let t=c=='w'?g.wt:g.bt;if(!g.res&&g.n>=2&&g.turn==c)t-=Date.now()-g.tl;return t};
-function tick(){if(!tid||!T)return;const g=view&&gm(view);
+function tick(){if(!tid||!T){const e=$('cdwn');if(e)e.style.display='none';return}cdPopup();autoOpen();const g=view&&gm(view);
  if(g)['w','b'].forEach(c=>{const e=$('ck_'+c),p=$('pl_'+c);if(e){const t=rem(g,c),on=!g.res&&g.n>=2&&g.turn==c;e.textContent=clk(t);e.className='clk'+(on?' on':'')+(t<10000&&!g.res&&g.n>=2?' low':'')}if(p)p.className='pl '+(c==(fl!=null?(fl?'w':'b'):(g.b==me?'w':'b'))?'pt':'pb')+(!g.res&&g.turn==c?' turn':'')});
  const a=$('ar');if(a&&T.endAt)a.textContent=Date.now()<T.endAt?'Ends in '+dur(T.endAt-Date.now()):'Finishing games';
  const cd=$('cd');if(cd&&T.startAt)cd.textContent=Date.now()<T.startAt?'Starts in '+dur(T.startAt-Date.now()):Object.keys(players).length<2?'Waiting for players…':'Starting…';
  if(rsg&&Date.now()-rsg>4000){rsg=0;render()}
  if(T.status=='running'&&!net)games.forEach(g=>{if(g.res||g.bye||flagged.has(g.id))return;let lose=null;
-  if(g.n>=2&&rem(g,g.turn)<=0)lose=g.turn;else if(g.n<2&&Date.now()-(g.n?g.tl:g.ct)>(T.fmt=='arena'?120000:900000))lose=g.turn;
+  if(g.n>=2&&rem(g,g.turn)<=0)lose=g.turn;else if(g.n<2&&Date.now()-(g.n?g.tl:Math.max(g.ct,gs(g)))>(T.fmt=='arena'?120000:900000))lose=g.turn;
   if(lose){flagged.add(g.id);const win=lose=='w'?'b':'w',d=insuf(g.bd)||!canMate(g.bd,win=='w');gref(g.id).update({res:d?'d':win,why:g.n<2?'no move made':'time forfeit'}).catch(()=>flagged.delete(g.id))}});
  if(++tc%12==0){advance();if(tc%80==0)beat()}}
 /* ----- actions ----- */
-async function create(){err='';const nmv=($('tn')||{}).value||'',[m,i]=cf.tc.split('+').map(Number);let startAt=0;
- if(cf.when=='sched'){startAt=Date.parse(cf.at);if(!startAt||startAt<Date.now()+30000){err='Pick a start time in the future.';return render()}}
+async function create(){err='';const v=id=>(($(id)||{}).value||'').trim();let m,i;
+ if(cf.tc=='custom'){m=parseFloat(cf.cm);i=parseInt(cf.ci||'0',10);if(!(m>=0.25&&m<=180)||!(i>=0&&i<=180)){err='Custom clock: minutes 0.25–180 and increment 0–180 seconds.';return render()}}else[m,i]=cf.tc.split('+').map(Number);
+ const nr=cf.rounds=='c'?parseInt(cf.rc,10):+cf.rounds;if(cf.fmt=='swiss'&&!(nr>=1&&nr<=30)){err='Number of rounds must be 1–30.';return render()}
+ const du=cf.dur=='c'?parseInt(cf.dc,10):+cf.dur;if(cf.fmt=='arena'&&!(du>=5&&du<=360)){err='Arena duration must be 5–360 minutes.';return render()}
+ const br=cf.brk=='c'?parseInt(cf.bc,10):+cf.brk;if(cf.fmt!='arena'&&!(br>=0&&br<=600)){err='Break between rounds must be 0–600 seconds.';return render()}
+ const mx=parseInt(v('tmx'),10)||0;if(mx&&mx<2){err='Maximum players must be at least 2.';return render()}
+ let startAt=0;if(cf.when=='sched'){startAt=Date.parse(cf.at);if(!startAt||startAt<Date.now()+30000){err='Pick a start time in the future.';return render()}}
+ const org=v('to').slice(0,40);ls.set('org',org);
  const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let id='';for(let k=0;k<6;k++)id+=A[Math.floor(Math.random()*A.length)];
- try{toast('Creating…');await tmo(db.doc('tournaments/'+id).set({name:(nmv.trim()||'Chess Tournament').slice(0,40),fmt:cf.fmt,m,i,rounds:+cf.rounds,dur:+cf.dur,round:0,status:'reg',host:me,endAt:0,startAt}));await enter(id)}catch(e){fail(e)}}
-async function join(){const n=(($('pn')||{}).value||'').trim().slice(0,20);if(!n){toast('Enter your name');return}await wr(db.doc(base()+'/players/'+me).set({name:n,at:Date.now(),seen:Date.now()}))}
-async function sqClick(i){const g=gm(view);if(!g||g.res||rv!=null||(g.turn=='w'?g.w:g.b)!=me||rem(g,g.turn)<=0)return;const p=g.bd[i];
+ try{toast('Creating…');await tmo(db.doc('tournaments/'+id).set({name:(v('tn')||'Chess Tournament').slice(0,40),org,desc:v('td').slice(0,500),fmt:cf.fmt,m,i,rounds:nr||5,dur:du||30,brk:br||0,max:mx,draws:+cf.draws,round:0,status:'reg',host:me,endAt:0,startAt,nextAt:0,created:Date.now()}));await enter(id)}catch(e){fail(e)}}
+async function join(){const n=(($('pn')||{}).value||'').trim().slice(0,20);if(!n){toast('Enter your name');return}if(T.max&&Object.keys(players).length>=T.max&&!players[me]){toast('Tournament is full');return}await wr(db.doc(base()+'/players/'+me).set({name:n,at:Date.now(),seen:Date.now()}))}
+async function sqClick(i){const g=gm(view);if(!g||g.res||rv!=null||(g.turn=='w'?g.w:g.b)!=me||rem(g,g.turn)<=0)return;if(Date.now()<gs(g)){toast('Round starts in '+Math.ceil((gs(g)-Date.now())/1000)+'s');return}const p=g.bd[i];
  if(sel!=null&&legal(g.bd,sel,g.cr,g.ep).includes(i)){if(g.bd[sel].toLowerCase()=='p'&&(i<8||i>55)){promo={f:sel,t:i};return render()}
   const f=sel;sel=null;return wr(gref(g.id).update(applyMove(g,f,i,'Q',T.i*1000)))}
  sel=(p!='.'&&isW(p)==(g.turn=='w')&&i!=sel)?i:null;render()}
@@ -311,8 +332,8 @@ function share(){const u=location.origin+location.pathname+'?t='+tid;if(navigato
 const copyId=()=>navigator.clipboard&&navigator.clipboard.writeText(tid).then(()=>toast('ID copied'));
 /* ----- views ----- */
 const banner=()=>(net?'<div class="warn">Connection lost — showing the saved copy. Reconnecting…</div>':'')+(err?'<div class="warn">'+esc(err)+'</div>':'');
-function render(){if(!db||!me)return;const keep={};app.querySelectorAll('input').forEach(e=>{if(e.id)keep[e.id]=[e.value,e===document.activeElement]});
- const g=tid&&view&&gm(view);let h;if(!tid)h=screen=='create'?createView():home();else h=g?gameView(g):tview();
+function render(){if(!db||!me)return;const keep={};app.querySelectorAll('input,textarea').forEach(e=>{if(e.id)keep[e.id]=[e.value,e===document.activeElement]});
+ const g=tid&&T&&view&&gm(view);let h;if(!tid||!T)h=screen=='create'?createView():home();else h=g?gameView(g):tview();
  app.className=g?'wide':'';app.innerHTML=banner()+h;
  for(const k in keep){const e=$(k);if(e){e.value=keep[k][0];if(keep[k][1])e.focus()}}
  $('bk').style.display=(g||(!tid&&screen=='create'))?'':'none';$('ft').style.display=(!tid&&screen=='home')?'':'none';sheet();tick();
@@ -321,31 +342,42 @@ function home(){const rc=ls.get('rec')||[];
  return (lockMsg?'<div class="cd mut">🔒 '+esc(lockMsg)+'</div>':'')+'<div class="cd stack"><h2>Join a tournament</h2><input class="in" id="ji" placeholder="Tournament ID" maxlength="6" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700" onkeydown="if(event.key==\'Enter\')enter(this.value)"><button class="btn p lg" onclick="enter($(\'ji\').value)">Join</button></div>'+
  '<button class="btn lg" onclick="screen=\'create\';err=\'\';render()">＋ Create a tournament</button>'+
  (rc.length?'<div class="lb">Recent</div><div class="cd">'+rc.map(x=>'<div class="li"><span><b>'+esc(x.name)+'</b> <span class="mut">'+x.id+'</span></span><button class="btn sm" onclick="enter(\''+x.id+'\')">Open</button></div>').join('')+'</div>':'')}
-function createView(){const ch=(k,v,l)=>'<button class="chip'+(cf[k]==v?' on':'')+'" onclick="setCf(\''+k+'\',\''+v+'\')">'+l+'</button>',lb=t=>'<div class="lb">'+t+'</div>';
- return '<div class="cd"><h2>Create tournament</h2><input class="in" id="tn" placeholder="Tournament name" maxlength="40">'+
+function createView(){const ch=(k,v,l)=>'<button class="chip'+(cf[k]==v?' on':'')+'" onclick="setCf(\''+k+'\',\''+v+'\')">'+l+'</button>',lb=t=>'<div class="lb">'+t+'</div>',gp=t=>'<div class="mut" style="margin:10px 0 6px">'+t+'</div>';
+ const num=(id,ph)=>'<input class="in" style="margin-top:10px" id="'+id+'" type="number" inputmode="decimal" placeholder="'+ph+'" value="'+esc(cf[id])+'" oninput="cf.'+id+'=this.value">';
+ const tcg=(t,a)=>gp(t)+'<div class="chips">'+a.map(x=>ch('tc',x,tcl(...x.split('+').map(Number)))).join('')+'</div>';
+ return '<div class="cd"><h2>Create tournament</h2><input class="in" id="tn" placeholder="Tournament name" maxlength="40"><input class="in" style="margin-top:10px" id="to" placeholder="Organiser name" maxlength="40" value="'+esc(ls.get('org')||'')+'">'+
  lb('Format')+'<div class="chips">'+ch('fmt','swiss','Swiss')+ch('fmt','rr','Round Robin')+ch('fmt','arena','Arena')+'</div>'+
- lb('Time control')+'<div class="chips">'+['1+0','3+0','3+2','5+0','5+3','10+0','10+5','15+10'].map(x=>ch('tc',x,x)).join('')+'</div>'+
- (cf.fmt=='swiss'?lb('Rounds')+'<div class="chips">'+['3','5','7'].map(x=>ch('rounds',x,x)).join('')+'</div>':cf.fmt=='arena'?lb('Duration')+'<div class="chips">'+['10','20','30','60'].map(x=>ch('dur',x,x+' min')).join('')+'</div>':'')+
- lb('Start')+'<div class="chips">'+ch('when','now','Manual')+ch('when','sched','Scheduled')+'</div>'+
- (cf.when=='sched'?'<input class="in" style="margin-top:10px" type="datetime-local" id="ta" value="'+cf.at+'" onchange="cf.at=this.value">':'')+
- '<button class="btn p lg" style="margin-top:18px" onclick="create()">Create</button></div>'}
+ lb('Time control')+tcg('Bullet',['0.5+0','1+0','1+1','2+1'])+tcg('Blitz',['3+0','3+2','5+0','5+3'])+tcg('Rapid',['10+0','10+5','15+10','20+0'])+tcg('Classical',['30+0','30+20','60+0'])+gp('Custom')+'<div class="chips">'+ch('tc','custom','Custom')+'</div>'+
+ (cf.tc=='custom'?'<div class="grid2" style="margin-top:10px"><input class="in" id="cm" type="number" inputmode="decimal" placeholder="Minutes" value="'+esc(cf.cm)+'" oninput="cf.cm=this.value"><input class="in" id="ci" type="number" inputmode="numeric" placeholder="Increment (s)" value="'+esc(cf.ci)+'" oninput="cf.ci=this.value"></div>':'')+
+ (cf.fmt=='swiss'?lb('Rounds')+'<div class="chips">'+['3','5','7','9'].map(x=>ch('rounds',x,x)).join('')+ch('rounds','c','Custom')+'</div>'+(cf.rounds=='c'?num('rc','Number of rounds (1–30)'):''):cf.fmt=='rr'?lb('Rounds')+'<div class="mut">Everyone plays everyone once.</div>':lb('Duration')+'<div class="chips">'+['10','20','30','60'].map(x=>ch('dur',x,x+' min')).join('')+ch('dur','c','Custom')+'</div>'+(cf.dur=='c'?num('dc','Minutes (5–360)'):''))+
+ (cf.fmt!='arena'?lb('Break between rounds')+'<div class="chips">'+[['0','None'],['15','15 s'],['30','30 s'],['60','1 min'],['120','2 min']].map(x=>ch('brk',x[0],x[1])).join('')+ch('brk','c','Custom')+'</div>'+(cf.brk=='c'?num('bc','Seconds (0–600)'):''):'')+
+ lb('Start')+'<div class="chips">'+ch('when','now','Manual')+ch('when','sched','Scheduled')+'</div>'+(cf.when=='sched'?'<input class="in" style="margin-top:10px" type="datetime-local" id="ta" value="'+cf.at+'" onchange="cf.at=this.value">':'')+
+ lb('Options')+'<input class="in" id="tmx" type="number" inputmode="numeric" placeholder="Maximum players (optional)"><div class="mut" style="margin:10px 0 6px">Draw offers</div><div class="chips">'+ch('draws','1','Allowed')+ch('draws','0','Not allowed')+'</div>'+
+ lb('Conditions & notes')+'<textarea class="in" id="td" maxlength="500" placeholder="Rules, prizes, special conditions… (optional)"></textarea>'+
+ '<button class="btn p lg" style="margin-top:18px" onclick="create()">Create tournament</button></div>'}
 function podium(rank){const M=['🥇','🥈','🥉'],ord=[1,0,2].filter(i=>rank[i]);
  return '<div class="cd"><div class="pdm">'+ord.map(i=>{const s=rank[i];return '<div class="stp s'+(i+1)+'"><div class="md">'+M[i]+'</div><b>'+esc(nm(s.id))+'</b><div><b>'+s.pts+' pts</b></div><small>'+s.W+'W '+s.D+'D '+s.L+'L'+(T.fmt=='arena'?'':' · BH '+s.bh)+'</small><div class="bar">'+(i+1)+'</div></div>'}).join('')+'</div></div>'}
 function tview(){const S=stats(),ids=Object.keys(players),inP=!!players[me],st=T.status,ar=T.fmt=='arena',dot=i=>'<span class="dot'+(onl(i)?' on':'')+'"></span>';
- const can=!inP&&(st=='reg'||(ar&&st=='running'&&Date.now()<T.endAt)),sg=T.startAt&&st=='reg';
- let h='<div class="cd"><h1>'+esc(T.name)+'</h1><span class="tg">'+FM[T.fmt]+'</span><span class="tg">'+T.m+'+'+T.i+'</span>'+(st=='reg'?'<span class="tg">'+(sg?'Scheduled':'Registration')+'</span>':st=='done'?'<span class="tg">Finished</span>':ar?'<span class="tg live" id="ar"></span>':'<span class="tg live">Round '+T.round+' / '+T.rounds+'</span>')+
+ const full=T.max&&ids.length>=T.max,can=!inP&&!full&&(st=='reg'||(ar&&st=='running'&&Date.now()<T.endAt)),sg=T.startAt&&st=='reg';
+ const bt=s=>!s?'None':s<60||s%60?s+' s':s/60+' min',r=(k,v)=>v?'<div class="li"><span class="mut">'+k+'</span><span style="text-align:right">'+v+'</span></div>':'';
+ const desc=T.desc?'<div class="cd"><div class="lb" style="margin-top:0">Conditions</div><div style="white-space:pre-wrap">'+esc(T.desc)+'</div></div>':'';
+ const info='<div class="cd">'+r('Organiser',esc(T.org||''))+r('Format',FM[T.fmt])+r('Time control',tcl(T.m,T.i))+(ar?r('Duration',T.dur+' min'):r('Rounds',T.rounds))+(ar?'':r('Break between rounds',bt(T.brk||0)))+r('Players',ids.length+(T.max?' / '+T.max:''))+r('Draw offers',T.draws===0?'Not allowed':'Allowed')+(T.startAt?r('Scheduled start',fd(T.startAt)):'')+'</div>'+desc;
+ let h='<div class="cd"><h1>'+esc(T.name)+'</h1>'+(T.org?'<div class="mut" style="margin-bottom:8px">Organised by <b>'+esc(T.org)+'</b></div>':'')+'<span class="tg">'+FM[T.fmt]+'</span><span class="tg">'+tcl(T.m,T.i)+'</span>'+(st=='reg'?'<span class="tg">'+(sg?'Scheduled':'Registration')+'</span>':st=='done'?'<span class="tg">Finished</span>':ar?'<span class="tg live" id="ar"></span>':'<span class="tg live">Round '+T.round+' / '+T.rounds+'</span>')+
  '<div class="idr"><span><span class="mut">ID </span><span class="id">'+tid+'</span></span><span class="chips"><button class="btn sm" onclick="copyId()">Copy</button><button class="btn sm" onclick="share()">Share</button></span></div>'+(sg?'<div class="mut" style="margin-top:8px">'+fd(T.startAt)+' · <b id="cd"></b></div>':'')+'</div>';
  if(can)h+='<div class="cd stack"><input class="in" id="pn" placeholder="Your name" maxlength="20" onkeydown="if(event.key==\'Enter\')join()"><button class="btn p lg" onclick="join()">Join tournament</button></div>';
- if(st=='reg'){h+='<div class="cd"><div class="lb" style="margin-top:0">Players · '+ids.length+'</div>'+(ids.map(i=>'<div class="li"><span>'+dot(i)+esc(nm(i))+'</span>'+(i==me?'<span class="mut">you</span>':'')+'</div>').join('')||'<span class="mut">Waiting for players…</span>')+'</div>';
-  if(canStart())h+='<button class="btn ok lg" onclick="launch()" '+(ids.length<2||starting?'disabled':'')+'>'+(starting?'Starting…':'Start tournament')+'</button>'+(ids.length<2?'<div class="mut" style="text-align:center;margin-top:8px">At least 2 players needed</div>':'')}
+ else if(!inP&&full)h+='<div class="cd mut">This tournament is full. You can watch the games.</div>';
+ else if(!inP)h+='<div class="cd mut">This tournament has started. You can watch the games.</div>';
+ if(st=='reg'){h+=desc+'<div class="cd"><div class="lb" style="margin-top:0">Players · '+ids.length+(T.max?' / '+T.max:'')+'</div>'+(ids.map(i=>'<div class="li"><span>'+dot(i)+esc(nm(i))+'</span>'+(i==me?'<span class="mut">you</span>':'')+'</div>').join('')||'<span class="mut">Waiting for players…</span>')+'</div>';
+  if(canStart())h+='<button class="btn ok lg" onclick="launch()" '+(ids.length<2||starting?'disabled':'')+'>'+(starting?'Starting…':'Start tournament')+'</button>'+(ids.length<2?'<div class="mut" style="text-align:center;margin-top:8px">At least 2 players needed</div>':T.fmt=='swiss'&&T.rounds>Math.max(1,ids.length-1)?'<div class="mut" style="text-align:center;margin-top:8px">With '+ids.length+' players some pairings will repeat.</div>':'')}
  else{const mine=games.filter(g=>g.w==me||g.b==me),cur=ar?mine.find(g=>!g.res):mine.find(g=>g.r==T.round),rank=rankOf(S);
   if(st=='done'&&rank.length)h+=podium(rank);
   if(inP&&st=='running'){if(cur&&!cur.bye){const my=(cur.turn=='w'?cur.w:cur.b)==me&&!cur.res;h+='<div class="cd yg'+(my?' turn':'')+'"><div><b>'+(ar?'':'Round '+cur.r+' · ')+'vs '+esc(nm(cur.w==me?cur.b:cur.w))+'</b><div class="mut">'+(cur.res?'Finished '+rs(cur):my?'Your move':'Waiting for opponent')+'</div></div><button class="btn p" onclick="open_(\''+cur.id+'\')">'+(cur.res?'View':'Play')+'</button></div>'}
    else h+='<div class="cd mut">'+(cur?'You have a bye this round (1 point).':ar?'Waiting for an opponent…':'Resting this round.')+'</div>'}
-  h+='<div class="seg"><button class="'+(tab=='st'?'on':'')+'" onclick="tab=\'st\';render()">Standings</button><button class="'+(tab=='gm'?'on':'')+'" onclick="tab=\'gm\';render()">'+(ar?'Games':'Pairings')+'</button></div>';
+  h+='<div class="seg"><button class="'+(tab=='st'?'on':'')+'" onclick="tab=\'st\';render()">Standings</button><button class="'+(tab=='gm'?'on':'')+'" onclick="tab=\'gm\';render()">'+(ar?'Games':'Pairings')+'</button><button class="'+(tab=='in'?'on':'')+'" onclick="tab=\'in\';render()">Info</button></div>';
   if(tab=='st')h+='<div class="cd"><table><tr><th>#</th><th>Player</th><th class="n">Pts</th><th class="n">W-D-L</th>'+(ar?'':'<th class="n">BH</th>')+'</tr>'+rank.map((s,k)=>'<tr class="'+(s.id==me?'me':'')+'"><td>'+(st=='done'&&k<3?['🥇','🥈','🥉'][k]:k+1)+'</td><td>'+dot(s.id)+esc(nm(s.id))+'</td><td class="n"><b>'+s.pts+'</b></td><td class="n">'+s.W+'-'+s.D+'-'+s.L+'</td>'+(ar?'':'<td class="n">'+s.bh+'</td>')+'</tr>').join('')+'</table></div>';
-  else{const R=vr||T.round,gl=ar?games.slice().sort((a,b)=>b.ct-a.ct).slice(0,20):games.filter(g=>g.r==R).sort((a,b)=>a.id<b.id?-1:1);
+  else if(tab=='gm'){const R=vr||T.round,gl=ar?games.slice().sort((a,b)=>b.ct-a.ct).slice(0,20):games.filter(g=>g.r==R).sort((a,b)=>a.id<b.id?-1:1);
    h+=(ar?'':'<div class="chips" style="margin-bottom:10px">'+Array.from({length:T.round},(_,i)=>'<button class="chip'+(R==i+1?' on':'')+'" onclick="vr='+(i+1)+';render()">Round '+(i+1)+'</button>').join('')+'</div>')+'<div class="cd">'+(gl.map(g=>'<div class="gr" onclick="open_(\''+g.id+'\')"><span class="bn">'+(ar?'':+g.id.split('_')[1])+'</span><span>'+esc(nm(g.w))+'</span><b>'+rs(g)+'</b><span class="r">'+(g.bye?'<i class="mut">bye</i>':esc(nm(g.b)))+'</span></div>').join('')||'<span class="mut">No games yet</span>')+'</div>'}
+  else h+=info;
   if(games.some(g=>g.mv&&g.mv.length))h+='<div class="chips"><button class="btn sm" onclick="expAll()">⬇ All games · PGN</button><button class="btn sm" onclick="expReport()">⬇ Standings · PDF</button></div>'}
  return h}
 function gameView(g){const mc=col(g),flip=fl!=null?fl:g.b==me,n=(g.mu||[]).length,S=rv!=null?replay(g,rv):g,live=rv==null,over=!!g.res,tm=!over&&mc==g.turn;
@@ -357,13 +389,13 @@ function gameView(g){const mc=col(g),flip=fl!=null?fl:g.b==me,n=(g.mu||[]).lengt
   return '<div class="pl '+pos+(!over&&g.turn==c?' turn':'')+'" id="pl_'+c+'"><span class="cl '+c+'"></span><div class="pi"><div class="nm">'+esc(nm(g[c]))+(g[c]==me?' <em>you</em>':'')+'</div><div class="cap">'+cp+(adv>0?' +'+adv:'')+'</div></div><span class="clk" id="ck_'+c+'">'+clk(rem(g,c))+'</span></div>'};
  let ml='';for(let i=0;i<g.mv.length;i+=2)ml+='<i>'+(i/2+1)+'</i>'+[i,i+1].map(j=>'<a class="'+((rv==null?n:rv)==j+1?'cur':'')+'" onclick="goPly('+(j+1)+')">'+(g.mv[j]||'')+'</a>').join('');
  const rt=g.bye?'Bye':g.res=='d'?'Draw':nm(g[g.res])+' wins',wy=g.why?' · '+cap1(g.why):'';if(over)ml+='<div class="end">'+(g.res=='d'?'½-½':rs(g))+' '+esc(rt)+wy+'</div>';
- let ctl='',stt='';if(!live)stt='<div class="stt">Move '+rv+' of '+n+'</div>';else if(!over&&mc)stt=tm?'<div class="stt you">Your move</div>':'<div class="stt">Opponent’s move</div>';
+ const lf=games.filter(x=>x.r==T.round&&!x.res).length,wt=over&&T.status=='running'?(T.fmt=='arena'?'<div class="stt">Finding your next opponent…</div>':(g.r==T.round&&lf?'<div class="stt">Waiting for '+lf+' other game'+(lf>1?'s':'')+'…</div>':'')):'';let ctl='',stt='';if(!live)stt='<div class="stt">Move '+rv+' of '+n+'</div>';else if(!over&&mc)stt=tm?'<div class="stt you">Your move</div>':'<div class="stt">Opponent’s move</div>';
  ctl=stt+'<div class="nv"><button class="btn sm" onclick="nv(-9999)">«</button><button class="btn sm" onclick="nv(-1)">‹</button><button class="btn sm" onclick="nv(1)">›</button><button class="btn sm" onclick="nv(9999)">»</button><button class="btn sm" onclick="flipB()">⇅</button></div>';
- if(over)ctl+='<div class="res"><b>'+(g.res=='d'?'½-½':rs(g))+'</b><span>'+esc(rt)+wy+'</span></div><button class="btn p" onclick="goBack()">Back to tournament</button>';
+ if(over)ctl+='<div class="res"><b>'+(g.res=='d'?'½-½':rs(g))+'</b><span>'+esc(rt)+wy+'</span></div>'+wt+'<button class="btn p" onclick="goBack()">Back to tournament</button>';
  else if(mc){ctl+=g.do&&g.do!=mc?'<div class="offer"><b>Opponent offers a draw</b><div class="ac2"><button class="btn ok" onclick="upd({res:\'d\',why:\'agreement\',do:\'\'})">Accept</button><button class="btn" onclick="upd({do:\'\'})">Decline</button></div></div>':
-  '<div class="ac2"><button class="btn" '+(g.do==mc?'disabled':'')+' onclick="upd({do:\''+mc+'\'})">'+(g.do==mc?'Draw offered':'½ Offer draw')+'</button><button class="btn r" onclick="resign()">'+(rsg?'Confirm resign':'⚑ Resign')+'</button></div>'}
+  '<div class="ac2"'+(T.draws===0?' style="grid-template-columns:1fr"':'')+'>'+(T.draws===0?'':'<button class="btn" '+(g.do==mc?'disabled':'')+' onclick="upd({do:\''+mc+'\'})">'+(g.do==mc?'Draw offered':'½ Offer draw')+'</button>')+'<button class="btn r" onclick="resign()">'+(rsg?'Confirm resign':'⚑ Resign')+'</button></div>'}
  return '<div class="gm">'+strip(top,'pt')+'<div class="bd" id="bd">'+sq+pm+'</div>'+strip(bot,'pb')+
- '<div class="mvp"><div class="tl"><span>'+T.m+'+'+T.i+' · '+FM[T.fmt]+'</span><span><button class="btn sm g" onclick="expPgn(\''+g.id+'\')" '+(g.mv.length?'':'disabled')+'>PGN</button><button class="btn sm g" onclick="expPdf(\''+g.id+'\')" '+(g.mv.length?'':'disabled')+'>PDF</button></span></div><div class="ml" id="ml">'+(ml||'<div class="end">No moves yet</div>')+'</div></div><div class="ctl">'+ctl+'</div></div>'}
+ '<div class="mvp"><div class="tl"><span>'+tcl(T.m,T.i)+' · '+FM[T.fmt]+'</span><span><button class="btn sm g" onclick="expPgn(\''+g.id+'\')" '+(g.mv.length?'':'disabled')+'>PGN</button><button class="btn sm g" onclick="expPdf(\''+g.id+'\')" '+(g.mv.length?'':'disabled')+'>PDF</button></span></div><div class="ml" id="ml">'+(ml||'<div class="end">No moves yet</div>')+'</div></div><div class="ctl">'+ctl+'</div></div>'}
 function sheet(){const s=$('sheet');if(!menu){s.style.display='none';return}
  const o=(k,a)=>'<div class="chips">'+a.map(([v,l])=>'<button class="chip'+(cfg[k]==v?' on':'')+'" onclick="setC(\''+k+'\',\''+v+'\')">'+l+'</button>').join('')+'</div>';
  s.innerHTML='<div class="sh" onclick="event.stopPropagation()"><div class="row"><h2 style="margin:0">Settings</h2><button class="btn sm" onclick="menu=false;render()">Close</button></div><div class="lb">Board</div>'+o('board',[['brown','Brown'],['blue','Blue'],['green','Green'],['grey','Grey']])+'<div class="lb">Pieces</div>'+o('pieces',[['cburnett','Classic'],['merida','Merida'],['alpha','Alpha'],['unicode','Symbols']])+'<div class="lb">Sound</div>'+o('sound',[[1,'On'],[0,'Off']])+
