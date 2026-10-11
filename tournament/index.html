@@ -69,10 +69,35 @@ textarea.in{min-height:84px;resize:vertical;font-family:inherit}.grid2{display:g
 #cdwn{position:fixed;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:25;display:none;width:min(92%,380px)}
 #cdwn .cw{background:var(--hdr);color:#fff;border-radius:16px;padding:16px 18px;text-align:center;box-shadow:0 12px 40px #0008;border:2px solid var(--ac2)}
 #cdwn .big{font:800 64px/1 ui-monospace,Consolas,monospace;color:var(--ac2);margin:4px 0}#cdwn .big small{font-size:24px;margin-left:4px}#cdwn .m2{color:#c7d2e3;font-size:14px}#cdwn .btn{margin-top:10px}
+/* create page */
+main.mid{max-width:1060px}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#0b1f3a 0%,#0a4f9e 60%,#0a66c2 100%);color:#fff;border-radius:20px;padding:26px 24px;margin-bottom:18px}
+.hero h1{font-size:28px;margin:0 0 6px;color:#fff}.hero p{margin:0;color:#cfe0f5;max-width:520px}.hero::after{content:"♞";position:absolute;right:22px;bottom:-26px;font-size:150px;line-height:1;opacity:.14}
+.c-rw{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+@media(min-width:900px){.c-rw{grid-template-columns:minmax(0,1fr) 340px;align-items:start}.c-sum{position:sticky;top:74px}}
+.c-sec{background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:18px;margin-bottom:14px}
+.c-hd{display:flex;gap:12px;align-items:center;margin-bottom:16px}.c-hd b{font-size:17px}.c-hd .mut{font-size:13px}
+.c-nb{flex:none;width:32px;height:32px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-weight:800}
+.c-sub{font-size:13px;font-weight:700;color:var(--mut);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.05em}.c-sub:first-of-type{margin-top:0}
+.c-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.c-fc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:14px;border:2px solid var(--ln);border-radius:14px;background:var(--pn2);color:var(--fg);cursor:pointer;font:inherit;transition:border-color .12s,transform .05s}
+.c-fc:hover{border-color:color-mix(in srgb,var(--ac) 50%,var(--ln))}.c-fc:active{transform:scale(.99)}.c-fc b{font-size:16px}.c-fc .mut{font-size:13px;line-height:1.3}
+.c-fc.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 11%,var(--pn))}
+.c-ic{width:38px;height:38px;border-radius:11px;background:var(--pn);display:grid;place-items:center;font-size:20px;border:1px solid var(--ln);margin-bottom:4px}.c-fc.on .c-ic{background:var(--ac);border-color:var(--ac);color:#fff}
+.c-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}.c-tabs button{flex:none;padding:9px 15px;border-radius:999px;border:1px solid var(--ln);background:var(--pn2);color:var(--fg);font:700 14px inherit;cursor:pointer}.c-tabs button.on{background:var(--hdr);color:#fff;border-color:transparent}
+.c-tt{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.c-t{padding:14px 6px;border:2px solid var(--ln);border-radius:14px;background:var(--pn2);color:var(--fg);cursor:pointer;text-align:center;font:inherit}.c-t b{display:block;font:800 21px ui-monospace,Consolas,monospace}.c-t span{font-size:12px;color:var(--mut)}.c-t.on{border-color:var(--ac);background:var(--ac);color:#fff}.c-t.on span{color:#dbe9fb}
+.c-stp{display:inline-flex;align-items:center;border:1px solid var(--ln);border-radius:12px;background:var(--pn2);overflow:hidden}.c-stp button{width:44px;height:44px;border:0;background:transparent;color:var(--fg);font:700 22px inherit;cursor:pointer}.c-stp button:hover{background:var(--ln)}
+.c-stp input{width:64px;height:44px;border:0;background:transparent;color:var(--fg);text-align:center;font:800 18px inherit;-moz-appearance:textfield}.c-stp input::-webkit-inner-spin-button{display:none}.c-stp span{color:var(--mut);font-size:13px;padding-right:12px}
+.c-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.c-sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--ln);margin-top:16px}
+.swt{flex:none;width:50px;height:30px;border-radius:999px;background:#8a94a3;position:relative;border:0;cursor:pointer;transition:background .15s}.swt::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}.swt.on{background:var(--ok)}.swt.on::after{left:23px}
+.c-sum{background:var(--pn);border:1px solid var(--ln);border-radius:18px;overflow:hidden}.c-sum .top{background:linear-gradient(135deg,#0b1f3a,#0a4f9e);color:#fff;padding:16px 18px}.c-sum .top b{display:block;font-size:18px;word-break:break-word}.c-sum .top span{color:#cfe0f5;font-size:13px}
+.c-sum .bd2{padding:6px 18px 18px}.c-sum .li b{font-size:14px}.c-sum .tip{font-size:12px;color:var(--mut);text-align:center;margin-top:10px}
 </style></head><body>
 <header class="hd"><button class="ib" id="bk" onclick="goBack()" style="display:none" aria-label="Back">‹</button><img src="assets/favicon.png" alt=""><b>MyChess64</b><span class="sp"></span><button class="ib" onclick="menu=true;render()" aria-label="Settings">⚙</button></header>
 <div id="idw"></div><div id="cdwn"></div><main id="app"></main>
-<footer class="ft" id="ft"><img src="assets/Footer_Logo.png" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere. · v2.1</p></footer>
+<footer class="ft" id="ft"><img src="assets/Footer_Logo.png" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere. · v2.2</p></footer>
 <div id="sheet" onclick="menu=false;render()"></div><div id="tz"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -180,7 +205,7 @@ function pdfReport(T,rows,results){let pages=[],c=ptx(50,795,20,T.name,1)+ptx(50
 const IDLE=5*60*1000,IDLE_LIVE=15*60*1000,FM={swiss:'Swiss',rr:'Round Robin',arena:'Arena'},PB='https://cdn.jsdelivr.net/gh/lichess-org/lila@master/public/piece/';
 let usr=null,db,me,tid=null,T=null,players={},games=[],subs=[],view=null,sel=null,promo=null,rv=null,fl=null,vr=0,err='',lockMsg='',adv=false,lastAct=Date.now(),tc=0,net='',openOnce=false,psig='',prev={},tab='st',screen='home',menu=false,rsg=0,starting=0,usePC=true,cdLast=0;
 const opened=new Set();
-const cf={fmt:'swiss',tc:'5+0',cm:'10',ci:'0',rounds:'5',rc:'',dur:'30',dc:'',brk:'30',bc:'',when:'now',at:'',draws:'1'};
+const cf={fmt:'swiss',cat:'blitz',tc:'5+0',cm:'10',ci:'0',rounds:'5',dur:'30',brk:'30',max:'0',when:'now',at:'',draws:'1'};
 const $=id=>document.getElementById(id),flagged=new Set(),app=$('app'),nm=id=>(players[id]&&players[id].name)||'Player',esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const ls={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
 const cfg=Object.assign({board:'brown',pieces:'cburnett',sound:1},ls.get('cfg')||{});
@@ -304,10 +329,10 @@ function tick(){if(!tid||!T){const e=$('cdwn');if(e)e.style.display='none';retur
 /* ----- actions ----- */
 async function create(){err='';const v=id=>(($(id)||{}).value||'').trim();let m,i;
  if(cf.tc=='custom'){m=parseFloat(cf.cm);i=parseInt(cf.ci||'0',10);if(!(m>=0.25&&m<=180)||!(i>=0&&i<=180)){err='Custom clock: minutes 0.25–180 and increment 0–180 seconds.';return render()}}else[m,i]=cf.tc.split('+').map(Number);
- const nr=cf.rounds=='c'?parseInt(cf.rc,10):+cf.rounds;if(cf.fmt=='swiss'&&!(nr>=1&&nr<=30)){err='Number of rounds must be 1–30.';return render()}
- const du=cf.dur=='c'?parseInt(cf.dc,10):+cf.dur;if(cf.fmt=='arena'&&!(du>=5&&du<=360)){err='Arena duration must be 5–360 minutes.';return render()}
- const br=cf.brk=='c'?parseInt(cf.bc,10):+cf.brk;if(cf.fmt!='arena'&&!(br>=0&&br<=600)){err='Break between rounds must be 0–600 seconds.';return render()}
- const mx=parseInt(v('tmx'),10)||0;if(mx&&mx<2){err='Maximum players must be at least 2.';return render()}
+ const nr=parseInt(cf.rounds,10);if(cf.fmt=='swiss'&&!(nr>=1&&nr<=30)){err='Number of rounds must be 1–30.';return render()}
+ const du=parseInt(cf.dur,10);if(cf.fmt=='arena'&&!(du>=5&&du<=360)){err='Arena duration must be 5–360 minutes.';return render()}
+ const br=parseInt(cf.brk,10);if(cf.fmt!='arena'&&!(br>=0&&br<=600)){err='Break between rounds must be 0–600 seconds.';return render()}
+ const mx=parseInt(cf.max,10)||0;if(mx&&mx<2){err='Maximum players must be at least 2.';return render()}
  let startAt=0;if(cf.when=='sched'){startAt=Date.parse(cf.at);if(!startAt||startAt<Date.now()+30000){err='Pick a start time in the future.';return render()}}
  const org=v('to').slice(0,40);ls.set('org',org);
  const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let id='';for(let k=0;k<6;k++)id+=A[Math.floor(Math.random()*A.length)];
@@ -332,9 +357,9 @@ function share(){const u=location.origin+location.pathname+'?t='+tid;if(navigato
 const copyId=()=>navigator.clipboard&&navigator.clipboard.writeText(tid).then(()=>toast('ID copied'));
 /* ----- views ----- */
 const banner=()=>(net?'<div class="warn">Connection lost — showing the saved copy. Reconnecting…</div>':'')+(err?'<div class="warn">'+esc(err)+'</div>':'');
-function render(){if(!db||!me)return;const keep={};app.querySelectorAll('input,textarea').forEach(e=>{if(e.id)keep[e.id]=[e.value,e===document.activeElement]});
+function render(){if(!db||!me)return;const keep={};app.querySelectorAll('input,textarea').forEach(e=>{if(e.id&&!(e.dataset&&e.dataset.s))keep[e.id]=[e.value,e===document.activeElement]});
  const g=tid&&T&&view&&gm(view);let h;if(!tid||!T)h=screen=='create'?createView():home();else h=g?gameView(g):tview();
- app.className=g?'wide':'';app.innerHTML=banner()+h;
+ app.className=g?'wide':(!tid&&screen=='create'?'mid':'');app.innerHTML=banner()+h;
  for(const k in keep){const e=$(k);if(e){e.value=keep[k][0];if(keep[k][1])e.focus()}}
  $('bk').style.display=(g||(!tid&&screen=='create'))?'':'none';$('ft').style.display=(!tid&&screen=='home')?'':'none';sheet();tick();
  const c=app.querySelector('.ml .cur'),m=$('ml');if(m){if(c)c.scrollIntoView({block:'nearest'});else m.scrollTop=m.scrollHeight}}
@@ -342,19 +367,37 @@ function home(){const rc=ls.get('rec')||[];
  return (lockMsg?'<div class="cd mut">🔒 '+esc(lockMsg)+'</div>':'')+'<div class="cd stack"><h2>Join a tournament</h2><input class="in" id="ji" placeholder="Tournament ID" maxlength="6" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700" onkeydown="if(event.key==\'Enter\')enter(this.value)"><button class="btn p lg" onclick="enter($(\'ji\').value)">Join</button></div>'+
  '<button class="btn lg" onclick="screen=\'create\';err=\'\';render()">＋ Create a tournament</button>'+
  (rc.length?'<div class="lb">Recent</div><div class="cd">'+rc.map(x=>'<div class="li"><span><b>'+esc(x.name)+'</b> <span class="mut">'+x.id+'</span></span><button class="btn sm" onclick="enter(\''+x.id+'\')">Open</button></div>').join('')+'</div>':'')}
-function createView(){const ch=(k,v,l)=>'<button class="chip'+(cf[k]==v?' on':'')+'" onclick="setCf(\''+k+'\',\''+v+'\')">'+l+'</button>',lb=t=>'<div class="lb">'+t+'</div>',gp=t=>'<div class="mut" style="margin:10px 0 6px">'+t+'</div>';
- const num=(id,ph)=>'<input class="in" style="margin-top:10px" id="'+id+'" type="number" inputmode="decimal" placeholder="'+ph+'" value="'+esc(cf[id])+'" oninput="cf.'+id+'=this.value">';
- const tcg=(t,a)=>gp(t)+'<div class="chips">'+a.map(x=>ch('tc',x,tcl(...x.split('+').map(Number)))).join('')+'</div>';
- return '<div class="cd"><h2>Create tournament</h2><input class="in" id="tn" placeholder="Tournament name" maxlength="40"><input class="in" style="margin-top:10px" id="to" placeholder="Organiser name" maxlength="40" value="'+esc(ls.get('org')||'')+'">'+
- lb('Format')+'<div class="chips">'+ch('fmt','swiss','Swiss')+ch('fmt','rr','Round Robin')+ch('fmt','arena','Arena')+'</div>'+
- lb('Time control')+tcg('Bullet',['0.5+0','1+0','1+1','2+1'])+tcg('Blitz',['3+0','3+2','5+0','5+3'])+tcg('Rapid',['10+0','10+5','15+10','20+0'])+tcg('Classical',['30+0','30+20','60+0'])+gp('Custom')+'<div class="chips">'+ch('tc','custom','Custom')+'</div>'+
- (cf.tc=='custom'?'<div class="grid2" style="margin-top:10px"><input class="in" id="cm" type="number" inputmode="decimal" placeholder="Minutes" value="'+esc(cf.cm)+'" oninput="cf.cm=this.value"><input class="in" id="ci" type="number" inputmode="numeric" placeholder="Increment (s)" value="'+esc(cf.ci)+'" oninput="cf.ci=this.value"></div>':'')+
- (cf.fmt=='swiss'?lb('Rounds')+'<div class="chips">'+['3','5','7','9'].map(x=>ch('rounds',x,x)).join('')+ch('rounds','c','Custom')+'</div>'+(cf.rounds=='c'?num('rc','Number of rounds (1–30)'):''):cf.fmt=='rr'?lb('Rounds')+'<div class="mut">Everyone plays everyone once.</div>':lb('Duration')+'<div class="chips">'+['10','20','30','60'].map(x=>ch('dur',x,x+' min')).join('')+ch('dur','c','Custom')+'</div>'+(cf.dur=='c'?num('dc','Minutes (5–360)'):''))+
- (cf.fmt!='arena'?lb('Break between rounds')+'<div class="chips">'+[['0','None'],['15','15 s'],['30','30 s'],['60','1 min'],['120','2 min']].map(x=>ch('brk',x[0],x[1])).join('')+ch('brk','c','Custom')+'</div>'+(cf.brk=='c'?num('bc','Seconds (0–600)'):''):'')+
- lb('Start')+'<div class="chips">'+ch('when','now','Manual')+ch('when','sched','Scheduled')+'</div>'+(cf.when=='sched'?'<input class="in" style="margin-top:10px" type="datetime-local" id="ta" value="'+cf.at+'" onchange="cf.at=this.value">':'')+
- lb('Options')+'<input class="in" id="tmx" type="number" inputmode="numeric" placeholder="Maximum players (optional)"><div class="mut" style="margin:10px 0 6px">Draw offers</div><div class="chips">'+ch('draws','1','Allowed')+ch('draws','0','Not allowed')+'</div>'+
- lb('Conditions & notes')+'<textarea class="in" id="td" maxlength="500" placeholder="Rules, prizes, special conditions… (optional)"></textarea>'+
- '<button class="btn p lg" style="margin-top:18px" onclick="create()">Create tournament</button></div>'}
+const CATS={bullet:['⚡','Bullet',['0.5+0','1+0','1+1','2+1'],'1+0'],blitz:['🔥','Blitz',['3+0','3+2','5+0','5+3'],'5+0'],rapid:['⏱️','Rapid',['10+0','10+5','15+10','20+0'],'10+0'],classical:['♟','Classical',['30+0','30+20','60+0','90+30'],'30+0']};
+const LIM={rounds:[1,30,1],dur:[5,360,5],brk:[0,600,5],max:[0,500,1]};
+const tcd=(m,i)=>(m<1?Math.round(m*60)+' s':m+' min')+(i?' + '+i+' s per move':'');
+function setCat(c){cf.cat=c;if(c=='custom')cf.tc='custom';else if(!CATS[c][2].includes(cf.tc))cf.tc=CATS[c][3];render()}
+function bump(k,d){const[l,h,st]=LIM[k];cf[k]=String(Math.max(l,Math.min(h,(parseInt(cf[k],10)||0)+d*st)));render()}
+function sn(v){const e=$('s-name');if(e)e.textContent=v.trim()||'Untitled tournament'}
+function sumHtml(){const[m,i]=cf.tc=='custom'?[parseFloat(cf.cm)||0,parseInt(cf.ci,10)||0]:cf.tc.split('+').map(Number),ar=cf.fmt=='arena',br=parseInt(cf.brk,10)||0,nr=parseInt(cf.rounds,10)||0,du=parseInt(cf.dur,10)||0,mx=parseInt(cf.max,10)||0;
+ const bt=s=>!s?'None':s<60||s%60?s+' s':s/60+' min',row=(k,v)=>'<div class="li"><span class="mut">'+k+'</span><b style="text-align:right">'+v+'</b></div>';
+ let est=cf.fmt=='swiss'?Math.round(nr*(2*m+(2*40*i)/60+br/60)):ar?du:0;
+ const et=est?'up to '+(est>=60?Math.floor(est/60)+'h '+(est%60)+'m':est+' min'):'depends on players';
+ return '<div class="top"><span>Preview</span><b id="s-name">'+esc((($('tn')||{}).value||'').trim()||'Untitled tournament')+'</b></div><div class="bd2">'+row('Format',FM[cf.fmt])+row('Clock',tcl(m,i))+(cf.fmt=='swiss'?row('Rounds',nr):cf.fmt=='rr'?row('Rounds','Everyone plays everyone'):row('Duration',du+' min'))+(ar?'':row('Break',bt(br)))+row('Start',cf.when=='sched'&&cf.at?fd(Date.parse(cf.at)):'Manual')+row('Players',mx?'max '+mx:'No limit')+row('Draw offers',cf.draws=='1'?'Allowed':'Not allowed')+row('Length',et)+
+ '<button class="btn p lg" style="margin-top:14px" onclick="create()">Create tournament</button><div class="tip">You will get a 6-character ID to share.</div></div>'}
+function createView(){const on=c=>c?' on':'',sec=(n,t,h,body)=>'<section class="c-sec"><div class="c-hd"><span class="c-nb">'+n+'</span><div><b>'+t+'</b><div class="mut">'+h+'</div></div></div>'+body+'</section>',sub=t=>'<div class="c-sub">'+t+'</div>';
+ const fc=(k,v,ic,t,d)=>'<button class="c-fc'+on(cf[k]==v)+'" onclick="setCf(\''+k+'\',\''+v+'\')"><span class="c-ic">'+ic+'</span><b>'+t+'</b><span class="mut">'+d+'</span></button>';
+ const chp=(k,v,l)=>'<button class="chip'+on(cf[k]==v)+'" onclick="setCf(\''+k+'\',\''+v+'\')">'+l+'</button>';
+ const stp=(k,u)=>'<div class="c-stp"><button onclick="bump(\''+k+'\',-1)" aria-label="Decrease">−</button><input data-s="1" type="number" inputmode="numeric" id="'+k+'" value="'+esc(cf[k])+'" onchange="cf.'+k+'=this.value;render()"><span>'+u+'</span><button onclick="bump(\''+k+'\',1)" aria-label="Increase">+</button></div>';
+ const cats=Object.keys(CATS).map(c=>'<button class="'+on(cf.cat==c)+'" onclick="setCat(\''+c+'\')">'+CATS[c][0]+' '+CATS[c][1]+'</button>').join('')+'<button class="'+on(cf.cat=='custom')+'" onclick="setCat(\'custom\')">⚙️ Custom</button>';
+ const tiles=cf.cat=='custom'?'<div class="c-g"><div><div class="c-sub">Minutes per player</div><input class="in" data-s="1" id="cm" type="number" inputmode="decimal" step="0.25" value="'+esc(cf.cm)+'" oninput="cf.cm=this.value" onchange="render()"></div><div><div class="c-sub">Increment (seconds)</div><input class="in" data-s="1" id="ci" type="number" inputmode="numeric" value="'+esc(cf.ci)+'" oninput="cf.ci=this.value" onchange="render()"></div></div><div class="mut" style="margin-top:8px">0.25–180 minutes, 0–180 seconds added after every move.</div>':
+  '<div class="c-tt">'+CATS[cf.cat][2].map(x=>{const[m,i]=x.split('+').map(Number);return '<button class="c-t'+on(cf.tc==x)+'" onclick="setCf(\'tc\',\''+x+'\')"><b>'+tcl(m,i)+'</b><span>'+(m<1?Math.round(m*60)+' sec':m+' min')+(i?' +'+i+'s':'')+'</span></button>'}).join('')+'</div>';
+ const prog=cf.fmt=='swiss'?sub('Number of rounds')+'<div class="c-row">'+stp('rounds','rounds')+['3','5','7','9'].map(x=>chp('rounds',x,x)).join('')+'</div>':cf.fmt=='rr'?'<div class="mut">Everyone plays everyone once — the number of rounds is set automatically.</div>':sub('Duration')+'<div class="c-row">'+stp('dur','min')+['10','20','30','60'].map(x=>chp('dur',x,x+' min')).join('')+'</div>';
+ const brk=cf.fmt!='arena'?sub('Break between rounds')+'<div class="c-row">'+stp('brk','sec')+[['0','None'],['15','15 s'],['30','30 s'],['60','1 min'],['120','2 min']].map(x=>chp('brk',x[0],x[1])).join('')+'</div><div class="mut" style="margin-top:8px">A countdown is shown, then games start automatically.</div>':'';
+ return '<div class="hero"><h1>Create your tournament</h1><p>Set it up in a minute, share the ID, and let the pairings run themselves.</p></div><div class="c-rw"><div>'+
+ sec(1,'Basics','Name your event and add the organiser','<input class="in" id="tn" placeholder="Tournament name" maxlength="40" oninput="sn(this.value)"><input class="in" style="margin-top:10px" id="to" placeholder="Organiser name" maxlength="40" value="'+esc(ls.get('org')||'')+'">')+
+ sec(2,'Format','How players are matched','<div class="c-g">'+fc('fmt','swiss','⚖️','Swiss','Paired by score every round')+fc('fmt','rr','🔄','Round Robin','Everyone plays everyone')+fc('fmt','arena','⚡','Arena','Play as many games as you can in a set time')+'</div>')+
+ sec(3,'Time control','Clock for every game','<div class="c-tabs">'+cats+'</div>'+tiles)+
+ sec(4,cf.fmt=='arena'?'Duration':'Rounds & breaks',cf.fmt=='arena'?'How long the arena runs':'How many rounds and the pause between them',prog+brk)+
+ sec(5,'Start time','When the tournament begins','<div class="c-g">'+fc('when','now','▶️','Manual','You press Start when ready')+fc('when','sched','📅','Scheduled','Starts by itself at a set time')+'</div>'+(cf.when=='sched'?'<input class="in" data-s="1" style="margin-top:12px" type="datetime-local" id="ta" value="'+cf.at+'" onchange="cf.at=this.value;render()">'+(cf.at?'<div class="mut" style="margin-top:8px">'+fd(Date.parse(cf.at))+'</div>':''):''))+
+ sec(6,'Rules & options','Optional extras','<div class="c-sub" style="margin-top:0">Maximum players <span style="text-transform:none;letter-spacing:0">(0 = no limit)</span></div><div class="c-row">'+stp('max','players')+[['0','No limit'],['8','8'],['16','16'],['32','32']].map(x=>chp('max',x[0],x[1])).join('')+'</div>'+
+  '<div class="c-sw"><div><b>Draw offers</b><div class="mut">Let players offer and accept draws</div></div><button class="swt'+on(cf.draws=='1')+'" onclick="setCf(\'draws\',\''+(cf.draws=='1'?'0':'1')+'\')" aria-label="Toggle draw offers"></button></div>'+
+  '<div class="c-sub">Conditions & notes</div><textarea class="in" id="td" maxlength="500" placeholder="Rules, prizes, special conditions… (optional)"></textarea>')+
+ '</div><aside class="c-sum">'+sumHtml()+'</aside></div>'}
 function podium(rank){const M=['🥇','🥈','🥉'],ord=[1,0,2].filter(i=>rank[i]);
  return '<div class="cd"><div class="pdm">'+ord.map(i=>{const s=rank[i];return '<div class="stp s'+(i+1)+'"><div class="md">'+M[i]+'</div><b>'+esc(nm(s.id))+'</b><div><b>'+s.pts+' pts</b></div><small>'+s.W+'W '+s.D+'D '+s.L+'L'+(T.fmt=='arena'?'':' · BH '+s.bh)+'</small><div class="bar">'+(i+1)+'</div></div>'}).join('')+'</div></div>'}
 function tview(){const S=stats(),ids=Object.keys(players),inP=!!players[me],st=T.status,ar=T.fmt=='arena',dot=i=>'<span class="dot'+(onl(i)?' on':'')+'"></span>';
