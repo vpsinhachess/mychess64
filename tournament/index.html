@@ -47,7 +47,7 @@ tr.go{cursor:pointer}.muted{opacity:.65;font-size:14px}.err{color:#d33}
 #lock{text-align:center;padding:50px 10px}
 .hd{background:#fff;border-bottom:3px solid #0a66c2;text-align:center;padding:6px 10px;padding-top:calc(6px + env(safe-area-inset-top,0px))}.hd img{height:44px;max-width:80%;object-fit:contain}
 .ft{text-align:center;padding:18px 10px calc(18px + env(safe-area-inset-bottom,0px))}.ft img{width:150px;max-width:50%;border-radius:10px;background:#fff}.ft p{font-size:12px;opacity:.7;margin:6px 0 0}
-</style></head><body><header class="hd"><img src="assets/Header_Logo.png" alt="MyChess64 — Learn. Play. Improve. Anytime, Anywhere."></header><div id="idw"></div><main id="app"></main><footer class="ft"><img src="assets/Footer_Logo.png" alt="MyChess64"><p>© MyChess64 · Learn. Play. Improve. Anytime, Anywhere.</p></footer><div id="tz"></div>
+</style></head><body><header class="hd"><img src="assets/Header_Logo.png" alt="MyChess64 — Learn. Play. Improve. Anytime, Anywhere."></header><div id="idw"></div><main id="app"></main><footer class="ft"><img src="assets/Footer_Logo.png" alt="MyChess64"><p>© MyChess64 · Learn. Play. Improve. Anytime, Anywhere. · v1.1</p></footer><div id="tz"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -155,6 +155,9 @@ let usr=null,db,me,tid=null,T=null,players={},games=[],subs=[],view=null,sel=nul
 const flagged=new Set(),app=document.getElementById('app'),nm=id=>(players[id]&&players[id].name)||'Player',esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const base=()=>'tournaments/'+tid,gref=id=>db.doc(base()+'/games/'+id),FM={swiss:'Swiss',rr:'Round Robin',arena:'Arena'},onl=id=>Date.now()-((players[id]||{}).seen||0)<70000;
 const toast=t=>{const e=document.getElementById('tz');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3500)};
+const tmo=(p,ms=9000)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r({code:'timeout'}),ms))]);
+const errMsg=e=>{const c=String((e&&e.code)||'');return /permission/.test(c)?'Permission denied — in Firebase open Firestore Database → Rules, paste firestore.rules and press Publish.':/unavailable|timeout|offline/.test(c)||/offline/i.test((e&&e.message)||'')?'Cannot reach the Firestore database. In Firebase open Build → Firestore Database → Create database (not Realtime Database), then reload this page.':'Error: '+((e&&(e.message||e.code))||e)};
+function fail(e){err=errMsg(e);toast(err);render();window.scrollTo(0,0)}
 async function wr(p){try{await p}catch(e){toast('Not sent — check your connection and try again')}}
 /* ----- local cache (this device) ----- */
 function saveCache(){if(!tid||!T)return;clearTimeout(saveCache.t);saveCache.t=setTimeout(()=>{try{localStorage.setItem('cache_'+tid,JSON.stringify({T,players,games:games.map(g=>({...g,ph:[]}))}))}catch(e){}},1500)}
@@ -162,14 +165,14 @@ function loadCache(id){try{return JSON.parse(localStorage.getItem('cache_'+id))}
 async function init(){
  const C=window.FIREBASE_CONFIG;
  if(!window.firebase||!C||/YOUR_/.test(C.apiKey||'YOUR_')){app.innerHTML='<h1>Setup needed</h1><div class="card">Open <b>firebase-config.js</b> and paste your Firebase web-app settings. See README.md.</div>';return}
- firebase.initializeApp(C);db=firebase.firestore();try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
+ firebase.initializeApp(C);db=firebase.firestore();try{db.settings({experimentalAutoDetectLongPolling:true})}catch(e){}try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
  const au=firebase.auth();let first=true;
  au.onAuthStateChanged(async u=>{
   if(!u){try{await au.signInAnonymously()}catch(e){app.innerHTML='<h1>Sign-in failed</h1><div class="card">Enable <b>Anonymous</b> in Firebase console → Authentication → Sign-in method.</div>'}return}
   const changed=me&&me!=u.uid;usr=u;me=u.uid;
   if(changed&&tid)return logoff(false);
   if(first){first=false;let s=null;try{s=localStorage.getItem('tid')}catch(e){}if(s)await enter(s);else render()}else render()})}
-async function gsign(){try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){toast('Google sign-in failed — enable it in Firebase and add this site to Authorized domains')}}
+async function gsign(){err='';try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){const c=(e&&e.code)||'';if(c=='auth/popup-blocked'){try{return await firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider())}catch(_){}}err=c=='auth/unauthorized-domain'?'Add vpsinhachess.github.io in Firebase → Authentication → Settings → Authorized domains.':c=='auth/operation-not-allowed'?'Enable Google in Firebase → Authentication → Sign-in method.':c=='auth/popup-closed-by-user'||c=='auth/cancelled-popup-request'?'':'Google sign-in failed ('+(c||'error')+')';if(err)toast(err);render()}}
 function sub(){subs.forEach(u=>{try{u()}catch(e){}});const bad=()=>{if(!tid)return;net='lost';render();clearTimeout(sub.t);sub.t=setTimeout(()=>{if(tid)sub()},6000)},ok=()=>{if(net){net='';toast('Reconnected')}};
  subs=[db.doc(base()).onSnapshot(s=>{if(!tid||!s.exists)return;ok();T=s.data();render();advance();saveCache()},bad),
   db.collection(base()+'/players').onSnapshot(s=>{if(!tid)return;ok();players={};s.docs.forEach(d=>players[d.id]=d.data());const g=Object.keys(players).sort().map(k=>k+players[k].name).join('|');if(g!=psig||net){psig=g;render()}saveCache()},bad),
@@ -177,11 +180,11 @@ function sub(){subs.forEach(u=>{try{u()}catch(e){}});const bad=()=>{if(!tid)retu
    if(openOnce){openOnce=false;const l=games.find(g=>!g.res&&!g.bye&&(g.w==me||g.b==me));if(l)view=l.id}
    games.forEach(g=>{const n=(g.mv||[]).length,p=prev[g.id];if(p!=null&&n>p&&(g.w==me||g.b==me)&&g[g.turn=='w'?'b':'w']!=me)beep();prev[g.id]=n});
    render();advance();saveCache()},bad)]}
-async function enter(id){id=(id||'').trim().toUpperCase();if(!id)return;
- try{const s=await db.doc('tournaments/'+id).get();if(!s.exists){err='Tournament "'+id+'" not found';return render()}
+async function enter(id){id=(id||'').trim().toUpperCase();if(!id){err='Type the 6-character tournament ID first.';return render()}
+ try{const s=await tmo(db.doc('tournaments/'+id).get());if(!s.exists){err='Tournament "'+id+'" not found';return render()}
   tid=id;T=s.data();err='';lockMsg='';lastAct=Date.now();view=null;rv=null;vr=0;openOnce=true;net='';sub();beat();
   try{localStorage.setItem('tid',id)}catch(e){}}
- catch(e){const c=loadCache(id);if(c){tid=id;T=c.T;players=c.players;games=c.games;net='lost';openOnce=true;render();sub()}else{err='Could not reach the cloud. Check your connection.';render()}}}
+ catch(e){const c=loadCache(id);if(c){tid=id;T=c.T;players=c.players;games=c.games;net='lost';openOnce=true;render();sub()}else fail(e)}}
 function logoff(auto){subs.forEach(u=>{try{u()}catch(e){}});subs=[];tid=null;T=null;players={};games=[];view=null;sel=null;promo=null;rv=null;prev={};
  try{localStorage.removeItem('tid')}catch(e){}lockMsg=auto?'Logged off after inactivity to protect your screen. If you were in a game it is saved on the cloud — enter the tournament ID to resume exactly where you left off (your clock keeps running).':'Logged off. Your progress is saved — enter the tournament ID to continue.';render()}
 async function leave(){if(T.status=='reg'&&players[me]){try{await db.doc(base()+'/players/'+me).delete()}catch(e){}}logoff(false)}
@@ -203,8 +206,8 @@ function expReport(){const S=stats(),rk=rankOf(S),rows=[['#','Player','Points','
  saveFile('standings_'+tid+'.pdf',pdfReport(T,rows,res))}
 /* ----- tournament logic ----- */
 function pickF(){const f=document.getElementById('tf').value;document.getElementById('tr').style.display=f=='swiss'?'':'none';document.getElementById('td').style.display=f=='arena'?'':'none'}
-async function create(){const v=id=>document.getElementById(id).value,[m,i]=v('tt').split('+').map(Number),A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let id='';for(let k=0;k<6;k++)id+=A[Math.floor(Math.random()*A.length)];
- try{await db.doc('tournaments/'+id).set({name:(v('tn').trim()||'Chess Tournament').slice(0,40),fmt:v('tf'),m,i,rounds:+v('tr'),dur:+v('td'),round:0,status:'reg',host:me,endAt:0});await enter(id)}catch(e){err='Could not create (check connection)';render()}}
+async function create(){err='';const v=id=>document.getElementById(id).value,[m,i]=v('tt').split('+').map(Number),A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let id='';for(let k=0;k<6;k++)id+=A[Math.floor(Math.random()*A.length)];
+ try{toast('Creating tournament…');await tmo(db.doc('tournaments/'+id).set({name:(v('tn').trim()||'Chess Tournament').slice(0,40),fmt:v('tf'),m,i,rounds:+v('tr'),dur:+v('td'),round:0,status:'reg',host:me,endAt:0}));await enter(id)}catch(e){fail(e)}}
 async function join(){const n=document.getElementById('pn').value.trim().slice(0,20);if(n)wr(db.doc(base()+'/players/'+me).set({name:n,at:Date.now(),seen:Date.now()}))}
 function stats(){const S={},ar=T.fmt=='arena';Object.keys(players).forEach(id=>S[id]={id,pts:0,col:[],opp:[],bye:false,bh:0,W:0,D:0,L:0,st:0,last:null});
  games.slice().sort((a,b)=>(a.ct||0)-(b.ct||0)||(a.id<b.id?-1:1)).forEach(g=>{const w=S[g.w],b=S[g.b];
@@ -260,8 +263,8 @@ function render(){if(!db||!me)return;const keep={};app.querySelectorAll('input,s
  if(!tid)app.innerHTML=home();else{const g=view&&gm(view);app.innerHTML=(net?'<div class="warn">⚠ Connection lost — showing the copy saved on this device. Reconnecting automatically…</div>':'')+(g?gameView(g):tview())}
  for(const k in keep){const e=document.getElementById(k);if(e){e.value=keep[k][0];if(keep[k][1]){e.focus()}}}tick()}
 function home(){const o=(a,s)=>a.map(x=>'<option'+(x[0]==s?' selected':'')+' value="'+x[0]+'">'+x[1]+'</option>').join('');
- return '<h1>Tournaments</h1>'+(lockMsg?'<div id="lock" class="card">🔒 '+esc(lockMsg)+'</div>':'')+
- '<div class="card"><b>Join with tournament ID</b><br><br><input id="ji" placeholder="e.g. K7M2QX" maxlength="6" autocapitalize="characters" style="text-transform:uppercase" onkeydown="if(event.key==\'Enter\')enter(this.value)"><button class="p" onclick="enter(document.getElementById(\'ji\').value)">Join tournament</button>'+(err?'<p class="err">'+esc(err)+'</p>':'')+'</div>'+
+ return (err?'<div class="warn">'+esc(err)+'</div>':'')+'<h1>Tournaments</h1>'+(lockMsg?'<div id="lock" class="card">🔒 '+esc(lockMsg)+'</div>':'')+
+ '<div class="card"><b>Join with tournament ID</b><br><br><input id="ji" placeholder="e.g. K7M2QX" maxlength="6" autocapitalize="characters" style="text-transform:uppercase" onkeydown="if(event.key==\'Enter\')enter(this.value)"><button class="p" onclick="enter(document.getElementById(\'ji\').value)">Join tournament</button>'+'</div>'+
  '<div class="card"><b>Create a tournament</b><br><br><input id="tn" placeholder="Tournament name" maxlength="40"><select id="tf" onchange="pickF()">'+o([['swiss','Swiss league'],['rr','Round Robin'],['arena','Arena (timed, continuous)']],'swiss')+'</select>'+
  '<select id="tt">'+o([['1+0','Bullet 1+0'],['3+0','Blitz 3+0'],['3+2','Blitz 3+2'],['5+0','Blitz 5+0'],['5+3','Blitz 5+3'],['10+0','Rapid 10+0'],['10+5','Rapid 10+5'],['15+10','Rapid 15+10']],'5+0')+'</select>'+
  '<select id="tr">'+o([['3','3 rounds'],['5','5 rounds'],['7','7 rounds']],'5')+'</select><select id="td" style="display:none">'+o([['10','10 minutes'],['20','20 minutes'],['30','30 minutes'],['60','60 minutes']],'30')+'</select>'+
@@ -300,5 +303,6 @@ function gameView(g){const mc=col(g),flip=fl!=null?fl:g.b==me,n=(g.mu||[]).lengt
  '<div><div class="card banner">'+(!live?'Move '+rv+' of '+n:res||(tm?'Your move':esc(nm(w?g.w:g.b))+' to move')+(S.turn&&ck>=0&&!g.res?' — check!':''))+'</div>'+pk+act+
  '<h2>Moves · '+T.m+'+'+T.i+'</h2><div class="card mv">'+(mv||'<span class="muted">No moves yet</span>')+'</div>'+
  '<div class="acts"><button onclick="expPgn(\''+g.id+'\')" '+(g.mv.length?'':'disabled')+'>⬇ PGN</button><button onclick="expPdf(\''+g.id+'\')" '+(g.mv.length?'':'disabled')+'>⬇ PDF</button><button onclick="view=null;sel=null;promo=null;rv=null;render()">← Back</button></div></div></div>'}
+addEventListener('error',e=>{err='Script error: '+e.message;toast(err)});addEventListener('unhandledrejection',e=>{const r=e.reason;toast('Error: '+((r&&(r.code||r.message))||r))});
 init();
 </script></body></html>
