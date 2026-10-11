@@ -19,6 +19,17 @@
 7. Upload `index.html` and `config.js` to your GitHub repository folder (Add file > Upload files > Commit).
    GitHub Pages updates in about a minute. Open `https://<user>.github.io/<repo>/pairing/`.
 
+## What's new in this version
+* **View Live Pairing & Result** (player/parent page): tournament name box, details (date, venue, organiser, arbiter),
+  tabs *View Pairing* / *Standing* / *List of Players*, ratings and points next to names, PDF export only.
+* **Copy Tournament / WhatsApp**: shares a direct link `...?t=CT-XXXXXX`; players open the live page with one tap.
+* **Edit tournament details**: updates the live page instantly.
+* **Pairing rules (customise)**: round-1 colour, bye points, top-scorer colour exception, repeated-float minimisation, colour relaxation.
+* **Withdrawn players** list with *include from next round* / *from current round* (current round needs a free bye player).
+* **Export**: *Full backup* (everything) or *through selected round*; files carry a checksum, and a signature
+  that is verified when you import into the same tournament. Edited or damaged files are rejected before anything changes.
+  A copy of your previous data is kept on the device before every import.
+
 ## How it works
 * **Create tournament**: gets a unique ID (`CT-XXXXXX`) and your organiser password.
 * **Organiser login**: ID + password, from any browser or device.

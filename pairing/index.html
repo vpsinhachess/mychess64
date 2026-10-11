@@ -44,10 +44,14 @@ tr:nth-child(even) td{background:rgba(127,127,127,.06)}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 button:active{transform:translateY(1px)}button:disabled{opacity:.5;cursor:default}
 button.d{color:#b3261e;border-color:#b3261e}.card:empty{display:none}
+:root{--hl:#fff2a8}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hl:#4a4220}}:root[data-theme="dark"]{--hl:#4a4220}
+.tbox{display:block;max-width:92%;margin:4px auto 6px;text-align:center;font-weight:800;font-size:22px;background:var(--hl);border:3px solid var(--ac);border-radius:12px;padding:10px 16px}
+.tbox:empty{display:none}.tdet{text-align:right;margin:2px 0 10px;line-height:1.55;font-size:14px}
+details>summary{cursor:pointer;padding:2px 0}details.card{padding:10px 14px}
 .org{display:none}.os .org{display:inline-block}
 .chip{display:inline-block;background:var(--ac);color:var(--on);border-radius:999px;padding:2px 12px;font-weight:700;letter-spacing:.4px;margin-top:4px}
 header button.on{background:#fff;color:#1f4a2c}
-</style></head><body><header><h1>♟ Chess Tournament Manager</h1><span class="row"><button class="org" onclick="$('imp').hidden=!$('imp').hidden">⬆ Import</button><button class="org" id="nO" onclick="ORG&&vback()">Organiser</button><button class="org" id="nP" onclick="prevw()">Participants</button><button onclick="theme()">◐</button></span></header><div id="toast" class="toast"></div>
+</style></head><body><header><h1>♟ Chess Tournament Manager</h1><span class="row"><button class="org" onclick="$('imp').hidden=!$('imp').hidden">⬆ Import</button><button class="org" id="nO" onclick="ORG&&vback()">Organiser</button><button class="org" id="nP" onclick="prevw()">View Live Pairing &amp; Result</button><button onclick="theme()">◐</button></span></header><div id="toast" class="toast"></div>
 <main>
 <div id="imp" class="card" hidden><b>Import saved data</b><p class="mu">Choose an exported .json file, or paste its contents, to continue a tournament.</p><input type="file" accept=".json,application/json" onchange="fileIn(this)"><textarea id="ip" style="min-height:70px;margin-top:8px" placeholder="…or paste JSON here"></textarea><div class="row" style="margin-top:8px"><button class="p" onclick="imp($('ip').value)">Load</button><button onclick="$('imp').hidden=true">Cancel</button></div><div class="msg" id="ie"></div></div>
 
@@ -56,8 +60,8 @@ header button.on{background:#fff;color:#1f4a2c}
   <div class="card" style="flex:1;min-width:230px"><b>Organiser zone</b><p class="mu">Password protected. Every tournament gets its own unique ID.</p>
    <button class="p" onclick="$('gate').hidden=true;$('setup').hidden=false">＋ Create tournament</button>
    <label>Organiser login</label><input id="li" placeholder="Tournament ID"><input id="lw" type="password" placeholder="Password" style="margin-top:6px"><br><button onclick="login()" style="margin-top:6px">Login</button><div class="msg" id="le"></div></div>
-  <div class="card" style="flex:1;min-width:230px"><b>Participants</b><p class="mu">No password needed. Enter the ID given by the organiser.</p>
-   <label>Tournament ID</label><input id="pi" placeholder="CT-XXXXXX"><br><button class="p" onclick="enterP()" style="margin-top:6px">View live status</button><div class="msg" id="pe"></div></div></div>
+  <div class="card" style="flex:1;min-width:230px"><b>View Live Pairing &amp; Result</b><p class="mu">No password needed. Enter the Tournament ID, or open the link shared by the organiser.</p>
+   <label>Tournament ID</label><input id="pi" placeholder="CT-XXXXXX"><br><button class="p" onclick="enterP()" style="margin-top:6px">View Live Pairing &amp; Result</button><div class="msg" id="pe"></div></div></div>
  <p class="mu" id="gm"></p><div class="mu" id="rec"></div></div>
 <div id="setup" class="card" hidden>
  <div class="row">
@@ -70,6 +74,8 @@ header button.on{background:#fff;color:#1f4a2c}
   <div id="rW"><label>Rounds</label><input id="rounds" type="number" min="1" style="width:70px" placeholder="auto"></div>
   <div id="bW" hidden><label>Boards per team</label><input id="boards" type="number" min="1" max="12" value="4" style="width:70px"></div>
  </div>
+ <div class="row" style="margin-top:6px"><div style="flex:1;min-width:150px"><label>Date of tournament</label><input id="sd" placeholder="12-14 Dec 2026" style="width:100%;box-sizing:border-box"></div><div style="flex:2;min-width:200px"><label>Venue</label><input id="svn" style="width:100%;box-sizing:border-box"></div></div>
+ <div class="row"><div style="flex:1;min-width:180px"><label>Organiser</label><input id="so" style="width:100%;box-sizing:border-box"></div><div style="flex:1;min-width:180px"><label>Arbiter</label><input id="sa" style="width:100%;box-sizing:border-box"></div></div>
  <label>Organiser password (needed to log in again)</label><input id="pw" type="password" placeholder="minimum 4 characters" style="width:100%;box-sizing:border-box">
  <label>Players / teams — one per line: <b>Name, rating</b></label>
  <textarea id="pl">Aarav, 2150
@@ -86,11 +92,23 @@ Harsh, 1700</textarea>
 </div>
 
 <div id="app" hidden>
+ <div class="tbox" id="oname"></div><div class="tdet" id="odet"></div>
+ <details class="card"><summary><b>✏ Edit tournament details</b> <span class="mu">(updates the live page instantly)</span></summary>
+  <div class="row" style="margin-top:8px"><div style="flex:2;min-width:200px"><label>Tournament name</label><input id="dn" style="width:100%;box-sizing:border-box"></div><div style="flex:1;min-width:150px"><label>Date</label><input id="dd" style="width:100%;box-sizing:border-box"></div></div>
+  <div class="row"><div style="flex:2;min-width:200px"><label>Venue</label><input id="dv" style="width:100%;box-sizing:border-box"></div><div style="flex:1;min-width:160px"><label>Organiser</label><input id="do" style="width:100%;box-sizing:border-box"></div><div style="flex:1;min-width:160px"><label>Arbiter</label><input id="da" style="width:100%;box-sizing:border-box"></div></div>
+  <div class="row" style="margin-top:10px"><button class="p" onclick="saveDet()">Update &amp; publish details</button></div></details>
+ <details class="card" id="orp"><summary><b>⚙ Pairing rules (FIDE Dutch)</b> <span class="mu">customise · applies from the next round</span></summary>
+  <div class="row" style="margin-top:8px"><div><label>Round 1: top seed plays</label><select id="o_init"><option value="W">White</option><option value="B">Black</option></select></div>
+   <div><label>Bye (PAB) points</label><select id="o_bye"><option value="1">1</option><option value="0.5">½</option><option value="0">0</option></select></div></div>
+  <label><input type="checkbox" id="o_top"> Top-scorer colour exception in the last round (score above 50%)</label>
+  <label><input type="checkbox" id="o_fh"> Minimise repeated floats (same downfloat/upfloat as the previous round)</label>
+  <label><input type="checkbox" id="o_rx"> If no legal pairing exists, relax colour rules instead of failing</label>
+  <div class="row" style="margin-top:10px"><button class="p" onclick="saveOpt()">Save pairing rules</button></div></details>
  <div class="row" style="justify-content:space-between;margin-bottom:8px">
-  <div><b id="ttl"></b> <span class="mu" id="sub"></span><br><span class="chip" id="tid"></span> <button onclick="navigator.clipboard.writeText(TID).then(()=>toast('ID copied'),()=>toast('ID: '+TID))">📋 Copy ID</button> <span class="mu" id="sv"></span></div>
+  <div><b id="ttl"></b> <span class="mu" id="sub"></span><br><span class="chip" id="tid"></span> <button class="p" onclick="copyT()">📋 Copy Tournament</button> <button onclick="waT()">🟢 WhatsApp</button> <span class="mu" id="sv"></span></div>
   <span class="row"><button class="d" onclick="delT()">🗑 Delete</button><button onclick="reset()">⎋ Exit</button></span></div>
- <div class="card bar"><b>Export</b><select id="xr"></select><button onclick="xPDF()">📄 PDF</button><button onclick="xCSV()">📊 CSV (round)</button><button onclick="xST()">📈 CSV (standings)</button><button onclick="xJSON()">💾 Data (.json)</button><button id="ud" class="d" onclick="undo()">↩ Undo last round</button></div>
- <div class="card bar"><b>Live page</b><button class="p" onclick="pubP()">📢 Publish pairings</button><button class="p" onclick="pubR()">🏁 Publish results</button><button class="d" onclick="unpub()">🚫 Unpublish</button><span class="mu" id="pst"></span><span class="mu">Uses the round chosen in Export.</span><div class="mu" style="width:100%">Participants page: in the Share menu give people <b>Viewer</b> access to this link — they open straight onto the Participants page. You can open it yourself with the Participants tab above.</div></div>
+ <div class="card bar"><b>Export</b><select id="xr"></select><button onclick="xPDF()">📄 PDF</button><button onclick="xCSV()">📊 CSV (round)</button><button onclick="xST()">📈 CSV (standings)</button><button onclick="xFull()">💾 Full backup (.json)</button><button onclick="xJSON()">💾 Through selected round</button><button id="ud" class="d" onclick="undo()">↩ Undo last round</button></div>
+ <div class="card bar"><b>Live page</b><button class="p" onclick="pubP()">📢 Publish pairings</button><button class="p" onclick="pubR()">🏁 Publish results</button><button class="d" onclick="unpub()">🚫 Unpublish</button><span class="mu" id="pst"></span><span class="mu">Uses the round chosen in Export.</span><div class="mu" style="width:100%">Share with players: press <b>Copy Tournament</b> or <b>WhatsApp</b>. The link opens <b>View Live Pairing &amp; Result</b> directly.</div></div>
  <div class="tabs" id="tabs"></div>
  <div class="card sc" id="pairs"></div>
  <div class="row"><button class="p" id="nx" onclick="next()">Generate next round</button><span class="msg" id="e2"></span><span class="ok" id="ch"></span></div>
@@ -99,19 +117,21 @@ Harsh, 1700</textarea>
   <div class="bar" style="margin-bottom:8px"><b>Withdraw from round</b><input id="wr" type="number" min="1" style="width:70px"><span class="mu">then press Withdraw on a player</span></div>
   <table><thead><tr><th>Player</th><th>Rtg</th><th>Status</th><th>Next round</th><th>Withdraw</th></tr></thead><tbody id="pmb"></tbody></table>
   <p class="mu">+ = present, − = absent (not paired; receives the chosen points). In a result, “Black absent” / “White absent” records a forfeit and marks that player − for the next round.</p></div>
- <div class="row" style="justify-content:space-between;align-items:center"><h2>Standings</h2><label style="margin:0">Tie-break <select id="tb" onchange="S.tb=+this.value;save();render()"><option value="0">Buch-1 → Buch → SB → Wins</option><option value="1">Wins → Buch-1 → Buch → SB</option><option value="2">SB → Buch → Buch-1 → Wins</option></select></label></div><div class="card sc" id="st"></div>
+ <div class="card sc" id="wl" hidden><b>Withdrawn players</b><table><thead><tr><th>Player</th><th>Rtg</th><th>Withdrawn from</th><th>Include in tournament</th></tr></thead><tbody id="wlb"></tbody></table></div>
+ <div class="row" style="justify-content:space-between;align-items:center"><h2 id="sth">Standings</h2><label style="margin:0">Tie-break <select id="tb" onchange="S.tb=+this.value;save();render()"><option value="0">Buch-1 → Buch → SB → Wins</option><option value="1">Wins → Buch-1 → Buch → SB</option><option value="2">SB → Buch → Buch-1 → Wins</option></select></label></div><div class="card sc" id="st"></div>
  <p class="mu" id="note"></p>
  <details class="card"><summary><b>FIDE rules applied (Swiss)</b></summary><ul class="mu"><li>Two players never meet twice; forfeited games do not count as played.</li><li>Pairing inside score groups: top half (S1) against bottom half (S2) by rating. The search first minimises the number of players floated to another score group, then the number of players who do not get their colour preference. If no legal pairing exists, colour rules are relaxed and you are told.</li><li>Buchholz ignores unplayed rounds (no virtual opponents).</li><li>Pairing-allocated bye (1 pt) goes to the lowest-ranked player of the lowest score group who has no bye or forfeit win yet.</li><li>Colours: nobody gets the same colour 3 times in a row or a colour difference above 2; two players with the same absolute preference are not paired; the stronger preference is served first; colour is alternated otherwise.</li><li>Last round: players scoring above 50% may be given an unfavourable colour (top-scorer exception).</li><li>Forfeits give the full point to the present player, no colours and no Buchholz credit.</li><li>Late entrants receive 0, ½ or 1 entry point and are paired from the next round. Absent players are not paired and receive 0, ½ or 1 point (arbiter's choice). Withdrawn players are never paired again.</li></ul></details>
 </div>
 <div id="vw" hidden>
- <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px"><div><b id="vt"></b> <span class="mu" id="vs"></span> <span class="ok">● Live</span></div><button id="vb" hidden onclick="vback()">← Organizer</button></div>
+ <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px"><span class="ok">● Live</span><button id="vb" hidden onclick="vback()">← Home</button></div>
+ <div class="tbox" id="vname"></div><div class="tdet" id="vdet"></div>
+ <div class="mu" id="vs" style="text-align:center;margin:4px 0 8px"></div>
  <div class="msg" id="vmsg"></div>
- <div class="tabs" id="vtabs"></div>
- <input id="vf" placeholder="🔍 Find a player to see all their games" oninput="vfind()" style="width:100%;box-sizing:border-box;margin-bottom:8px"><div class="card sc" id="vmy"></div>
- <div class="card sc" id="vpairs"></div>
- <div class="card bar"><b>Export</b><select id="vxr"></select><button onclick="xPDF()">📄 PDF</button><button onclick="xCSV()">📊 CSV (round)</button><button onclick="xST()">📈 CSV (standings)</button></div>
- <h2>Players</h2><div class="card sc" id="vpl"></div>
- <h2 id="vh">Standings</h2><div class="card sc" id="vst"></div></div>
+ <div class="tabs"><button id="vt1" class="on" onclick="VT=1;vrender()">View Pairing</button><button id="vt2" onclick="VT=2;vrender()">Standing</button><button id="vt3" onclick="VT=3;vrender()">List of Players</button></div>
+ <div id="vp1"><input id="vf" placeholder="🔍 Find a player to see all their games" oninput="vfind()" style="width:100%;box-sizing:border-box;margin-bottom:8px"><div class="card sc" id="vmy"></div><div id="vrl"></div></div>
+ <div id="vp2" hidden></div><div id="vp3" hidden></div>
+ <div class="card bar"><b>Export</b><select id="vxr"></select><button onclick="xPDF()">📄 PDF</button></div>
+</div>
 </main>
 <script>
 const $=id=>document.getElementById(id);let S=null;
@@ -124,7 +144,7 @@ function save(now){if(!TID||!dbh||!S||S.vo)return;clearTimeout(sv);S.rev=(S.rev|
  if(now)return w();$('sv').textContent='Saving\u2026';sv=setTimeout(w,500)}
 setInterval(()=>{if(dirty&&TID&&S&&!S.vo)save(true)},10000);addEventListener('online',()=>{if(dirty&&TID&&S&&!S.vo)save(true)});
 function load(){try{const s=localStorage.getItem('chessT');if(s){S=JSON.parse(s);S.pend=S.pend||{};S.pub=S.pub||{pair:0,res:0}}}catch(e){}}
-function reset(){home()}
+async function reset(){if(TID&&S&&!S.vo){try{await save(true)}catch(e){}}home()}
 
 /* ---------- Round robin (Berger / circle method) ---------- */
 function rrRounds(n,dbl){
@@ -157,7 +177,7 @@ function stats(rs=S.rounds){
  const val=(x,y)=>team?(x>y?2:x===y?1:0):lg?(x>y?3:x===y?1:0):x;
  for(const rd of rs)for(const g of rd){
   const a=st[g.w];
-  if(g.b===null){if(g.u===undefined){a.pts+=team?2:lg?3:1;a.gp+=team?boards/2:1;a.w++;a.bye++}else{a.pts+=g.u*(team?2:lg?3:1);a.gp+=g.u*(team?boards:1);if(g.u===1){a.w++;a.bye++}}a.col.push(null);continue}
+  if(g.b===null){if(g.u===undefined){const bp=O().bye;a.pts+=bp*(team?2:lg?3:1);a.gp+=bp*(team?boards/2:1);if(bp===1)a.w++;a.bye++}else{a.pts+=g.u*(team?2:lg?3:1);a.gp+=g.u*(team?boards:1);if(g.u===1){a.w++;a.bye++}}a.col.push(null);continue}
   if(g.s===null)continue;
   const b=st[g.b];if(g.f){const wn=g.s===1?a:b;wn.pts+=team?2:lg?3:1;wn.gp+=team?boards:1;wn.w++;wn.bye++;continue}a.col.push('W');b.col.push('B');a.opp.push(g.b);b.opp.push(g.w);
   const sa=g.s,sb=(team?boards:1)-g.s;const wt=(x,y)=>team?(x>y?1:x===y?.5:0):x;a.res.push([g.b,wt(sa,sb)]);b.res.push([g.w,wt(sb,sa)]);
@@ -179,12 +199,17 @@ function swissNext(){
   if(d===1)return{c:'B',s:1,d};if(d===-1)return{c:'W',s:1,d};
   if(c.length)return{c:c[c.length-1]==='W'?'B':'W',s:1,d};
   return{c:null,s:0,d:0}};
- const lastR=rn===S.R,tm=S.fmt==='team',P=new Map(st.map(x=>{const r={...pref(x)};if(lastR&&r.s===2&&x.pts>(tm?S.R:S.R/2))r.s=1;return[x,r]}));
+ const lastR=rn===S.R,tm=S.fmt==='team',P=new Map(st.map(x=>{const r={...pref(x)};if(lastR&&O().topExc&&r.s===2&&x.pts>(tm?S.R:S.R/2))r.s=1;return[x,r]}));
  const ok=(a,b)=>{if(had.has(a.p.id+'-'+b.p.id))return false;const pa=P.get(a),pb=P.get(b);
   return relax||!(pa.s===2&&pb.s===2&&pa.c===pb.c)};
  let steps=0,relax=false,T=0;const CAP=60000,INF=1e9;
  const cc=(p,q)=>{const a=P.get(p),b=P.get(q);return a.c&&a.c===b.c};
- function solve(L,fl,cl){
+ const lf={};
+ if(O().fh)for(let r=0;r<S.rounds.length;r++){const pr=stats(S.rounds.slice(0,r)),cur={};
+  for(const g of S.rounds[r]){if(g.b===null||g.f)continue;const a=pr[g.w].pts,b=pr[g.b].pts;cur[g.w]=a>b?'D':a<b?'U':'';cur[g.b]=a>b?'U':a<b?'D':''}
+  for(const x of st)lf[x.p.id]=cur[x.p.id]||''}
+ const fcost=(p,q)=>{if(!O().fh||p.pts===q.pts)return 0;const hi=p.pts>q.pts?p:q,lo=hi===p?q:p;return(lf[hi.p.id]==='D'?1:0)+(lf[lo.p.id]==='U'?1:0)};
+ function solve(L,fl,cl,fc){
   if(!L.length)return[];
   if(++steps>CAP)return null;
   const p=L[0],rest=L.slice(1);
@@ -192,16 +217,18 @@ function swissNext(){
   const k=Math.max(0,Math.floor((g.length+1)/2)-1);
   for(const q of [...g.slice(k),...g.slice(0,k).reverse(),...lo]){
    if(!ok(p,q))continue;
-   const f=p.pts!==q.pts?1:0,c=cc(p,q)?1:0;
-   if(f>fl||c>cl)continue;
-   const r=solve(rest.filter(x=>x!==q),fl-f,cl-c);
+   const f=p.pts!==q.pts?1:0,c=cc(p,q)?1:0,x=fcost(p,q);
+   if(f>fl||c>cl||x>fc)continue;
+   const r=solve(rest.filter(y=>y!==q),fl-f,cl-c,fc-x);
    if(r)return[[p,q],...r];
    if(steps>CAP)return null}
   return null}
  function best(L){const m=Math.floor(L.length/2);
-  steps=0;let r1=solve(L,INF,INF);if(!r1)return null;
-  let f1=INF;for(let f=0;f<=m&&Date.now()<T;f++){steps=0;const r=solve(L,f,INF);if(r){r1=r;f1=f;break}}
-  for(let c=0;c<=m&&Date.now()<T;c++){steps=0;const r=solve(L,f1,c);if(r)return r}
+  steps=0;let r1=solve(L,INF,INF,INF);if(!r1)return null;
+  let f1=INF,c1=INF;
+  for(let f=0;f<=m&&Date.now()<T;f++){steps=0;const r=solve(L,f,INF,INF);if(r){r1=r;f1=f;break}}
+  for(let c=0;c<=m&&Date.now()<T;c++){steps=0;const r=solve(L,f1,c,INF);if(r){r1=r;c1=c;break}}
+  if(O().fh)for(let x=0;x<=m&&Date.now()<T;x++){steps=0;const r=solve(L,f1,c1,x);if(r){r1=r;break}}
   return r1}
  let pairs=null,byeP=null;
  const run=()=>{T=Date.now()+1500;pairs=null;byeP=null;
@@ -209,14 +236,14 @@ function swissNext(){
    for(const b of(pool.length?pool:c)){const r=best(order.filter(x=>x!==b));if(r){pairs=r;byeP=b;break}}}
   else pairs=best(order)};
  delete S.warn;run();
- if(!pairs){relax=true;run();if(pairs)S.warn='Colour rules had to be relaxed in this round.'}
+ if(!pairs&&O().relax){relax=true;run();if(pairs)S.warn='Colour rules had to be relaxed in this round.'}
  if(!pairs)return null;
  pairs.sort((A,B)=>Math.max(B[0].pts,B[1].pts)-Math.max(A[0].pts,A[1].pts)||(B[0].pts+B[1].pts)-(A[0].pts+A[1].pts)||Math.min(A[0].p.id,A[1].p.id)-Math.min(B[0].p.id,B[1].p.id));
  const out=pairs.map(([a,b],i)=>{
   const pa=P.get(a),pb=P.get(b);let wa;
   if(pa.c&&pb.c&&pa.c!==pb.c)wa=pa.c==='W';
   else{const win=pa.s>pb.s?a:pb.s>pa.s?b:Math.abs(pa.d)>=Math.abs(pb.d)?a:b,pw=P.get(win);
-   const wW=pw.c?pw.c==='W':(win===a?i%2===0:i%2===1);
+   const wW=pw.c?pw.c==='W':(win===a?(i%2===0)===(O().init!=='B'):(i%2===1)===(O().init!=='B'));
    wa=win===a?wW:!wW}
   return wa?{w:a.p.id,b:b.p.id,s:null}:{w:b.p.id,b:a.p.id,s:null}});
  if(byeP)out.push({w:byeP.p.id,b:null,s:null});
@@ -233,7 +260,7 @@ async function start(){
  if(new Set(ps.map(p=>p.name.toLowerCase())).size!==n){e.textContent='Names must be unique.';return}
  ps.sort((a,b)=>b.rating-a.rating||a.name.localeCompare(b.name));ps.forEach((p,i)=>p.id=i);
  const boards=f==='team'?Math.max(1,parseInt($('boards').value)||4):1;
- S={fmt:f,ps,boards,rounds:[],R:0,view:0,pend:{},tb:0,pub:{pair:0,res:0},name:cl($('tn').value)};
+ S={fmt:f,ps,boards,rounds:[],R:0,view:0,pend:{},tb:0,pub:{pair:0,res:0},name:cl($('tn').value),det:sdet({date:$('sd').value,venue:$('svn').value,org:$('so').value,arb:$('sa').value}),opt:{init:'W',bye:1,topExc:true,fh:true,relax:true}};
  if(f==='swiss'||f==='team'){
   const R=parseInt($('rounds').value)||Math.ceil(Math.log2(n));
   if(R>n-1||R<1){e.textContent='Rounds must be between 1 and '+(n-1)+' (no repeat pairings allowed).';S=null;return}
@@ -261,22 +288,22 @@ function render(){
  $('setup').hidden=!!S;$('app').hidden=!S;if(!S)return;
  const names={swiss:'Swiss',rr:'Round Robin',league:'League',ko:'Knockout',team:'Team Swiss'};
  const v=Math.min(S.view,S.rounds.length-1),rd=S.rounds[v],t=S.fmt==='team',ko=S.fmt==='ko';
- $('ttl').textContent=(S.name?S.name+' · ':'')+names[S.fmt];$('tid').textContent='Tournament ID: '+TID+'  (share with participants)';
- $('xr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===v?'selected':''}>Round ${i+1}</option>`).join('');
+ $('ttl').textContent=(S.name?S.name+' · ':'')+names[S.fmt];$('tid').textContent='Tournament ID: '+TID+'  (share with participants)';hdr('oname','odet');if(FD!==TID){fillDet();FD=TID}$('orp').hidden=!(S.fmt==='swiss'||S.fmt==='team');
+ PRE=stats(S.rounds.slice(0,v));$('xr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===v?'selected':''}>${RN(i+1)}</option>`).join('');$('sth').textContent='Standing of '+RN(v+1);
  $('ud').hidden=S.rounds.length<2||S.fmt==='rr'||S.fmt==='league';
  $('tb').value=S.tb||0;rp();pst();nav(0);
  $('sub').textContent=S.ps.length+(t?' teams':' players')+' · round '+(v+1)+' of '+S.R+' · results '+rd.filter(g=>g.b===null||g.s!==null).length+'/'+rd.length;
- $('tabs').innerHTML=S.rounds.map((_,i)=>`<button class="${i===v?'on':''}" onclick="S.view=${i};render()">${ko&&i===S.R-1?'Final':'R'+(i+1)}</button>`).join('');
+ $('tabs').innerHTML=S.rounds.map((_,i)=>`<button class="${i===v?'on':''}" onclick="S.view=${i};render()">${ko&&i===S.R-1?'Final':RN(i+1)+' - Pairing'}</button>`).join('');
  const opts=g=>opts0(g)+`<option value="f1" ${g.f&&g.s===1?'selected':''}>+ / − Black absent</option><option value="f0" ${g.f&&g.s===0?'selected':''}>− / + White absent</option>`;const opts0=g=>{
   if(t){let o='<option value="">–</option>';for(let x=0;x<=S.boards;x+=.5)o+=`<option value="${x}" ${g.s===x?'selected':''}>${x} – ${S.boards-x}</option>`;return o}
   const a=[['1','1 – 0'],['0.5','½ – ½'],['0','0 – 1']].filter(x=>!(ko&&x[0]==='0.5'));
   return '<option value="">–</option>'+a.map(x=>`<option value="${x[0]}" ${g.s===+x[0]?'selected':''}>${x[1]}</option>`).join('')};
  $('pairs').innerHTML='<table><tr><th>Bd</th><th>White</th><th>Result</th><th>Black</th></tr>'+rd.map((g,i)=>
-  `<tr><td>${i+1}</td><td>${nm(g.w)}</td><td>${g.b===null?(g.u===undefined?'<i>bye (full point)</i>':'<i>absent (−) · '+g.u+' pt</i>'):`<select onchange="setRes(${v},${i},this.value)">${opts(g)}</select>`}</td><td>${g.b===null?'—':nm(g.b)}</td></tr>`).join('')+'</table>'+
+  `<tr><td>${i+1}</td><td>${pl(g.w)}</td><td>${g.b===null?(g.u===undefined?'<i>bye (full point)</i>':'<i>absent (−) · '+g.u+' pt</i>'):`<select onchange="setRes(${v},${i},this.value)">${opts(g)}</select>`}</td><td>${g.b===null?'—':pl(g.b)}</td></tr>`).join('')+'</table>'+
   (ko?'<p class="mu">Knockout: a draw is not allowed — record the winner of the tiebreak as 1–0 or 0–1.</p>':'');
  const auto=S.fmt==='rr'||S.fmt==='league';
  $('nx').hidden=auto||S.rounds.length>=S.R;
- const st=stats().sort(cmp);
+ const st=stats(S.rounds.slice(0,v+1)).sort(cmp);
  $('st').innerHTML='<table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+
   st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd R'+x.p.wd+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table>';
  const done=S.rounds.length>=S.R&&rd===S.rounds[S.R-1]&&rd.every(g=>g.b===null||g.s!==null);
@@ -295,47 +322,66 @@ const N=()=>+($('vw').hidden?$('xr'):$('vxr')).value,fn=x=>S.fmt+'_'+x+'_'+new D
 const rt=g=>g.b===null?(g.u===undefined?'bye':'absent '+g.u):g.s===null?'':g.f?(g.s===1?'+/-':'-/+'):S.fmt==='team'?g.s+'-'+(S.boards-g.s):g.s===1?'1-0':g.s===0?'0-1':'1/2-1/2';
 function snap(n){const c=JSON.parse(JSON.stringify(S));delete c.view;
  if(S.fmt==='rr'||S.fmt==='league')c.rounds=c.rounds.map((r,i)=>i<n?r:r.map(g=>({...g,s:null})));else c.rounds=c.rounds.slice(0,n);return c}
-function xJSON(){const n=N();dl(fn('through-R'+n)+'.json',JSON.stringify({app:'chess-tm',v:1,through:n,exported:new Date().toISOString(),t:snap(n)},null,1))}
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function env(t,kind,thr){const p=JSON.stringify(t);return JSON.stringify({app:'chess-tm',v:2,kind,tid:TID,through:thr,exported:new Date().toISOString(),sum:await sha(p),sig:TOKEN?await sha(TOKEN+':'+p):'',t},null,1)}
+async function xJSON(){const n=N();dl(fn('through-R'+n)+'.json',await env(snap(n),'partial',n))}
+async function xFull(){const c=JSON.parse(JSON.stringify(S));delete c.view;dl(fn('FULL')+'.json',await env(c,'full',S.rounds.length))}
 function xCSV(){const n=N()-1,q=s=>'"'+String(s).replace(/"/g,'""')+'"';
  const rows=[['Round','Board','White','White rating','Result','Black','Black rating']];
  S.rounds[n].forEach((g,i)=>rows.push([n+1,i+1,nm(g.w),S.ps[g.w].rating,rt(g),g.b===null?'':nm(g.b),g.b===null?'':S.ps[g.b].rating]));
  dl(fn('round'+(n+1))+'.csv',rows.map(r=>r.map(q).join(',')).join('\n'))}
 function xPDF(){
  if(!window.jspdf){toast('PDF library failed to load.');return}
- if(S.ps.some(p=>/[^\x00-\xff]/.test(p.name)))toast('PDF supports Latin letters only. Use CSV for other scripts.');
- const n=N(),t=S.fmt==='team',doc=new window.jspdf.jsPDF(),W=doc.internal.pageSize.getWidth();let y=18;
- const cut=s=>String(s).slice(0,30);
- const row=(c,x,b)=>{if(y>282){doc.addPage();y=18}doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(10);c.forEach((v,i)=>doc.text(cut(v),x[i],y));y+=6.5;if(b)doc.line(14,y-4.8,W-14,y-4.8)};
- doc.setFontSize(17);doc.setFont('helvetica','bold');doc.text((S.name||'Chess Tournament')+' - '+NAMES[S.fmt],14,y);y+=7;
- doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text(S.ps.length+(t?' teams':' players')+'  |  Round '+n+' of '+S.R+'  |  '+new Date().toLocaleDateString(),14,y);y+=10;
- doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text('Pairings - Round '+n,14,y);y+=8;
- const px=[14,24,92,124];row(['Bd','White','Result','Black'],px,1);
- S.rounds[n-1].forEach((g,i)=>row([i+1,nm(g.w),rt(g)||'-',g.b===null?'-':nm(g.b)],px));
- y+=6;doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text('Standings after round '+n,14,y);y+=8;
- const sx=[14,24,76,94,110,126,144,162,182],hd=['#','Name','Rtg',t?'MP':'Pts',t?'GP':'','Buch-1','Buch','SB','Wins'];row(hd,sx,1);
- stats(S.rounds.slice(0,S.vo?Math.min(n,S.pub.res):n)).sort(cmp)
-  .forEach((x,i)=>row([i+1,x.p.name,x.p.rating||'',x.pts,t?x.gp:'',x.cut1,x.buch,+x.sb.toFixed(2),x.w],sx));
+ if(S.ps.some(p=>/[^\x00-\xff]/.test(p.name)))toast('PDF supports Latin letters only.');
+ const n=N(),t=S.fmt==='team',lim=S.vo?Math.min(n,S.pub.res):n,d=S.det||{},doc=new window.jspdf.jsPDF(),W=doc.internal.pageSize.getWidth();let y=16;
+ const row=(c,x,b)=>{if(y>284){doc.addPage();y=16}doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(9);c.forEach((v,i)=>doc.text(String(v).slice(0,44),x[i],y));y+=6;if(b)doc.line(14,y-4.5,W-14,y-4.5)};
+ doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text(S.name||'Chess Tournament',W/2,y,{align:'center'});y+=8;
+ doc.setFontSize(10);doc.setFont('helvetica','normal');
+ [['Date',d.date],['Venue',d.venue],['Organiser',d.org],['Arbiter',d.arb]].filter(x=>x[1]).forEach(x=>{doc.text(x[0]+': '+x[1],W-14,y,{align:'right'});y+=5});
+ y+=4;doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text(RN(n)+' - Pairing',14,y);y+=8;
+ const pre=stats(S.rounds.slice(0,Math.min(n-1,lim))),px=[14,24,98,126],pn=id=>nm(id)+(S.ps[id].rating?' ('+S.ps[id].rating+')':'')+'  ['+pre[id].pts+']';
+ row(['Bd','White [pts]','Result','Black [pts]'],px,1);
+ S.rounds[n-1].forEach((g,i)=>row([i+1,pn(g.w),g.b===null||n<=lim?(rt(g)||'-'):'-',g.b===null?'-':pn(g.b)],px));
+ y+=6;doc.setFontSize(13);doc.setFont('helvetica','bold');
+ if(!lim){doc.text('No results published yet.',14,y)}else{
+  doc.text('Standing of '+RN(lim),14,y);y+=8;
+  const sx=[14,24,80,98,114,130,148,166,184];row(['#','Name','Rtg',t?'MP':'Pts',t?'GP':'','Buch-1','Buch','SB','Wins'],sx,1);
+  stats(S.rounds.slice(0,lim)).sort(cmp).forEach((x,i)=>row([i+1,x.p.name,x.p.rating||'',x.pts,t?x.gp:'',x.cut1,x.buch,+x.sb.toFixed(2),x.w],sx))}
  dl(fn('round'+n)+'.pdf',doc.output('blob'))}
 async function fileIn(el){const f=el.files[0];if(f)imp(await f.text())}
-function parseT(txt){const o=JSON.parse(txt),t=o.t||o;
+function parseT(t){
  if(!t||!Array.isArray(t.ps)||!Array.isArray(t.rounds)||!t.rounds.length||!['swiss','rr','league','ko','team'].includes(t.fmt))throw 'This is not a tournament data file.';
  const n=t.ps.length;if(n<2)throw 'No players in file.';
  for(const r of t.rounds){if(!Array.isArray(r))throw 'Invalid round data.';for(const g of r){if(!Number.isInteger(g.w)||g.w<0||g.w>=n||(g.b!==null&&(!Number.isInteger(g.b)||g.b<0||g.b>=n||g.b===g.w)))throw 'Invalid pairing data.';if(g.s!==null&&typeof g.s!=='number')throw 'Invalid result data.'}}
- const ps=t.ps.map((p,i)=>({id:i,name:cl(p.name)||'Player '+(i+1),rating:+p.rating||0,wd:+p.wd||0,init:+p.init||0})),k=t.rounds.findIndex(r=>r.some(g=>g.b!==null&&g.s===null));
- return{k,S:{fmt:t.fmt,ps,boards:+t.boards||1,rounds:t.rounds,pend:t.pend||{},name:cl(t.name),pub:t.pub||{pair:0,res:0},tb:+t.tb||0,R:+t.R||t.rounds.length,view:k<0?t.rounds.length-1:k}}}
-function imp(txt){try{if(!TID)throw 'Log in or create a tournament first.';const o=parseT(txt),rv=S?S.rev||0:0;S=o.S;S.rev=rv;save();$('imp').hidden=true;$('ie').textContent='';render();toast('Imported - continue from round '+(o.k<0?S.rounds.length:o.k+1)+'.')}catch(e){$('ie').textContent=typeof e==='string'?e:'Invalid or corrupted file.'}}
+ const X=JSON.parse(JSON.stringify(t));['psig','vo','vv','warn'].forEach(k=>delete X[k]);
+ X.ps=X.ps.map((p,i)=>({...p,id:i,name:cl(p.name)||'Player '+(i+1),rating:+p.rating||0,wd:+p.wd||0,init:+p.init||0}));
+ X.name=cl(X.name);X.det=sdet(X.det);X.pend=X.pend||{};X.pub=X.pub||{pair:0,res:0};X.tb=+X.tb||0;X.boards=+X.boards||1;X.R=+X.R||X.rounds.length;X.opt=X.opt||{};
+ const k=X.rounds.findIndex(r=>r.some(g=>g.b!==null&&g.s===null));X.view=k<0?X.rounds.length-1:k;return{k,S:X}}
+async function readT(txt){const o=JSON.parse(txt);let warn='';
+ if(o&&o.v>=2){const p=JSON.stringify(o.t);
+  if(!o.sum||o.sum!==await sha(p))throw 'File is damaged or has been edited (checksum mismatch). Nothing was imported.';
+  if(o.tid&&o.tid===TID&&TOKEN){if(o.sig!==await sha(TOKEN+':'+p))throw 'Signature mismatch: not an authentic export of this tournament. Nothing was imported.'}
+  else if(o.tid&&o.tid!==TID)warn=' (file is from tournament '+o.tid+')'}
+ else warn=' (old file format: integrity not verified)';
+ const r=parseT(o.t||o);r.warn=warn;return r}
+async function imp(txt){try{if(!TID)throw 'Log in or create a tournament first.';const o=await readT(txt),rv=S?S.rev||0:0;
+ try{localStorage.setItem('chessPre:'+TID,JSON.stringify(S))}catch(x){}
+ S=o.S;S.rev=rv;FD=null;save();$('imp').hidden=true;$('ie').textContent='';render();toast('Imported'+o.warn+'. Continue from round '+(o.k<0?S.rounds.length:o.k+1)+'. Previous version kept on this device.')}catch(e){$('ie').textContent=typeof e==='string'?e:'Invalid or corrupted file.'}}
 async function newFromFile(el){const f=el.files[0];if(!f)return;const e=$('e1');e.textContent='';
- try{S=parseT(await f.text()).S;S.pub={pair:0,res:0}}catch(x){S=null;e.textContent=typeof x==='string'?x:'Invalid or corrupted file.';return}
+ try{S=(await readT(await f.text())).S;S.pub={pair:0,res:0}}catch(x){S=null;e.textContent=typeof x==='string'?x:'Invalid or corrupted file.';return}
  if(!await mkT()){S=null;return}save();watch();render()}
 let ud=0;function undo(){if(!ud){ud=1;toast('Press Undo again to remove round '+S.rounds.length+'.');setTimeout(()=>ud=0,4000);return}ud=0;S.rounds.pop().forEach(g=>{if(g.b===null&&g.u!==undefined)S.pend[g.w]=g.u});const op=S.pub.pair,or=S.pub.res;S.pub.pair=Math.min(S.pub.pair,S.rounds.length);S.pub.res=Math.min(S.pub.res,S.rounds.length);S.view=S.rounds.length-1;save();render();if(S.pub.pair<op||S.pub.res<or)pubSend('Live page updated.')}
 const TB=[['cut1','buch','sb','w'],['w','cut1','buch','sb'],['sb','buch','cut1','w']];
 const cmp=(a,b)=>{let d=b.pts-a.pts;if(d)return d;if(S.fmt==='team'){d=b.gp-a.gp;if(d)return d}for(const k of TB[S.tb||0]){d=b[k]-a[k];if(d)return d}return b.p.rating-a.p.rating};
-function rp(){const ok=S.fmt==='swiss'||S.fmt==='team';$('pm').hidden=!ok;if(!ok)return;
+function rp(){const ok=S.fmt==='swiss'||S.fmt==='team';$('pm').hidden=!ok;$('wl').hidden=true;if(!ok)return;
  const nr=S.rounds.length+1;if(!$('wr').value||+$('wr').value<nr)$('wr').value=Math.min(nr,S.R);
- $('pmb').innerHTML=S.ps.map(p=>{const wd=p.wd&&nr>=p.wd,ab=p.id in S.pend;
-  const stt=wd?'<span class="mu">Withdrawn (R'+p.wd+')</span>':ab?'<b style="color:#b3261e">− Absent</b>':'<b class="ok">+ Present</b>'+(p.wd?' <span class="mu">(leaves R'+p.wd+')</span>':'');
-  const act=wd?'':`<button onclick="tg(${p.id})">${ab?'Mark +':'Mark −'}</button>`+(ab?` <select onchange="S.pend[${p.id}]=+this.value;save()">${[0,.5,1].map(v=>`<option ${S.pend[p.id]===v?'selected':''}>${v}</option>`).join('')}</select> pt`:'');
-  return `<tr><td>${p.name}</td><td>${p.rating||''}</td><td>${stt}</td><td>${act}</td><td><button onclick="wdr(${p.id},${p.wd?0:1})">${p.wd?'Reinstate':'Withdraw'}</button></td></tr>`}).join('')}
+ const out=p=>p.wd&&nr>=p.wd;
+ $('pmb').innerHTML=S.ps.filter(p=>!out(p)).map(p=>{const ab=p.id in S.pend;
+  const stt=ab?'<b style="color:#b3261e">\u2212 Absent</b>':'<b class="ok">+ Present</b>'+(p.wd?' <span class="mu">(leaves '+RN(p.wd)+')</span>':'');
+  const act=`<button onclick="tg(${p.id})">${ab?'Mark +':'Mark \u2212'}</button>`+(ab?` <select onchange="S.pend[${p.id}]=+this.value;save()">${[0,.5,1].map(v=>`<option ${S.pend[p.id]===v?'selected':''}>${v}</option>`).join('')}</select> pt`:'');
+  return `<tr><td>${p.name}</td><td>${p.rating||''}</td><td>${stt}</td><td>${act}</td><td><button onclick="wdr(${p.id},${p.wd?0:1})">${p.wd?'Cancel withdrawal':'Withdraw'}</button></td></tr>`}).join('');
+ const w=S.ps.filter(out);$('wl').hidden=!w.length;
+ $('wlb').innerHTML=w.map(p=>`<tr><td>${p.name}</td><td>${p.rating||''}</td><td>${RN(p.wd)}</td><td><button class="p" onclick="inc(${p.id},0)">From next round (${RN(nr)})</button> <button onclick="inc(${p.id},1)">From current round</button></td></tr>`).join('')}
 function tg(id){if(id in S.pend)delete S.pend[id];else S.pend[id]=0;save();render()}
 function wdr(id,on){const p=S.ps[id];if(!on){delete p.wd;save();render();return}
  const r=+$('wr').value,nr=S.rounds.length+1;
@@ -349,7 +395,7 @@ function addP(){const n=cl($('ln').value);
  $('ln').value='';$('lr').value='';save();render();toast(n+' added, paired from round '+(S.rounds.length+1)+'.')}
 /* ---------- Live publishing (organiser) and participant page ---------- */
 let ORG=null,dbh=null,TID=null,unsub=null,unsubS=null,lf=0,lk=0;
-function pubData(){const P=S.pub;return{name:S.name||'',fmt:S.fmt,boards:S.boards,R:S.R,tb:S.tb||0,pub:{pair:P.pair,res:P.res},upd:Date.now(),
+function pubData(){const P=S.pub;return{name:S.name||'',det:S.det||{},opt:{bye:O().bye},fmt:S.fmt,boards:S.boards,R:S.R,tb:S.tb||0,pub:{pair:P.pair,res:P.res},upd:Date.now(),
  ps:S.ps.map(p=>({id:p.id,name:p.name,rating:p.rating,wd:p.wd||0,init:p.init||0})),
  rounds:S.rounds.slice(0,P.pair).map((r,i)=>r.map(g=>i<P.res?g:{w:g.w,b:g.b,s:null,u:g.u}))}}
 function sig(){const d=pubData();delete d.upd;return JSON.stringify(d)}
@@ -367,23 +413,26 @@ function prevw(){if(ORG)return;if(!S)return toast('Start a tournament first.');
 function nav(p){$('nP').classList.toggle('on',!!p);$('nO').classList.toggle('on',!p)}
 function vback(){if(!ORG){home();return}S=ORG;ORG=null;$('vw').hidden=true;$('vb').hidden=true;render()}
 function vrender(){const P=S.pub,t=S.fmt==='team',nr=S.rounds.length;
- $('vw').hidden=false;$('vmsg').textContent='';$('vt').textContent=S.name||NAMES[S.fmt];
- $('vpl').innerHTML='<table><tr><th>#</th><th>Name</th><th>Rating</th><th>Status</th></tr>'+S.ps.map((p,i)=>`<tr><td>${i+1}</td><td>${p.name}</td><td>${p.rating||''}</td><td>${p.wd?'Withdrawn (R'+p.wd+')':'Active'}</td></tr>`).join('')+'</table>';
- if(!nr){$('vs').textContent='';$('vtabs').innerHTML=$('vxr').innerHTML=$('vst').innerHTML='';$('vpairs').innerHTML='<p class="mu">Pairings are not published yet.</p>';return}
- const v=Math.min(S.vv==null?nr-1:S.vv,nr-1);S.vv=v;
+ $('vw').hidden=false;$('vmsg').textContent='';hdr('vname','vdet');
  $('vs').textContent=S.ps.length+(t?' teams':' players')+' · '+nr+' of '+S.R+' rounds published'+(S.upd?' · updated '+new Date(S.upd).toLocaleTimeString():'');
- $('vtabs').innerHTML=S.rounds.map((_,i)=>`<button class="${i===v?'on':''}" onclick="S.vv=${i};vrender()">R${i+1}</button>`).join('');
- $('vxr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===v?'selected':''}>Round ${i+1}</option>`).join('');
- const rl=g=>nm(g)+' <span class="mu">'+(S.ps[g].rating||'')+'</span>';
- $('vpairs').innerHTML='<table><tr><th>Bd</th><th>White</th><th>Result</th><th>Black</th></tr>'+S.rounds[v].map((g,i)=>`<tr><td>${i+1}</td><td>${rl(g.w)}</td><td><b>${g.b===null||v<P.res?(rt(g)||'–'):'–'}</b></td><td>${g.b===null?'—':rl(g.b)}</td></tr>`).join('')+'</table>'+(v<P.res?'':'<p class="mu">Results of this round are not published yet.</p>');
- $('vh').textContent=P.res?'Standings after round '+P.res:'Standings (no results published yet)';
- const st=stats(S.rounds.slice(0,P.res)).sort(cmp);
- $('vst').innerHTML='<table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd R'+x.p.wd+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table>';vfind()}
-function viewerStart(id){if(unsub){unsub();unsub=null}$('gate').hidden=true;$('vb').hidden=false;$('vb').textContent='← Home';$('setup').hidden=true;$('app').hidden=true;$('vw').hidden=false;$('vt').textContent='Live tournament';
+ [1,2,3].forEach(i=>{$('vt'+i).className=i===VT?'on':'';$('vp'+i).hidden=i!==VT});
+ const rl=p=>nm(p.id)+(p.rating?' <span class="mu">('+p.rating+')</span>':'');
+ $('vp3').innerHTML='<div class="card sc"><table><tr><th>#</th><th>Name</th><th>Rating</th><th>Status</th></tr>'+S.ps.map((p,i)=>`<tr><td>${i+1}</td><td>${p.name}</td><td>${p.rating||''}</td><td>${p.wd?'Withdrawn ('+RN(p.wd)+')':'Active'}</td></tr>`).join('')+'</table></div>';
+ $('vxr').innerHTML=S.rounds.map((_,i)=>`<option value="${i+1}" ${i===nr-1?'selected':''}>${RN(i+1)}</option>`).join('');
+ if(!nr)$('vrl').innerHTML='<p class="mu">Pairings are not published yet.</p>';
+ else{let o='';for(let r=nr-1;r>=0;r--){const st=stats(S.rounds.slice(0,Math.min(r,P.res))),pp=id=>rl(S.ps[id])+' · <b>'+st[id].pts+'</b>';
+  o+=`<details class="card" ${r===nr-1?'open':''}><summary><b>${RN(r+1)} - Pairing</b>${r<P.res?' <span class="ok">· result published</span>':''}</summary><div class="sc"><table><tr><th>Bd</th><th>White</th><th>Result</th><th>Black</th></tr>`+
+  S.rounds[r].map((g,i)=>`<tr><td>${i+1}</td><td>${pp(g.w)}</td><td><b>${g.b===null||r<P.res?(rt(g)||'–'):'–'}</b></td><td>${g.b===null?'—':pp(g.b)}</td></tr>`).join('')+'</table></div></details>'}
+  $('vrl').innerHTML=o}
+ if(!P.res)$('vp2').innerHTML='<p class="mu">No results published yet.</p>';
+ else{const n=Math.min(Math.max(+VS||P.res,1),P.res),st=stats(S.rounds.slice(0,n)).sort(cmp);
+  $('vp2').innerHTML='<div class="bar" style="margin-bottom:8px"><b>Standing of '+RN(n)+'</b><select onchange="VS=+this.value;vrender()">'+Array.from({length:P.res},(_,i)=>`<option value="${i+1}" ${i+1===n?'selected':''}>${RN(i+1)}</option>`).join('')+'</select></div><div class="card sc"><table><tr><th>#</th><th>Name</th><th>Rtg</th><th>'+(t?'MP':'Pts')+'</th>'+(t?'<th>GP</th>':'')+'<th>Buch-1</th><th>Buch</th><th>SB</th><th>Wins</th></tr>'+st.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p.name}${x.p.wd?' <span class="mu">(wd '+RN(x.p.wd)+')</span>':''}</td><td>${x.p.rating||''}</td><td><b>${x.pts}</b></td>${t?`<td>${x.gp}</td>`:''}<td>${x.cut1}</td><td>${x.buch}</td><td>${+x.sb.toFixed(2)}</td><td>${x.w}</td></tr>`).join('')+'</table></div>'}
+ vfind()}
+function viewerStart(id){if(unsub){unsub();unsub=null}$('gate').hidden=true;$('vb').hidden=false;$('vb').textContent='← Home';$('setup').hidden=true;$('app').hidden=true;$('vw').hidden=false;
  if(!dbh){$('vmsg').textContent='Backend not configured. Open config.js and set FIREBASE_URL (see README).';return}
  unsub=dbh.doc('t/'+id).onSnapshot(s=>{let d=null;try{d=s.exists?JSON.parse(s.data().j):null}catch(e){}
-  if(!d){S=null;$('vmsg').textContent='Tournament not found, or nothing published yet. This page updates automatically.';$('vtabs').innerHTML=$('vpairs').innerHTML=$('vst').innerHTML='';return}
-  if(!Array.isArray(d.rounds)||!Array.isArray(d.ps)||!d.pub)return;d.ps.forEach(p=>p.name=cl(p.name));d.name=cl(d.name);const prev=S;S=d;S.vo=1;S.vv=prev&&prev.pub.pair===d.pub.pair?prev.vv:undefined;vrender()},()=>{$('vmsg').textContent='Could not load the live data.'})}
+  if(!d){S=null;$('vmsg').textContent='Tournament not found, or nothing published yet. This page updates automatically.';$('vrl').innerHTML=$('vp2').innerHTML=$('vp3').innerHTML=$('vmy').innerHTML='';return}
+  if(!Array.isArray(d.rounds)||!Array.isArray(d.ps)||!d.pub)return;d.ps.forEach(p=>p.name=cl(p.name));d.name=cl(d.name);d.det=sdet(d.det);const prev=S;S=d;S.vo=1;if(!prev||prev.pub.res!==d.pub.res)VS=0;vrender()},()=>{$('vmsg').textContent='Could not load the live data.'})}
 const rid=n=>{const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=crypto.getRandomValues(new Uint8Array(n));return[...a].map(v=>c[v%c.length]).join('')};
 async function hash(p,s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s+':'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function mkT(){const e=$('e1'),pw=$('pw').value;
@@ -408,7 +457,7 @@ async function login(){const e=$('le'),id=$('li').value.trim().toUpperCase(),pw=
   const okS=d=>d&&Array.isArray(d.rounds)&&Array.isArray(d.ps);if(!okS(R))R=null;if(!okS(L))L=null;
   if(!R&&!L)throw{message:'no saved data found for this tournament'};
   const useL=!!L&&(!R||(L.rev||0)>(R.rev||0));S=useL?L:R;
-  S.pend=S.pend||{};S.pub=S.pub||{pair:0,res:0};S.ps.forEach(p=>p.name=cl(p.name));TID=id;dirty=useL;
+  S.pend=S.pend||{};S.pub=S.pub||{pair:0,res:0};S.ps.forEach(p=>p.name=cl(p.name));S.name=cl(S.name);S.det=sdet(S.det);S.opt=S.opt||{};TID=id;dirty=useL;FD=null;
   if(useL)save(true);watch();restored=useL;
   try{localStorage.setItem('lastTid',id)}catch(x){}
   document.body.classList.add('os');$('gate').hidden=true;$('lw').value='';render();toast(restored?'Recovered the newer copy saved on this device.':'Logged in. Tournament data loaded.')}
@@ -456,8 +505,28 @@ function recent(){const el=$('rec');if(!el)return;let o='';
   let n='';try{n=cl(JSON.parse(localStorage.getItem(k)).name)}catch(e){}const id=k.slice(9);
   o+=`<button onclick="$('li').value='${id}';$('lw').focus()">${id}${n?' \u00b7 '+n:''}</button> `}}catch(e){}
  el.innerHTML=o?'<b>Tournaments saved on this device</b><br>'+o:''}
+const RN=i=>'Round '+String(i).padStart(2,'0');
+const cl2=s=>String(s==null?'':s).replace(/[<>&"'`]/g,'').trim().slice(0,120);
+const sdet=o=>({date:cl2(o&&o.date),venue:cl2(o&&o.venue),org:cl2(o&&o.org),arb:cl2(o&&o.arb)});
+const O=()=>({init:'W',bye:1,topExc:true,fh:true,relax:true,...((typeof S!=='undefined'&&S&&S.opt)||{})});
+let VT=1,VS=0,FD=null,PRE=[];
+const pl=id=>{const p=S.ps[id];return p.name+(p.rating?' <span class="mu">('+p.rating+')</span>':'')+' · <b>'+(PRE[id]?PRE[id].pts:0)+'</b>'};
+function hdr(a,b){const d=S.det||{};$(a).textContent=S.name||'Chess Tournament';$(b).innerHTML=[['Date',d.date],['Venue',d.venue],['Organiser',d.org],['Arbiter',d.arb]].filter(x=>x[1]).map(x=>`<div><b>${x[0]}:</b> ${x[1]}</div>`).join('')}
+function fillDet(){const d=S.det||{},o=O();$('dn').value=S.name||'';$('dd').value=d.date||'';$('dv').value=d.venue||'';$('do').value=d.org||'';$('da').value=d.arb||'';
+ $('o_init').value=o.init;$('o_bye').value=String(o.bye);$('o_top').checked=!!o.topExc;$('o_fh').checked=!!o.fh;$('o_rx').checked=!!o.relax}
+function saveDet(){S.name=cl($('dn').value);S.det=sdet({date:$('dd').value,venue:$('dv').value,org:$('do').value,arb:$('da').value});render();pubSend('Tournament details updated live.')}
+function saveOpt(){S.opt={init:$('o_init').value,bye:+$('o_bye').value,topExc:$('o_top').checked,fh:$('o_fh').checked,relax:$('o_rx').checked};save();toast('Pairing rules saved. They apply from the next round you generate.')}
+function shareTxt(){return '♟ '+(S.name||'Chess Tournament')+'\nView Live Pairing & Result:\n'+location.origin+location.pathname+'?t='+TID+'\nTournament ID: '+TID}
+function copyT(){const t=shareTxt();const f=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();let k=false;try{k=document.execCommand('copy')}catch(e){}a.remove();toast(k?'Tournament link copied. Paste it in WhatsApp.':'Copy failed. ID: '+TID)};
+ if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('Tournament link copied. Paste it in WhatsApp.'),f);else f()}
+function waT(){window.open('https://wa.me/?text='+encodeURIComponent(shareTxt()),'_blank')}
+function inc(id,cur){const p=S.ps[id],nr=S.rounds.length+1;
+ if(!cur){delete p.wd;save();render();toast(p.name+' will be paired from '+RN(nr)+'.');return}
+ const rd=S.rounds[S.rounds.length-1],bye=rd&&rd.find(g=>g.b===null&&g.u===undefined);
+ if(!bye)return toast('No free opponent in the current round (no bye player). Use "From next round".');
+ const o=bye.w,hi=S.ps[o].rating>=p.rating;rd[rd.indexOf(bye)]={w:hi?o:id,b:hi?id:o,s:null};delete p.wd;delete S.pend[id];save();render();toast(p.name+' added to '+RN(S.rounds.length)+' against '+nm(o)+'.')}
 async function boot(){fmtUI();let ok=true;
  if(window.FIREBASE_URL&&!/YOUR/.test(window.FIREBASE_URL))dbh={doc:mkDoc};
- addEventListener('pagehide',()=>{if(TID&&S&&!S.vo)save(true)});home();try{$('li').value=localStorage.getItem('lastTid')||''}catch(e){}if(!dbh)$('gm').textContent='Backend not configured. Open config.js and set FIREBASE_URL (see README).'}
+ addEventListener('pagehide',()=>{if(TID&&S&&!S.vo)save(true)});home();try{$('li').value=localStorage.getItem('lastTid')||''}catch(e){}if(!dbh)$('gm').textContent='Backend not configured. Open config.js and set FIREBASE_URL (see README).';try{const q=(new URLSearchParams(location.search).get('t')||'').trim().toUpperCase();if(dbh&&/^CT-[A-HJ-NP-Z2-9]{6}$/.test(q)){$('pi').value=q;enterP()}}catch(e){}}
 boot();
 </script></body></html>
