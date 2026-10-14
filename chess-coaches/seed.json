@@ -1,0 +1,632 @@
+{
+ "Coaches": [
+  {
+   "ach": [
+    "National Women's Championship medallist",
+    "3x State Women's Champion",
+    "Represented India at Asian Youth"
+   ],
+   "bio": "Former national women's medallist who builds clear opening repertoires and sharp tactical vision for ambitious juniors.",
+   "city": "Chennai, Tamil Nadu",
+   "exp": 9,
+   "feeMax": 2200,
+   "feeMin": 1200,
+   "langs": [
+    "English",
+    "Tamil"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate",
+    "Advanced"
+   ],
+   "name": "Ananya Iyer",
+   "rating": 2245,
+   "sample": true,
+   "spec": [
+    "Openings",
+    "Tactics",
+    "Girls' coaching"
+   ],
+   "students": 85,
+   "title": "WIM · Women's International Master",
+   "id": "c-ananya",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "IM title and 2 GM norms",
+    "National Premier finalist",
+    "Second to a GM at Asian Zonal"
+   ],
+   "bio": "High-performance coaching for rated players chasing norms, with engine-assisted analysis and game reviews.",
+   "city": "Delhi",
+   "exp": 16,
+   "featured": true,
+   "feeMax": 4000,
+   "feeMin": 2500,
+   "langs": [
+    "English",
+    "Hindi",
+    "Punjabi"
+   ],
+   "lv": [
+    "Advanced"
+   ],
+   "name": "Arjun Malhotra",
+   "rating": 2420,
+   "sample": true,
+   "spec": [
+    "Opening theory",
+    "Calculation",
+    "Grandmaster prep"
+   ],
+   "students": 210,
+   "title": "International Master",
+   "id": "c-arjun",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "Telangana Rapid Champion",
+    "Top 10 Online Arena Series",
+    "500+ coaching hours on Lichess"
+   ],
+   "bio": "Fast-paced puzzle-driven sessions to sharpen tactics and boost blitz and rapid performance online.",
+   "city": "Hyderabad, Telangana",
+   "exp": 7,
+   "feeMax": 1200,
+   "feeMin": 700,
+   "langs": [
+    "English",
+    "Urdu",
+    "Telugu"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate"
+   ],
+   "name": "Fatima Sheikh",
+   "rating": 2105,
+   "sample": true,
+   "spec": [
+    "Tactics",
+    "Blitz",
+    "Rapid"
+   ],
+   "students": 70,
+   "title": "Candidate Master · Online coach",
+   "id": "c-fatima",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "UP State Rapid runner-up",
+    "1000+ puzzle curriculum",
+    "Trained 45 students online"
+   ],
+   "bio": "Affordable, results-focused tactics training with daily puzzle sets and live problem-solving sessions.",
+   "city": "Lucknow, Uttar Pradesh",
+   "exp": 5,
+   "feeMax": 700,
+   "feeMin": 350,
+   "langs": [
+    "English",
+    "Hindi",
+    "Urdu"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate"
+   ],
+   "name": "Imran Qureshi",
+   "rating": 1950,
+   "sample": true,
+   "spec": [
+    "Tactics",
+    "Beginners",
+    "Blitz"
+   ],
+   "students": 45,
+   "title": "Chess trainer · Tactics & puzzles",
+   "id": "c-imran",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "FM title",
+    "Karnataka State Champion",
+    "Author of repertoire courses"
+   ],
+   "bio": "Builds practical, engine-verified repertoires and teaches students how to prepare against any opponent.",
+   "city": "Bengaluru, Karnataka",
+   "exp": 12,
+   "feeMax": 3000,
+   "feeMin": 1800,
+   "langs": [
+    "English",
+    "Kannada",
+    "Tamil"
+   ],
+   "lv": [
+    "Intermediate",
+    "Advanced"
+   ],
+   "name": "Karthik Subramanian",
+   "rating": 2290,
+   "sample": true,
+   "spec": [
+    "Opening theory",
+    "Sicilian & Indian defences",
+    "Analysis"
+   ],
+   "students": 140,
+   "title": "FIDE Master · Opening specialist",
+   "id": "c-karthik",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "WFM title",
+    "Gujarat State Champion",
+    "Asian Schools finalist"
+   ],
+   "bio": "Calm, methodical coach who helps girls and women players build confidence and consistent results.",
+   "city": "Ahmedabad, Gujarat",
+   "exp": 10,
+   "feeMax": 1600,
+   "feeMin": 900,
+   "langs": [
+    "English",
+    "Hindi",
+    "Gujarati"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate",
+    "Advanced"
+   ],
+   "name": "Meera Joshi",
+   "rating": 2150,
+   "sample": true,
+   "spec": [
+    "Endgames",
+    "Girls' coaching",
+    "Strategy"
+   ],
+   "students": 90,
+   "title": "Women FIDE Master",
+   "id": "c-meera",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "Rajasthan U-19 Champion",
+    "National School Games participant",
+    "Weekly parent reports"
+   ],
+   "bio": "Friendly beginner-to-club-level coaching with homework puzzles and weekly progress reports for parents.",
+   "city": "Jaipur, Rajasthan",
+   "exp": 6,
+   "feeMax": 800,
+   "feeMin": 400,
+   "langs": [
+    "English",
+    "Hindi"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate"
+   ],
+   "name": "Priya Chaudhary",
+   "rating": 1890,
+   "sample": true,
+   "spec": [
+    "Kids",
+    "Fundamentals",
+    "Openings"
+   ],
+   "students": 55,
+   "title": "National-level player · Kids & teens coach",
+   "id": "c-priya",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "FIDE Master title",
+    "Maharashtra Open winner",
+    "Coached 12 state-level champions"
+   ],
+   "bio": "Turns club players into tournament performers with deep endgame technique and practical strategic training.",
+   "city": "Pune, Maharashtra",
+   "exp": 14,
+   "feeMax": 2500,
+   "feeMin": 1500,
+   "langs": [
+    "English",
+    "Hindi",
+    "Marathi"
+   ],
+   "lv": [
+    "Intermediate",
+    "Advanced"
+   ],
+   "name": "Rohan Deshmukh",
+   "rating": 2310,
+   "sample": true,
+   "spec": [
+    "Endgames",
+    "Strategy",
+    "Tournament prep"
+   ],
+   "students": 160,
+   "title": "FIDE Master · Endgame specialist",
+   "id": "c-rohan",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "FIDE Instructor certification",
+    "School Chess League organizer",
+    "Trained 30+ rated juniors"
+   ],
+   "bio": "Patient, playful teaching for ages 5-12 using puzzles, stories and mini-games that make children love chess.",
+   "city": "Kolkata, West Bengal",
+   "exp": 8,
+   "featured": true,
+   "feeMax": 900,
+   "feeMin": 500,
+   "langs": [
+    "English",
+    "Bengali",
+    "Hindi"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate"
+   ],
+   "name": "Sneha Banerjee",
+   "rating": 1980,
+   "sample": true,
+   "spec": [
+    "Kids",
+    "Beginners",
+    "Fundamentals"
+   ],
+   "students": 120,
+   "title": "Kids chess coach · Certified FIDE Instructor",
+   "id": "c-sneha",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "State Team Gold",
+    "Certified FIDE Arbiter",
+    "Coached school national winners"
+   ],
+   "bio": "Structured year-long curriculum covering middlegame strategy, plans and practical tournament preparation.",
+   "city": "Kochi, Kerala",
+   "exp": 11,
+   "feeMax": 1400,
+   "feeMin": 800,
+   "langs": [
+    "English",
+    "Malayalam"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate",
+    "Advanced"
+   ],
+   "name": "Vikram Nair",
+   "rating": 2030,
+   "sample": true,
+   "spec": [
+    "Strategy",
+    "Positional play",
+    "Tournament prep"
+   ],
+   "students": 95,
+   "title": "FIDE Arbiter & Coach",
+   "id": "c-vikram",
+   "status": "approved",
+   "read": true
+  },
+  {
+   "ach": [
+    "Bihar State Junior Champion",
+    "Silver – All India Inter-University Chess Championship",
+    "Silver – National School Games (Chess)",
+    "Bronze – All India Civil Services Chess Championship",
+    "Qualified for World U-18 & U-15 Olympiad"
+   ],
+   "bio": "Professional chess coach and player with over a decade of experience. Trained 100+ students worldwide, including 20+ FIDE-rated players and 50+ national and state players. Interactive, concept-driven classes that teach students to think like real chess players, not just memorize moves.",
+   "city": "Patna, Bihar",
+   "exp": 12,
+   "featured": true,
+   "feeMax": 1500,
+   "feeMin": 700,
+   "langs": [
+    "English",
+    "Hindi"
+   ],
+   "lv": [
+    "Beginner",
+    "Intermediate",
+    "Advanced"
+   ],
+   "name": "Ved Prakash Sinha",
+   "rating": 2132,
+   "spec": [
+    "Fundamentals",
+    "Positional play",
+    "Tournament prep",
+    "Beginners to intermediate"
+   ],
+   "students": 100,
+   "title": "Master of Online Chess Training · Peak FIDE 2132",
+   "ts": 1760380000000,
+   "id": "ved-prakash-sinha",
+   "status": "approved",
+   "read": true
+  }
+ ],
+ "Enquiries": [
+  {
+   "age": 9,
+   "budget": "₹500–700/hr",
+   "first": "Aarav",
+   "goal": "Learn the basics",
+   "level": "Beginner",
+   "msg": "My son loves the game but only knows how pieces move. Looking for a patient coach for a fun start.",
+   "sample": true,
+   "status": "open",
+   "timing": "Weekends 10 AM",
+   "ts": 1760350000000,
+   "read": true,
+   "responded": false,
+   "id": "e-aarav",
+   "name": "Aarav",
+   "contact": ""
+  },
+  {
+   "age": 12,
+   "budget": "₹800–1200/hr",
+   "first": "Diya",
+   "goal": "Win district tournament",
+   "level": "Intermediate",
+   "msg": "Rated 1250 and playing school events. Wants opening prep and tactical training before district round.",
+   "sample": true,
+   "status": "open",
+   "timing": "Weekdays 6–7 PM",
+   "ts": 1760340000000,
+   "read": true,
+   "responded": false,
+   "id": "e-diya",
+   "name": "Diya",
+   "contact": ""
+  },
+  {
+   "age": 14,
+   "budget": "₹2000–3500/hr",
+   "first": "Ishita",
+   "goal": "National Championship",
+   "level": "Tournament",
+   "msg": "State-level player aiming for nationals. Need an IM or FM for deep opening work and game analysis.",
+   "sample": true,
+   "status": "open",
+   "timing": "Daily 7 AM",
+   "ts": 1760260000000,
+   "read": true,
+   "responded": false,
+   "id": "e-ishita",
+   "name": "Ishita",
+   "contact": ""
+  },
+  {
+   "age": 10,
+   "budget": "₹600–900/hr",
+   "first": "Kabir",
+   "goal": "Master tactics",
+   "level": "Intermediate",
+   "msg": "Knows basic openings and mates in 2. Wants puzzle-based coaching to avoid blunders.",
+   "sample": true,
+   "status": "matched",
+   "timing": "Weekends",
+   "ts": 1760240000000,
+   "read": true,
+   "responded": false,
+   "id": "e-kabir",
+   "name": "Kabir",
+   "contact": ""
+  },
+  {
+   "age": 28,
+   "budget": "₹500–800/hr",
+   "first": "Neha",
+   "goal": "Learn from scratch",
+   "level": "Beginner",
+   "msg": "Working professional who wants to learn chess properly. Prefer Hindi-speaking coach.",
+   "sample": true,
+   "status": "open",
+   "timing": "Late evenings",
+   "ts": 1760220000000,
+   "read": true,
+   "responded": false,
+   "id": "e-neha",
+   "name": "Neha",
+   "contact": ""
+  },
+  {
+   "age": 16,
+   "budget": "₹1500–2500/hr",
+   "first": "Rahul",
+   "goal": "Earn FIDE rating",
+   "level": "Advanced",
+   "msg": "Played 20 tournaments, rated 1750 on Lichess. Need structured plan to cross 1900 and get FIDE rated.",
+   "sample": true,
+   "status": "open",
+   "timing": "Flexible evenings",
+   "ts": 1760320000000,
+   "read": true,
+   "responded": false,
+   "id": "e-rahul",
+   "name": "Rahul",
+   "contact": ""
+  },
+  {
+   "age": 7,
+   "budget": "₹400–600/hr",
+   "first": "Sana",
+   "goal": "Hobby & focus",
+   "level": "Beginner",
+   "msg": "Looking for a kind female coach for my daughter. Short 30-min sessions please.",
+   "sample": true,
+   "status": "matched",
+   "timing": "Weekdays 5 PM",
+   "ts": 1760300000000,
+   "read": true,
+   "responded": false,
+   "id": "e-sana",
+   "name": "Sana",
+   "contact": ""
+  },
+  {
+   "age": 34,
+   "budget": "₹1000–1500/hr",
+   "first": "Vivek",
+   "goal": "Improve endgames",
+   "level": "Intermediate",
+   "msg": "Adult club player (1500). I keep losing winning positions in the endgame and want systematic training.",
+   "sample": true,
+   "status": "open",
+   "timing": "Sunday mornings",
+   "ts": 1760280000000,
+   "read": true,
+   "responded": false,
+   "id": "e-vivek",
+   "name": "Vivek",
+   "contact": ""
+  }
+ ],
+ "Reviews": [
+  {
+   "cid": "ved-prakash-sinha",
+   "name": "Rakesh K.",
+   "sample": true,
+   "stars": 5,
+   "status": "visible",
+   "text": "My son's rating went from 1100 to 1480 in six months. Clear explanations and very patient.",
+   "ts": 1760300000000,
+   "id": "r1"
+  },
+  {
+   "cid": "ved-prakash-sinha",
+   "name": "Anita S.",
+   "sample": true,
+   "stars": 5,
+   "status": "visible",
+   "text": "Structured training plan and honest feedback after every game. Highly recommended.",
+   "ts": 1760200000000,
+   "id": "r2"
+  },
+  {
+   "cid": "c-sneha",
+   "name": "Pooja M.",
+   "sample": true,
+   "stars": 5,
+   "status": "visible",
+   "text": "My 7-year-old actually asks for chess class now. Lovely teaching style for kids.",
+   "ts": 1760280000000,
+   "id": "r3"
+  },
+  {
+   "cid": "c-sneha",
+   "name": "Imran A.",
+   "sample": true,
+   "stars": 4,
+   "status": "visible",
+   "text": "Great with beginners. Would love more weekend slots.",
+   "ts": 1760100000000,
+   "id": "r4"
+  },
+  {
+   "cid": "c-arjun",
+   "name": "Siddharth R.",
+   "sample": true,
+   "stars": 5,
+   "status": "visible",
+   "text": "Deep opening preparation and brutally honest game analysis. Earned my first norm after training.",
+   "ts": 1760250000000,
+   "id": "r5"
+  },
+  {
+   "cid": "c-rohan",
+   "name": "Vivek P.",
+   "sample": true,
+   "stars": 5,
+   "status": "visible",
+   "text": "His endgame sessions fixed my biggest weakness. Worth every rupee.",
+   "ts": 1760180000000,
+   "id": "r6"
+  },
+  {
+   "cid": "c-ananya",
+   "name": "Lakshmi N.",
+   "sample": true,
+   "stars": 5,
+   "status": "visible",
+   "text": "My daughter won her first state medal after joining. Inspiring coach.",
+   "ts": 1760150000000,
+   "id": "r7"
+  },
+  {
+   "cid": "c-fatima",
+   "name": "Arman Q.",
+   "sample": true,
+   "stars": 4,
+   "status": "visible",
+   "text": "Fast-paced tactics drills improved my blitz a lot.",
+   "ts": 1760120000000,
+   "id": "r8"
+  }
+ ],
+ "Responses": [
+  {
+   "coach": "Sneha Banerjee",
+   "eid": "e-aarav",
+   "note": "Certified kids coach, weekends available",
+   "sample": true,
+   "ts": 1760355000000,
+   "read": true,
+   "id": "i1"
+  },
+  {
+   "coach": "Priya Chaudhary",
+   "eid": "e-aarav",
+   "note": "Beginner programme for ages 6-10",
+   "sample": true,
+   "ts": 1760356000000,
+   "read": true,
+   "id": "i2"
+  },
+  {
+   "coach": "Karthik Subramanian",
+   "eid": "e-rahul",
+   "note": "FM, can help with FIDE rating path",
+   "sample": true,
+   "ts": 1760325000000,
+   "read": true,
+   "id": "i3"
+  }
+ ]
+}
