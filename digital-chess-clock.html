@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>MyChess64 — Premium Chess Clock</title>
-<meta name="theme-color" content="#080909">
 
 
 <style>
@@ -183,13 +182,13 @@ button{cursor:pointer}
 .time{
   align-self:center;
   justify-self:center;
-  font-family:Georgia,"Times New Roman",serif;
-  font-variant-numeric:tabular-nums;
-  font-feature-settings:"tnum";
+  font-family:"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","DejaVu Sans",sans-serif;
+  font-variant-numeric:tabular-nums lining-nums;
+  font-feature-settings:"tnum","lnum";
   font-size:clamp(78px,22vw,148px);
   line-height:.86;
   font-weight:700;
-  letter-spacing:-.045em;
+  letter-spacing:-.01em;
   white-space:nowrap;
   text-shadow:0 1px 0 #fff9;
 }
@@ -340,6 +339,22 @@ button{cursor:pointer}
 }
 #toast.show{opacity:1;transform:translate(-50%,0)}
 
+/* active clock = green (your turn); amber <30s, pulsing red <10s */
+.clock.running-red{background:linear-gradient(135deg,#e3f2da,#bfdeb1 58%,#a5cba2);border-color:#3f8a52;box-shadow:0 0 0 3px #3f8a52,0 17px 42px #000b,inset 0 2px 0 #fff}
+.clock.running-red .status{color:#1f5a30;border-color:#3f8a52;background:#fffa}
+.clock.running-red .clock-meta{color:#2c5a38}
+.clock.running-red .live-dot{background:#3f8a52;box-shadow:0 0 12px #3f8a52}
+.clock.running-red.warning{background:linear-gradient(135deg,#fff3d6,#f3d894 58%,#e6c070);border-color:#c78b2f;box-shadow:0 0 0 3px #c78b2f,0 17px 42px #000b,inset 0 2px 0 #fff}
+.clock.running-red.warning .status,.clock.running-red.warning .clock-meta{color:#6b4a10;border-color:#c78b2f}
+.clock.running-red.critical{background:linear-gradient(135deg,#f6d2cd,#e8a9a2 58%,#d98d86);border-color:#a33232;box-shadow:0 0 0 3px #a33232,0 17px 42px #000b,inset 0 2px 0 #fff;animation:pulse 1s infinite}
+.clock.running-red.critical .status,.clock.running-red.critical .clock-meta{color:#741f1f;border-color:#a33232}
+@keyframes pulse{50%{opacity:.82}}
+.control.go{border-color:#5f9a6a}.control.go .icon{color:#8fe0a0}
+.control.hold{border-color:#d4a24a}.control.hold .icon{color:#f6c667}
+.control.reset .icon{color:#e58a82}.control.snd .icon{color:#8cc4f0}.control.mode .icon{color:#e8d9a8}
+.time.long{font-size:clamp(46px,13.5vw,100px)}
+.mode-card.sel{border-color:var(--gold);background:linear-gradient(145deg,#3a3426,#201d15)}
+.clock:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
 @media(max-height:650px){
   .clock-inner{padding:10px 18px}
   .control{min-height:48px}
@@ -356,7 +371,7 @@ button{cursor:pointer}
 <main id="app" aria-label="MyChess64 Premium Chess Clock">
 
   <!-- BLACK: physically upside-down for the opponent -->
-  <section id="blackClock" class="clock black inactive" data-player="black" aria-label="Black clock">
+  <section id="blackClock" class="clock black inactive" data-player="black" aria-label="Black clock" role="button" tabindex="0">
     <div class="clock-inner">
       <div class="player-line">
         <span class="player-name"><span class="player-symbol">♚</span>BLACK</span>
@@ -372,22 +387,22 @@ button{cursor:pointer}
 
   <!-- CENTRAL PHYSICAL-CLOCK-LIKE CONTROL DECK -->
   <nav id="controlDeck" aria-label="Clock controls">
-    <button class="control" id="resetBtn" type="button">
+    <button class="control reset" id="resetBtn" type="button">
       <span class="icon">↻</span><small>RESET</small>
     </button>
     <button class="control primary" id="startBtn" type="button">
       <span class="icon" id="startIcon">▶</span><small id="startLabel">START</small>
     </button>
-    <button class="control" id="modeBtn" type="button">
+    <button class="control mode" id="modeBtn" type="button">
       <span class="icon">◴</span><small>MODE</small>
     </button>
-    <button class="control" id="soundBtn" type="button">
+    <button class="control snd" id="soundBtn" type="button">
       <span class="icon" id="soundIcon">◉</span><small id="soundLabel">SOUND</small>
     </button>
   </nav>
 
   <!-- WHITE -->
-  <section id="whiteClock" class="clock white active" data-player="white" aria-label="White clock">
+  <section id="whiteClock" class="clock white active" data-player="white" aria-label="White clock" role="button" tabindex="0">
     <div class="clock-inner">
       <div class="player-line">
         <span class="player-name"><span class="player-symbol">♔</span>WHITE</span>
@@ -428,13 +443,13 @@ button{cursor:pointer}
    5. Main game screen never scrolls.
    ============================================================ */
 
-const DEFAULT_PROGRAM_VERSION = "v4-color-alarm-default";
 
-const PRESETS = [
-  ["1 + 0",60,0],["1 + 1",60,1],["2 + 1",120,1],
-  ["3 + 0",180,0],["3 + 2",180,2],["5 + 0",300,0],
-  ["5 + 3",300,3],["10 + 0",600,0],["10 + 5",600,5],
-  ["15 + 10",900,10],["25 + 10",1500,10],["90 + 30",5400,30]
+const PRESETS = [ // [label, seconds, increment, bonusMoves, bonusSeconds, category]
+  ["1 + 0",60,0,0,0,"BULLET"],["1 + 1",60,1,0,0,"BULLET"],["2 + 1",120,1,0,0,"BULLET"],
+  ["3 + 0",180,0,0,0,"BLITZ"],["3 + 2",180,2,0,0,"BLITZ"],["5 + 0",300,0,0,0,"BLITZ"],
+  ["5 + 3",300,3,0,0,"BLITZ"],["10 + 0",600,0,0,0,"BLITZ"],
+  ["10 + 5",600,5,0,0,"RAPID"],["15 + 0",900,0,0,0,"RAPID"],["15 + 10",900,10,0,0,"RAPID"],["25 + 10",1500,10,0,0,"RAPID"],
+  ["45 + 45",2700,45,0,0,"CLASSICAL"],["60 + 30",3600,30,0,0,"CLASSICAL"],["FIDE 90+30",5400,30,40,1800,"CLASSICAL"],["120 + 30",7200,30,0,0,"CLASSICAL"]
 ];
 
 const state = {
@@ -444,7 +459,8 @@ const state = {
   },
   activePlayer:"white",
   status:"ready", // ready | running | paused | finished
-  sound:true,
+  vol:2, // 0 muted, 1 low, 2 medium, 3 high
+  
   haptic:true,
   fullscreen:false,
   wakeLock:null,
@@ -452,14 +468,21 @@ const state = {
   renderHandle:0,
   flagAlarmTimer:null,
   flagAlarmActive:false,
-  flagAlarmTimer:null,
-  flagAlarmActive:false,
+  stage:null, // {moves,add}: time added when a player completes that move (FIDE classical)
+  mode:"fischer", // fischer | delay | bronstein | none
+  turnMs:0,
+  warnSec:-1,
   controlLabel:"3 + 2"
 };
 
 const $ = id => document.getElementById(id);
 
+function inProgress(){return state.status==="running"||state.status==="paused";}
+function incLabel(n){
+  return state.mode==="none"?"sudden death":state.mode==="delay"?`delay ${n} sec`:state.mode==="bronstein"?`bronstein ${n} sec`:`+${n} sec`;
+}
 function formatTime(ms){
+  if(ms>0 && ms<10000){const t=Math.ceil(ms/100)/10;return "00:"+(t<10?"0":"")+t.toFixed(1);}
   let total = Math.max(0,Math.ceil(ms/1000));
   const h = Math.floor(total/3600);
   total %= 3600;
@@ -473,7 +496,8 @@ function formatTime(ms){
 function playerClass(p){
   const x = state.players[p];
   if(x.remain <= 0) return "flag";
-  if(state.status === "running" && state.activePlayer === p) return "running-red";
+  if(state.status === "running" && state.activePlayer === p)
+    return "running-red"+(x.remain<=10000?" critical":x.remain<=30000?" warning":"");
   if(x.remain <= 10000) return "critical";
   if(x.remain <= 30000) return "warning";
   return "inactive";
@@ -485,7 +509,7 @@ function statusText(p){
   if(state.status === "finished") return "GAME OVER";
   if(state.status === "paused") return "PAUSED";
   if(state.status === "running") return state.activePlayer === p ? "YOUR TURN" : "WAITING";
-  return p === "white" ? "READY" : "WAITING";
+  return p === "white" ? "TAP TO START" : "READY";
 }
 
 /* ---------- Rendering: only reflects state ---------- */
@@ -494,9 +518,11 @@ function render(){
     const x = state.players[p];
     const clock = $(p+"Clock");
     clock.className = `clock ${p} ${playerClass(p)}`;
-    $(p+"Time").textContent = formatTime(x.remain);
+    const tt=formatTime(x.remain);
+    $(p+"Time").textContent = tt;
+    $(p+"Time").classList.toggle("long",tt.length>5);
     $(p+"Moves").textContent = x.moves;
-    $(p+"Inc").textContent = `+${x.inc} sec`;
+    $(p+"Inc").textContent = incLabel(x.inc);
     $(p+"Status").textContent = statusText(p);
   }
 
@@ -508,8 +534,10 @@ function render(){
     state.status === "running" ? "PAUSE" :
     state.status === "paused" ? "RESUME" : "START";
 
-  $("soundIcon").textContent = state.sound ? "◉" : "○";
-  $("soundLabel").textContent = state.sound ? "SOUND" : "MUTED";
+  $("soundIcon").textContent = state.vol ? "◉" : "○";
+  $("soundLabel").textContent = VOLS[state.vol];
+  $("startBtn").classList.toggle("hold",state.status==="running");
+  $("startBtn").classList.toggle("go",state.status!=="running");
 }
 
 /* ---------- Audio / haptic ---------- */
@@ -525,59 +553,58 @@ function ensureAudio(){
   }catch(_){return null}
 }
 
+const VOLS=["MUTED","VOL LOW","VOL MED","VOL HIGH"];
+function cycleVol(){state.vol=(state.vol+1)%4;}
+let master=null,noiseBuf=null;
+function ensureMaster(ctx){
+  if(master)return master;
+  const comp=ctx.createDynamicsCompressor();
+  master=ctx.createGain();
+  master.connect(comp);comp.connect(ctx.destination);
+  const n=Math.floor(ctx.sampleRate*0.12);
+  noiseBuf=ctx.createBuffer(1,n,ctx.sampleRate);
+  const d=noiseBuf.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+  return master;
+}
+function tone(ctx,out,t,f0,f1,dur,type,vol){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type;
+  o.frequency.setValueAtTime(f0,t);
+  o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol,t+0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+0.01);
+}
+function click(ctx,out,t,freq,vol,dur,q=1.2){
+  const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();
+  s.buffer=noiseBuf;f.type="bandpass";f.frequency.value=freq;f.Q.value=q;
+  g.gain.setValueAtTime(vol,t);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(out);s.start(t);s.stop(t+dur);
+}
+/* Move = mechanical clock "tock": filtered noise click + short low body thump. */
 function beep(type="move"){
   const ctx=ensureAudio();
-  if(!ctx || !state.sound)return;
-
+  if(!ctx||!state.vol)return;
   try{
-    const now=ctx.currentTime;
-
-    /* Soft mechanical chess-clock click for normal presses. */
+    const out=ensureMaster(ctx);
+    out.gain.value=[0,0.35,0.7,1][state.vol];
+    const t=ctx.currentTime;
     if(type==="move"){
-      const osc=ctx.createOscillator();
-      const gain=ctx.createGain();
-      osc.type="triangle";
-      osc.frequency.setValueAtTime(1050,now);
-      osc.frequency.exponentialRampToValueAtTime(760,now+0.025);
-      gain.gain.setValueAtTime(0.0001,now);
-      gain.gain.exponentialRampToValueAtTime(0.420,now+0.002);
-      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.045);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now+0.05);
-      return;
+      /* Plastic clock button: sharp contact, ringing casing, body thump, then a softer release click. */
+      const r=1+(Math.random()-0.5)*0.06, v=0.92+Math.random()*0.16;
+      click(ctx,out,t,4200*r,1.0*v,0.012);
+      click(ctx,out,t+0.001,1500*r,2.6*v,0.06,9);
+      tone(ctx,out,t,190*r,70,0.09,"sine",0.9*v);
+      click(ctx,out,t+0.075,3300*r,0.5*v,0.012);
+      click(ctx,out,t+0.076,1900*r,1.1*v,0.035,8);
+      tone(ctx,out,t+0.075,230,110,0.04,"sine",0.25*v);
     }
-
-    /* Start/resume: soft single click, slightly lower pitched. */
-    if(type==="start"){
-      const osc=ctx.createOscillator();
-      const gain=ctx.createGain();
-      osc.type="triangle";
-      osc.frequency.setValueAtTime(700,now);
-      osc.frequency.exponentialRampToValueAtTime(520,now+0.03);
-      gain.gain.setValueAtTime(0.0001,now);
-      gain.gain.exponentialRampToValueAtTime(0.025,now+0.002);
-      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.05);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now+0.055);
-      return;
-    }
-
-    /* Flag alarm remains clearly audible and repeating. */
-    const osc=ctx.createOscillator();
-    const gain=ctx.createGain();
-    osc.type="square";
-    osc.frequency.value=type==="flag" ? 420 : 660;
-    gain.gain.setValueAtTime(0.0001,now);
-    gain.gain.exponentialRampToValueAtTime(type==="flag" ? 0.16 : 0.05,now+0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001,now+(type==="flag" ? 0.24 : 0.08));
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now+(type==="flag" ? 0.25 : 0.085));
+    else if(type==="start"){tone(ctx,out,t,660,880,0.09,"sine",0.35);tone(ctx,out,t+0.1,880,1100,0.12,"sine",0.35);}
+    else if(type==="warn"){tone(ctx,out,t,1400,1400,0.06,"sine",0.22);}
+    else{for(let i=0;i<3;i++)tone(ctx,out,t+i*0.2,880,880,0.14,"square",0.22);}
   }catch(_){}
 }
 
@@ -622,7 +649,9 @@ async function requestWakeLock(){
 }
 document.addEventListener("visibilitychange",()=>{
   if(document.visibilityState==="visible" && state.status==="running"){
-    state.lastTimestamp = performance.now();
+    consumeElapsed(); // keep real elapsed time while hidden
+    scheduleRender();
+    render();
     requestWakeLock();
   }
 });
@@ -651,11 +680,10 @@ function stopFlagAlarm(){
 
 /* ---------- Timing engine ---------- */
 function startGame(){
-  if(state.status==="finished") return;
+  if(state.status==="finished"){toast("Game over — press Reset");return;}
   ensureAudio();
   stopFlagAlarm();
   state.status="running";
-  state.activePlayer="white";
   state.lastTimestamp=performance.now();
   requestImmersive();
   beep("start"); haptic(16);
@@ -690,13 +718,19 @@ function consumeElapsed(){
   const delta=now-state.lastTimestamp;
   state.lastTimestamp=now;
   const p=state.players[state.activePlayer];
-  p.remain -= delta;
+  const before=state.turnMs;
+  state.turnMs+=delta;
+  let charge=delta;
+  if(state.mode==="delay") charge=Math.max(0,state.turnMs-Math.max(before,p.inc*1000));
+  p.remain -= charge;
   if(p.remain<=0){
     p.remain=0;
     state.status="finished";
     startFlagAlarm();
     return false;
   }
+  const sec=Math.ceil(p.remain/1000);
+  if(sec<=10 && sec!==state.warnSec){state.warnSec=sec;beep("warn");}
   return true;
 }
 
@@ -713,6 +747,8 @@ function scheduleRender(){
 
 /* ---------- The critical move transaction ---------- */
 function completeMove(player){
+  if(state.status==="ready"){startGame();return;}
+  if(state.status==="paused"){toast("Paused — press Resume");return;}
   if(state.status!=="running") return;
   if(state.activePlayer!==player) return;
   ensureAudio(); // inactive side cannot switch clock
@@ -724,28 +760,30 @@ function completeMove(player){
 
   const current=state.players[player];
 
-  // Fischer-style increment for this player.
-  current.remain += current.inc*1000;
+  if(state.mode==="fischer") current.remain += current.inc*1000;
+  else if(state.mode==="bronstein") current.remain += Math.min(current.inc*1000,state.turnMs);
   current.moves += 1;
+  if(state.stage && current.moves===state.stage.moves){
+    current.remain += state.stage.add*1000;
+    toast(`Move ${state.stage.moves}: +${state.stage.add/60} min added`);
+  }
 
   // Single authoritative switch.
   state.activePlayer = player==="white" ? "black" : "white";
   state.lastTimestamp = performance.now();
+  state.turnMs=0; state.warnSec=-1;
 
   beep("move");
   haptic(12);
   render();
-  saveLastProgram();
 }
 
 /* ---------- Reset protection ---------- */
 function resetGame(){
-  if(state.status==="running"){
-    if(!confirm("Reset the current game?")) return;
-  }
+  if(inProgress() && !confirm("Reset the current game?")) return;
   stopFlagAlarm();
   cancelAnimationFrame(state.renderHandle);
-  stopFlagAlarm();
+  state.turnMs=0; state.warnSec=-1;
   state.status="ready";
   state.activePlayer="white";
   for(const p of ["white","black"]){
@@ -756,16 +794,20 @@ function resetGame(){
 }
 
 /* ---------- Time control ---------- */
-function applyPreset(label,seconds,increment){
-  if(state.status==="running" && !confirm("Start a new game with this time control?")) return;
+function applyPreset(label,seconds,increment,bm=0,bs=0){
+  if(inProgress() && !confirm("Start a new game with this time control?")) return;
   state.players.white={base:seconds,remain:seconds*1000,inc:increment,moves:0};
   state.players.black={base:seconds,remain:seconds*1000,inc:increment,moves:0};
   state.activePlayer="white";
   state.status="ready";
+  state.turnMs=0; state.warnSec=-1;
+  state.stage=bm?{moves:bm,add:bs}:null;
+  if(bm) state.mode="fischer";
   state.controlLabel=label;
   saveLastProgram();
   closeMode();
   render();
+  toast(label+" ready — tap a clock or press Start");
 }
 
 function applyCustomTime(){
@@ -784,17 +826,18 @@ function applyCustomTime(){
     return;
   }
 
-  if(state.status==="running" && !confirm("Start a new game with custom time?")) return;
+  if(inProgress() && !confirm("Start a new game with custom time?")) return;
 
   state.players.white={base:white,remain:white*1000,inc:wi,moves:0};
   state.players.black={base:black,remain:black*1000,inc:bi,moves:0};
   state.activePlayer="white";
   state.status="ready";
+  state.turnMs=0; state.warnSec=-1; state.stage=null;
   state.controlLabel=`W ${formatTime(white*1000)} +${wi} / B ${formatTime(black*1000)} +${bi}`;
   saveLastProgram();
   closeMode();
   render();
-  toast("Custom asymmetric time applied.");
+  toast("Custom time ready — tap a clock to start");
 }
 
 /* ---------- Mode UI ---------- */
@@ -809,10 +852,9 @@ function closeMode(){
 }
 function modeHome(){
   openMode(`
-    <div class="section-title">QUICK TIME</div>
-    <div class="time-grid">
-      ${PRESETS.map((p,i)=>`<button class="time-btn" data-preset="${i}">${p[0]}</button>`).join("")}
-    </div>
+    ${["BULLET","BLITZ","RAPID","CLASSICAL"].map(c=>`
+      <div class="section-title">${c}</div>
+      <div class="time-grid">${PRESETS.map((p,i)=>p[5]===c?`<button class="time-btn" data-preset="${i}">${p[0]}</button>`:"").join("")}</div>`).join("")}
 
     <div class="section-title">CUSTOM</div>
     <button class="mode-card" id="customCard">
@@ -822,10 +864,10 @@ function modeHome(){
 
     <div class="section-title">ADVANCED</div>
     <div class="mode-grid">
-      <button class="mode-card" id="fischerCard"><b>Fischer Increment</b><span>Individual increment after each move.</span></button>
-      <button class="mode-card" id="delayCard"><b>Delay</b><span>Configure a delay before main time is consumed.</span></button>
-      <button class="mode-card" id="bronsteinCard"><b>Bronstein</b><span>Return unused delay after the move.</span></button>
-      <button class="mode-card" id="periodCard"><b>Multi-Period</b><span>Configure up to four tournament periods.</span></button>
+      <button class="mode-card${state.mode==="fischer"?" sel":""}" id="fischerCard"><b>Fischer Increment</b><span>Seconds added after each move.</span></button>
+      <button class="mode-card${state.mode==="delay"?" sel":""}" id="delayCard"><b>Delay</b><span>Clock waits the delay seconds each turn before counting down.</span></button>
+      <button class="mode-card${state.mode==="bronstein"?" sel":""}" id="bronsteinCard"><b>Bronstein</b><span>Time spent is returned after the move, up to the delay value.</span></button>
+      <button class="mode-card${state.mode==="none"?" sel":""}" id="periodCard"><b>Sudden Death</b><span>No increment or delay.</span></button>
     </div>
 
     <div class="section-title">ARBITER</div>
@@ -835,7 +877,7 @@ function modeHome(){
 
     <div class="section-title">DEVICE</div>
     <div class="mode-grid">
-      <button class="mode-card" id="soundCard"><b>Sound</b><span>${state.sound?"ON":"OFF"}</span></button>
+      <button class="mode-card" id="soundCard"><b>Sound</b><span>${VOLS[state.vol]} — tap to change</span></button>
       <button class="mode-card" id="hapticCard"><b>Haptic</b><span>${state.haptic?"ON":"OFF"}</span></button>
     </div>
   `);
@@ -847,12 +889,13 @@ function modeHome(){
     };
   });
   $("customCard").onclick=customView;
-  $("fischerCard").onclick=()=>toast("Fischer mode uses the selected increment settings.");
-  $("delayCard").onclick=()=>toast("Delay configuration will be added to Advanced Time.");
-  $("bronsteinCard").onclick=()=>toast("Bronstein configuration will be added to Advanced Time.");
-  $("periodCard").onclick=()=>toast("Multi-Period configuration will be added to Tournament Mode.");
+  const setMode=(m,n)=>()=>{state.mode=m;modeHome();render();toast(n+" selected")};
+  $("fischerCard").onclick=setMode("fischer","Fischer");
+  $("delayCard").onclick=setMode("delay","Delay");
+  $("bronsteinCard").onclick=setMode("bronstein","Bronstein");
+  $("periodCard").onclick=setMode("none","Sudden death");
   $("arbiterCard").onclick=arbiterView;
-  $("soundCard").onclick=()=>{state.sound=!state.sound;modeHome();render()};
+  $("soundCard").onclick=()=>{cycleVol();beep("move");modeHome();render()};
   $("hapticCard").onclick=()=>{state.haptic=!state.haptic;modeHome();render()};
 }
 
@@ -863,14 +906,14 @@ function customView(){
       <div class="field"><label>MINUTES</label><input id="wm" type="number" min="0" value="${Math.floor(state.players.white.base/60)}"></div>
       <div class="field"><label>SECONDS</label><input id="ws" type="number" min="0" max="59" value="${state.players.white.base%60}"></div>
     </div>
-    <div class="field full-field"><label>WHITE INCREMENT / MOVE (SEC)</label><input id="wi" type="number" min="0" value="${state.players.white.inc}"></div>
+    <div class="field full-field"><label>WHITE INCREMENT / DELAY (SEC)</label><input id="wi" type="number" min="0" value="${state.players.white.inc}"></div>
 
     <div class="section-title">BLACK CLOCK</div>
     <div class="fields">
       <div class="field"><label>MINUTES</label><input id="bm" type="number" min="0" value="${Math.floor(state.players.black.base/60)}"></div>
       <div class="field"><label>SECONDS</label><input id="bs" type="number" min="0" max="59" value="${state.players.black.base%60}"></div>
     </div>
-    <div class="field full-field"><label>BLACK INCREMENT / MOVE (SEC)</label><input id="bi" type="number" min="0" value="${state.players.black.inc}"></div>
+    <div class="field full-field"><label>BLACK INCREMENT / DELAY (SEC)</label><input id="bi" type="number" min="0" value="${state.players.black.inc}"></div>
 
     <div class="sheet-actions">
       <button class="gold-btn" id="applyCustom">APPLY CUSTOM TIME</button>
@@ -885,8 +928,8 @@ function arbiterView(){
   openMode(`
     <div class="section-title">ARBITER CORRECTION</div>
     <div class="fields">
-      <div class="field"><label>WHITE SECONDS</label><input id="aw" type="number" min="0" value="${Math.round(state.players.white.remain/1000)}"></div>
-      <div class="field"><label>BLACK SECONDS</label><input id="ab" type="number" min="0" value="${Math.round(state.players.black.remain/1000)}"></div>
+      <div class="field"><label>WHITE SECONDS</label><input id="aw" type="number" min="0" value="${Math.ceil(state.players.white.remain/1000)}"></div>
+      <div class="field"><label>BLACK SECONDS</label><input id="ab" type="number" min="0" value="${Math.ceil(state.players.black.remain/1000)}"></div>
     </div>
     <div class="field full-field"><label>MOVE COUNT</label><input id="am" type="number" min="0" value="${Math.max(state.players.white.moves,state.players.black.moves)}"></div>
     <div class="section-title">ACTIVE CLOCK</div>
@@ -899,13 +942,17 @@ function arbiterView(){
       <button class="dark-btn" id="backArbiter">BACK</button>
     </div>
   `);
-  $("activeWhite").onclick=()=>{state.activePlayer="white";toast("White selected as active side")};
-  $("activeBlack").onclick=()=>{state.activePlayer="black";toast("Black selected as active side")};
+  let pick=state.activePlayer;
+  const sel=()=>{$("activeWhite").classList.toggle("sel",pick==="white");$("activeBlack").classList.toggle("sel",pick==="black");};
+  sel();
+  $("activeWhite").onclick=()=>{pick="white";sel()};
+  $("activeBlack").onclick=()=>{pick="black";sel()};
   $("applyArbiter").onclick=()=>{
     state.players.white.remain=Math.max(0,+$("aw").value||0)*1000;
     state.players.black.remain=Math.max(0,+$("ab").value||0)*1000;
     const m=Math.max(0,+$("am").value||0);
-    state.players.white.moves=m;state.players.black.moves=m;
+    if(m!==Math.max(state.players.white.moves,state.players.black.moves)){state.players.white.moves=m;state.players.black.moves=m;}
+    state.activePlayer=pick;state.turnMs=0;state.warnSec=-1;state.lastTimestamp=performance.now();
     if(state.status==="finished")state.status="paused";
     render();closeMode();toast("Arbiter correction applied");
   };
@@ -914,11 +961,11 @@ function arbiterView(){
 
 /* ---------- Persistence ---------- */
 function saveLastProgram(){
-  localStorage.setItem("mychess64-last-program",JSON.stringify({
+  try{localStorage.setItem("mychess64-last-program",JSON.stringify({
     white:{base:state.players.white.base,inc:state.players.white.inc},
     black:{base:state.players.black.base,inc:state.players.black.inc},
     label:state.controlLabel
-  }));
+  }));}catch(_){}
 }
 function loadLastProgram(){
   // Keep the product default on every fresh page load:
@@ -943,15 +990,32 @@ $("startBtn").onclick=()=>{
   else startGame();
 };
 $("resetBtn").onclick=resetGame;
-$("modeBtn").onclick=modeHome;
+$("modeBtn").onclick=()=>{
+  if(state.status==="running"){pauseGame();toast("Clock paused");}
+  modeHome();
+};
 $("soundBtn").onclick=()=>{
-  state.sound=!state.sound;
+  cycleVol();
   render();
   beep("move");
 };
 
-$("whiteClock").addEventListener("pointerup",()=>completeMove("white"));
-$("blackClock").addEventListener("pointerup",()=>completeMove("black"));
+$("whiteClock").addEventListener("pointerdown",()=>completeMove("white"));
+$("blackClock").addEventListener("pointerdown",()=>completeMove("black"));
+
+/* Keyboard: Space = press clock / start, P = pause, R = reset, M = mode, Esc = close */
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){closeMode();return;}
+  if(e.target.closest("input")||$("modeSheet").classList.contains("open"))return;
+  if(e.code==="Space"){
+    e.preventDefault();
+    if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+    state.status==="running"?completeMove(state.activePlayer):$("startBtn").click();
+  }else if(e.key==="p"||e.key==="P"){if(inProgress())$("startBtn").click();}
+  else if(e.key==="r"||e.key==="R")resetGame();
+  else if(e.key==="m"||e.key==="M")$("modeBtn").click();
+});
+document.addEventListener("keyup",e=>{if(e.code==="Space"&&!e.target.closest("input"))e.preventDefault();});
 
 $("closeSheet").onclick=closeMode;
 $("modeSheet").addEventListener("pointerup",e=>{
