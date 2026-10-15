@@ -541,52 +541,7 @@
       body.appendChild(chips);
     }
 
-    // Actions
-    const acts = h('div', { class: 'acts' });
-    const playBtn = h('button', { class: 'act', type: 'button' }, '▶ Play');
-    playBtn.onclick = () => startQueue(v.key);
-
-    const fsBtn = h('button', { class: 'act', type: 'button', title: 'Full screen' }, '⛶ Full screen');
-    fsBtn.onclick = () => {
-      if (activeKey !== v.key) startQueue(v.key);
-      const m = document.querySelector(`#${CSS.escape(v.key)} .media`);
-      if (m && m.requestFullscreen) m.requestFullscreen().catch(() => {});
-    };
-
-    const thBtn = h('button', { class: 'act', type: 'button', title: 'Wider view' }, theaters.has(v.key) ? '▣ Normal' : '▭ Theater');
-    thBtn.onclick = () => {
-      const on = !theaters.has(v.key);
-      on ? theaters.add(v.key) : theaters.delete(v.key);
-      const cur = document.getElementById(v.key);
-      if (cur) cur.classList.toggle('theater', on);
-      thBtn.textContent = on ? '▣ Normal' : '▭ Theater';
-    };
-    acts.append(playBtn, fsBtn, thBtn);
-
-    const favOn = favs.has(v.key);
-    const favBtn = h('button', { class: 'act' + (favOn ? ' on' : ''), type: 'button' }, favOn ? '♥ Saved' : '♡ Save');
-    favBtn.onclick = () => {
-      const on = !favs.has(v.key);
-      on ? favs.add(v.key) : favs.delete(v.key);
-      store.set('cv-fav', [...favs]);
-      favBtn.className = 'act' + (on ? ' on' : '');
-      favBtn.textContent = on ? '♥ Saved' : '♡ Save';
-      updateStats();
-      if ($fav.checked) render();
-    };
-
-    const shareBtn = h('button', { class: 'act', type: 'button' }, '🔗 Share');
-    shareBtn.onclick = async () => {
-      const link = location.href.split('#')[0] + '#' + v.key;
-      try { await navigator.clipboard.writeText(link); toast('Link copied'); }
-      catch (e) { window.prompt('Copy this link:', link); }
-    };
-    acts.append(favBtn, shareBtn, h('a', { class: 'act', href: v.info.open, target: '_blank', rel: 'noopener' }, '↗ Original'));
-    body.appendChild(acts);
-    c.appendChild(body);
-    return c;
-  }
-
+   
   // ---------- Rendering ----------
   function render() {
     filtered = getFiltered();
