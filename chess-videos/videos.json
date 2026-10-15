@@ -1,11 +1,13 @@
 [
   {
-    "title": "Learn How to Play Chess for Beginners",
-    "url": "https://www.youtube.com/watch?v=IU6k-4rKf-g",
-    "tags": ["learn-chess"],
- },
+    "title": "World No 01 vs India No. 01 - CHess Fight",
+    "url": "https://www.youtube.com/watch?v=sfAXsuBkmA0",
+    "date": "2026-10-10",
+    "tags": ["Sample"],
+    "note": "Any .mp4, .webm, .ogg or .mov link works, with or without https://."
+  },
   {
-    "title": "Replace me: YouTube video",
+    "title": "Chess is just Wow!",
     "url": "https://www.youtube.com/watch?v=AZhKtU_E-Fs",
     "date": "2026-10-05",
     "tags": ["Openings"],
