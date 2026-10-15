@@ -1,14 +1,14 @@
 [
   {
-    "title": "World No 01 vs India No. 01 - CHess Fight",
-    "url": "https://www.youtube.com/watch?v=sfAXsuBkmA0",
+    "title": "Sample: Direct video file (plays right here)",
+    "url": "https://www.w3schools.com/html/mov_bbb.mp4",
     "date": "2026-10-10",
     "tags": ["Sample"],
     "note": "Any .mp4, .webm, .ogg or .mov link works, with or without https://."
   },
   {
-    "title": "Chess is just Wow!",
-    "url": "https://www.youtube.com/watch?v=AZhKtU_E-Fs",
+    "title": "Replace me: YouTube video",
+    "url": "https://www.youtube.com/watch?v=PASTE_YOUR_VIDEO_ID_HERE",
     "date": "2026-10-05",
     "tags": ["Openings"],
     "note": "Paste any YouTube, Vimeo or web video link here."

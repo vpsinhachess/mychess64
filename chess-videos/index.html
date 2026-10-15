@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark light">
-<title>Chess Videos</title>
+<title>Learn, Fun &amp; Play - Chess Videos</title>
+<meta name="description" content="Chess videos from MyChess64: learn, play and improve, anytime, anywhere.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
 <script>
   // Apply saved or system theme before first paint to avoid a flash
   try {
@@ -15,75 +18,100 @@
 </script>
 <style>
   :root {
-    --bg:#14130f; --panel:#221f1a; --panel2:#2c2821; --text:#f3efe6; --muted:#a39c8c;
+    --bg:#11100d; --panel:#1f1c17; --panel2:#2a261f; --text:#f3efe6; --muted:#a39c8c;
     --accent:#d4a72c; --accent-ink:#17150f; --border:rgba(255,255,255,.09);
-    --shadow:0 10px 30px rgba(0,0,0,.35); --sq:rgba(255,255,255,.035); --err:#f08a80;
+    --shadow:0 10px 30px rgba(0,0,0,.4); --sq:rgba(255,255,255,.03); --piece:#d4a72c; --piece-op:.09;
+    --err:#f08a80; --brand:#1f6fff;
   }
   [data-theme="light"] {
-    --bg:#f5efdf; --panel:#fffdf7; --panel2:#f1eadb; --text:#2a2519; --muted:#6f6758;
+    --bg:#f6f1e3; --panel:#fffdf7; --panel2:#f1eadb; --text:#1f1b12; --muted:#6f6758;
     --accent:#8a6310; --accent-ink:#fff; --border:rgba(60,40,10,.12);
-    --shadow:0 10px 25px rgba(70,50,10,.12); --sq:rgba(60,40,10,.06); --err:#b3261e;
+    --shadow:0 10px 25px rgba(70,50,10,.12); --sq:rgba(60,40,10,.055); --piece:#5a4210; --piece-op:.12;
+    --err:#b3261e; --brand:#0f5fd6;
   }
   * { box-sizing:border-box; }
   html, body { margin:0; }
   body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background:var(--bg); color:var(--text); min-height:100vh; position:relative;
+    background:var(--bg); color:var(--text); min-height:100vh; position:relative; overflow-x:hidden;
     transition: background .3s, color .3s;
   }
-  body::before {
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  /* ---------- Chess background ---------- */
+  .checks {
+    position:fixed; inset:0; pointer-events:none; z-index:0;
     background: conic-gradient(var(--sq) 25%, transparent 0 50%, var(--sq) 0 75%, transparent 0) 0 0 / 96px 96px;
-    -webkit-mask-image: radial-gradient(ellipse at top, #000 15%, transparent 75%);
-            mask-image: radial-gradient(ellipse at top, #000 15%, transparent 75%);
   }
-  body::after {
-    content:"♞"; position:fixed; right:-4vmin; bottom:-10vmin; z-index:0; pointer-events:none;
-    font-size:70vmin; line-height:1; font-family:Georgia, serif; color:var(--accent); opacity:.05;
+  .bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .bgp {
+    position:absolute; color:var(--piece); opacity:var(--piece-op); line-height:1; user-select:none;
+    font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", serif;
+    animation: drift 20s ease-in-out infinite alternate;
+    will-change: transform;
   }
+  @keyframes drift {
+    0%   { transform: translate(0,0) rotate(var(--rot)); }
+    50%  { transform: translate(22px,-30px) rotate(calc(var(--rot) * -1)); }
+    100% { transform: translate(-16px,14px) rotate(var(--rot)); }
+  }
+  .vignette {
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background: radial-gradient(ellipse at center, transparent 40%, var(--bg) 100%);
+    opacity:.55;
+  }
+
   .wrap { position:relative; z-index:1; max-width:1400px; margin:0 auto; padding:0 clamp(12px,2.5vw,28px); }
 
-  /* Header */
-  .top { padding-top: clamp(16px,3vw,28px); }
+  /* ---------- Header ---------- */
+  .top { padding-top: clamp(14px,3vw,26px); }
   .brand { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-  h1 { margin:0; font-size:clamp(1.5rem,3vw,2.1rem); color:var(--accent); font-family:Georgia,"Times New Roman",serif; }
-  .muted { color:var(--muted); margin:4px 0 0; font-size:.9rem; }
-  .toolbar { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 12px; }
-  input[type=search], select {
-    font:inherit; color:var(--text); background:var(--panel); border:1px solid var(--border);
-    border-radius:10px; padding:10px 12px;
+  .logo-wrap {
+    display:inline-flex; background:#fff; border-radius:16px; padding:8px 16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.25); border:1px solid rgba(0,0,0,.06);
   }
-  input[type=search] { flex:1 1 260px; }
-  .check { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:1px solid var(--border);
-    border-radius:10px; background:var(--panel); cursor:pointer; user-select:none; }
-  .tags { display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+  .logo-wrap img { height:clamp(52px,8vw,78px); width:auto; display:block; }
+  .caption { margin:10px 2px 0; color:var(--muted); font-size:.9rem; letter-spacing:.04em; text-transform:uppercase; font-weight:600; }
+  .caption b { color:var(--accent); font-weight:700; }
+
+  .icon-btn { font:inherit; width:44px; height:44px; border-radius:50%; border:1px solid var(--border);
+    background:var(--panel); color:var(--text); cursor:pointer; display:inline-grid; place-items:center; font-size:1.05rem; flex-shrink:0; }
+  .icon-btn:disabled { opacity:.4; cursor:default; }
+
+  .searchbar { position:relative; margin:18px 0 12px; }
+  .searchbar::before { content:"⌕"; position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1.2rem; color:var(--muted); pointer-events:none; }
+  #search { width:100%; font:inherit; font-size:1rem; color:var(--text); background:var(--panel);
+    border:1px solid var(--border); border-radius:14px; padding:13px 14px 13px 40px; box-shadow:var(--shadow); outline:none; }
+  #search:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(212,167,44,.25), var(--shadow); }
+
+  .tags { display:flex; gap:8px; overflow-x:auto; padding:2px 0 6px; scrollbar-width:none; }
   .tags::-webkit-scrollbar { display:none; }
   .tag { white-space:nowrap; font:inherit; font-size:.85rem; padding:6px 14px; border-radius:999px;
     border:1px solid var(--border); background:var(--panel); color:var(--text); cursor:pointer; }
   .tag.on { background:var(--accent); color:var(--accent-ink); border-color:transparent; }
-  .playbar { display:flex; flex-wrap:wrap; gap:10px; margin:12px 0 4px; align-items:center; }
-  .btn { font:inherit; font-weight:600; padding:10px 18px; border-radius:10px; border:1px solid var(--border);
-    background:var(--panel); color:var(--text); cursor:pointer; }
-  .btn.primary { background:var(--accent); color:var(--accent-ink); border-color:transparent; }
-  .icon-btn { font:inherit; width:42px; height:42px; border-radius:50%; border:1px solid var(--border);
-    background:var(--panel); color:var(--text); cursor:pointer; display:inline-grid; place-items:center; font-size:1rem; }
-  .icon-btn:disabled { opacity:.4; cursor:default; }
 
-  /* Grid: 1 column on phones, 2 columns on laptops and wider */
-  .grid { display:grid; grid-template-columns:minmax(0,1fr); gap:clamp(14px,2vw,24px); padding-top:12px; padding-bottom:110px; }
+  .playbar { display:flex; flex-wrap:wrap; gap:10px; margin:10px 0 4px; align-items:center; }
+  .btn { font:inherit; font-weight:600; padding:10px 18px; border-radius:12px; border:1px solid var(--border);
+    background:var(--panel); color:var(--text); cursor:pointer; }
+  .btn.primary { background:linear-gradient(135deg,#e6bd3e,var(--accent)); color:var(--accent-ink); border-color:transparent; box-shadow:0 6px 18px rgba(212,167,44,.3); }
+  select.mode { font:inherit; color:var(--text); background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px 12px; }
+
+  /* ---------- Grid ---------- */
+  .grid { display:grid; grid-template-columns:minmax(0,1fr); gap:clamp(14px,2vw,24px); padding-top:14px; padding-bottom:120px; }
   @media (min-width:900px) {
     .grid { grid-template-columns:repeat(2, minmax(0,1fr)); }
-    .card.theater { grid-column:1 / -1; }
   }
   @media (max-width:899px) {
     .grid { scroll-snap-type:y proximity; }
     .card { scroll-snap-align:start; scroll-margin-top:12px; }
   }
+  .status { grid-column:1 / -1; text-align:center; color:var(--muted); padding:60px 0; }
 
-  /* Cards */
-  .card { background:var(--panel); border:1px solid var(--border); border-radius:16px; overflow:hidden;
+  /* ---------- Cards ---------- */
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:18px; overflow:hidden;
     box-shadow:var(--shadow); display:flex; flex-direction:column; min-width:0;
     transition: transform .25s, box-shadow .25s, border-color .25s; }
+  .card[hidden] { display:none !important; }
   .card:hover { transform:translateY(-3px); }
   .card.playing { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent), var(--shadow); }
   .card.flash { animation: flash 1.6s ease-in-out 2; }
@@ -99,28 +127,31 @@
     background:#111 center / cover no-repeat; display:grid; place-items:center; }
   .poster::after { content:""; position:absolute; inset:0; background:linear-gradient(transparent 45%, rgba(0,0,0,.5)); }
   .poster.nothumb { background:radial-gradient(circle at 30% 30%, #4a3f2e, #0d0c0a); }
-  .play { position:relative; z-index:1; width:68px; height:68px; border-radius:50%; background:rgba(212,167,44,.95);
-    color:#17150f; display:grid; place-items:center; font-size:1.5rem; padding-left:4px;
-    box-shadow:0 6px 20px rgba(0,0,0,.4); transition:transform .2s; }
+  .poster.nothumb::before { content:"♞"; position:absolute; font-size:9rem; color:rgba(212,167,44,.12); z-index:0; }
+  .play { position:relative; z-index:1; width:68px; height:68px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f1cd62, var(--accent)); color:#17150f;
+    display:grid; place-items:center; font-size:1.5rem; padding-left:4px;
+    box-shadow:0 6px 20px rgba(0,0,0,.45); transition:transform .2s; }
   .poster:hover .play { transform:scale(1.08); }
   .bad { position:absolute; inset:0; display:grid; place-items:center; padding:16px; text-align:center;
     color:var(--err); font-size:.9rem; background:#111; }
 
-  .body { padding:14px 16px 16px; display:flex; flex-direction:column; gap:8px; flex:1; }
-  .meta { font-size:.8rem; color:var(--muted); display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .prov { text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700; }
-  h2 { margin:0; font-size:1.1rem; line-height:1.3; overflow-wrap:anywhere; }
-  .note { margin:0; color:var(--muted); font-size:.92rem; line-height:1.5; }
+  .body { padding:12px 14px 16px; display:flex; flex-direction:column; gap:8px; flex:1; }
+  .meta { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .spacer { flex:1; }
+  .pill { font:inherit; font-size:.78rem; font-weight:600; padding:6px 11px; border-radius:999px;
+    border:1px solid var(--border); background:var(--panel2); color:var(--text); cursor:pointer;
+    text-decoration:none; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+  .pill:hover { border-color:var(--accent); }
+  .pill.prov { background:var(--accent); color:var(--accent-ink); border-color:transparent;
+    text-transform:uppercase; letter-spacing:.07em; font-size:.68rem; cursor:default; }
+  .pill.icon { padding:6px 9px; font-size:.95rem; }
+  .pill.icon.on { color:#e0525a; border-color:rgba(224,82,90,.5); }
+  h2 { margin:2px 0 0; font-size:1.12rem; line-height:1.3; overflow-wrap:anywhere; }
   .chips { display:flex; flex-wrap:wrap; gap:6px; }
-  .chip { font-size:.75rem; padding:3px 9px; border-radius:999px; background:var(--panel2); color:var(--muted); }
-  .acts { margin-top:auto; display:flex; flex-wrap:wrap; gap:6px; padding-top:8px; }
-  .act { font:inherit; font-size:.82rem; padding:6px 10px; border-radius:8px; border:1px solid var(--border);
-    background:var(--panel2); color:var(--text); cursor:pointer; text-decoration:none;
-    display:inline-flex; align-items:center; gap:4px; }
-  .act:hover { border-color:var(--accent); }
-  .act.on { color:#e0525a; border-color:rgba(224,82,90,.45); }
+  .chip { font-size:.72rem; padding:3px 9px; border-radius:999px; background:var(--panel2); color:var(--muted); }
 
-  /* Now-playing bar */
+  /* ---------- Now playing ---------- */
   .now { position:fixed; left:50%; transform:translateX(-50%); bottom:max(14px, env(safe-area-inset-bottom));
     z-index:20; width:min(640px, calc(100% - 24px)); display:flex; align-items:center; justify-content:space-between;
     gap:12px; padding:8px 8px 8px 16px; border-radius:999px; background:var(--panel); border:1px solid var(--border);
@@ -130,17 +161,21 @@
   .now-ctrl { display:flex; gap:6px; flex-shrink:0; }
   .now-ctrl .icon-btn { width:38px; height:38px; }
 
-  .toast { position:fixed; left:50%; bottom:92px; transform:translate(-50%,20px); opacity:0; z-index:30;
+  .toast { position:fixed; left:50%; bottom:96px; transform:translate(-50%,20px); opacity:0; z-index:30;
     background:var(--text); color:var(--bg); padding:8px 14px; border-radius:999px; font-size:.9rem;
     transition:.3s; pointer-events:none; }
   .toast.show { opacity:1; transform:translate(-50%,0); }
 
-  .status { grid-column:1 / -1; text-align:center; color:var(--muted); padding:60px 0; }
-  .foot { text-align:center; color:var(--muted); font-size:.8rem; padding:0 0 110px; position:relative; z-index:1; }
+  /* ---------- Footer ---------- */
+  .foot { position:relative; z-index:1; text-align:center; padding:0 0 110px; color:var(--muted); font-size:.85rem; }
+  .foot-logo { display:inline-block; background:#fff; border-radius:18px; padding:14px 22px; box-shadow:0 8px 24px rgba(0,0,0,.2); }
+  .foot-logo img { width:min(320px,70vw); height:auto; display:block; }
+  .foot p { margin:12px 0 0; }
 
   @media (max-width:600px) {
+    .playbar .btn { flex:1; }
+    select.mode { flex:1; }
     .play { width:56px; height:56px; }
-    .toolbar select { flex:1; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition:none !important; animation:none !important; }
@@ -149,30 +184,29 @@
 </head>
 <body>
 
+<div class="checks" aria-hidden="true"></div>
+<div id="bg" class="bg" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
 <header class="top wrap">
   <div class="brand">
-    <div>
-      <h1>♞ Chess Videos</h1>
-      <p class="muted" id="stats">Loading…</p>
-    </div>
-    <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle light or dark mode" title="Toggle theme">☾</button>
+    <a class="logo-wrap" href="./" aria-label="MyChess64 home">
+      <img src="assets/Header_Logo.png" alt="MyChess64 – Learn. Play. Improve. Anytime, Anywhere.">
+    </a>
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="Switch light or dark mode" title="Switch theme">☾</button>
   </div>
+  <h1 class="sr-only">Learn, Fun &amp; Play - Chess Videos</h1>
+  <p class="caption">Chess <b>Videos</b> · Learn, Fun &amp; Play</p>
 
-  <div class="toolbar">
-    <input id="search" type="search" placeholder="Search title, note or tag…" aria-label="Search videos">
-    <select id="sort" aria-label="Sort order">
-      <option value="new">Newest first</option>
-      <option value="old">Oldest first</option>
-      <option value="az">Title A–Z</option>
-    </select>
-    <label class="check"><input type="checkbox" id="favOnly"> ♥ Saved only</label>
+  <div class="searchbar">
+    <input id="search" type="search" placeholder="Search videos…" aria-label="Search videos" autocomplete="off">
   </div>
 
   <div id="tags" class="tags" role="group" aria-label="Filter by topic"></div>
 
   <div class="playbar">
     <button id="playAll" class="btn primary" type="button">▶ Play all</button>
-    <select id="mode" aria-label="Playback mode">
+    <select id="mode" class="mode" aria-label="Playback mode">
       <option value="once">Play once</option>
       <option value="loop">Loop list</option>
       <option value="shuffle">Shuffle</option>
@@ -181,9 +215,14 @@
   </div>
 </header>
 
-<main id="grid" class="grid wrap" aria-live="polite"></main>
+<main id="grid" class="grid wrap" aria-live="polite">
+  <div id="empty" class="status" hidden>No videos match your search.</div>
+</main>
 
-<footer class="foot wrap" id="foot"></footer>
+<footer class="foot wrap">
+  <div class="foot-logo"><img src="assets/Footer_Logo.png" alt="MyChess64 – Learn. Play. Improve. Anytime, Anywhere."></div>
+  <p id="stats"></p>
+</footer>
 
 <div id="now" class="now" hidden>
   <div class="now-title" id="nowTitle"></div>
@@ -198,13 +237,14 @@
 
 <script>
 (() => {
-  // ---------- Helpers ----------
+  // ---------- DOM ----------
   const $ = id => document.getElementById(id);
-  const $grid = $('grid'), $tags = $('tags'), $search = $('search'), $sort = $('sort'),
-        $fav = $('favOnly'), $mode = $('mode'), $playAll = $('playAll'), $now = $('now'),
-        $nowTitle = $('nowTitle'), $stats = $('stats'), $foot = $('foot'), $theme = $('themeBtn'),
-        $prev = $('prevBtn'), $next = $('nextBtn'), $stop = $('stopBtn');
+  const $grid = $('grid'), $tags = $('tags'), $search = $('search'), $mode = $('mode'),
+        $playAll = $('playAll'), $now = $('now'), $nowTitle = $('nowTitle'), $stats = $('stats'),
+        $theme = $('themeBtn'), $prev = $('prevBtn'), $next = $('nextBtn'), $stop = $('stopBtn'),
+        $empty = $('empty'), $bg = $('bg');
 
+  // ---------- Helpers ----------
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -226,7 +266,6 @@
     return a;
   }
 
-  // Short stable ID from any string (used for keys of non-YouTube/Vimeo links)
   function hashStr(s) {
     let x = 5381;
     for (let i = 0; i < s.length; i++) x = ((x << 5) + x + s.charCodeAt(i)) | 0;
@@ -241,21 +280,17 @@
     toast.timer = setTimeout(() => t.classList.remove('show'), 1800);
   }
 
-  // ---------- Link handling: accept any link ----------
-  // Adds https:// when the scheme is missing; leaves relative paths (/x.mp4, ./x.mp4) alone.
+  // ---------- Link handling: accepts any link ----------
   function normalizeUrl(s) {
     s = String(s || '').trim();
     if (!s) return '';
     if (s.startsWith('//')) return 'https:' + s;
     if (/^(https?:|\/|\.\/|\.\.\/)/i.test(s)) return s;
-    if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return s;   // other schemes, e.g. blob: or data:
+    if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return s;
     return 'https://' + s;
   }
 
   function parseVideo(url) {
-    if (!url) return null;
-
-    // YouTube single videos (watch, youtu.be, shorts, live, embed, music, mobile)
     const yt = url.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])/);
     if (yt) return {
       provider: 'yt', id: yt[1],
@@ -264,7 +299,6 @@
       open: `https://www.youtube.com/watch?v=${yt[1]}`
     };
 
-    // YouTube playlists (no single video)
     const ytList = url.match(/youtube(?:-nocookie)?\.com\/.*[?&]list=([A-Za-z0-9_-]+)/);
     if (ytList) return {
       provider: 'iframe', id: 'pl-' + ytList[1],
@@ -272,7 +306,6 @@
       thumb: null, open: url
     };
 
-    // Vimeo, including unlisted videos (vimeo.com/ID/HASH)
     const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([A-Za-z0-9]+))?/);
     if (vm) {
       const [, id, hash] = vm;
@@ -284,30 +317,30 @@
       };
     }
 
-    // Direct video files
     if (/\.(mp4|webm|ogg|ogv|mov|m4v)([?#]|$)/i.test(url)) return {
       provider: 'file', id: hashStr(url), embed: url, thumb: null, open: url
     };
 
-    // Any other web link: shown in an embedded frame
     return { provider: 'iframe', id: hashStr(url), embed: url, thumb: null, open: url };
   }
 
-  const PROVIDER_LABEL = { yt: 'YouTube', vm: 'Vimeo', file: 'Video file', iframe: 'Web video' };
+  const PROVIDER_LABEL = { yt: 'YouTube', vm: 'Vimeo', file: 'Video', iframe: 'Web' };
 
   // ---------- State ----------
-  let videos = [];          // all loaded videos
-  let filtered = [];        // currently visible videos (display order)
-  let queue = [];           // playback queue
-  let qIdx = -1;            // index in queue of the playing video
-  let activeKey = null;     // key of the playing video
-  let player = null;        // current player (YouTube, Vimeo, or <video>)
-  let mountSeq = 0;         // invalidates stale async player setup
+  let videos = [];               // all videos, newest first
+  let byKey = new Map();         // key -> video
+  let cards = new Map();         // key -> card element (built once, shown/hidden)
+  let visible = new Set();       // keys currently shown
+  let queue = [];                // playback queue
+  let qIdx = -1;
+  let activeKey = null;
+  let player = null;
+  let mountSeq = 0;              // invalidates stale async player setup
   let activeTag = 'All';
   let favs = new Set(store.get('cv-fav', []));
-  let theaters = new Set();
 
   const mode = () => $mode.value;
+  const visibleList = () => videos.filter(v => visible.has(v.key));
 
   // ---------- External player APIs (loaded on demand) ----------
   function loadScript(src) {
@@ -337,7 +370,7 @@
 
   // ---------- Player control ----------
   function destroyPlayer() {
-    mountSeq++;                       // cancel any pending setup
+    mountSeq++;
     const p = player; player = null;
     if (!p) return;
     try {
@@ -352,6 +385,15 @@
   }
 
   const FRAME_ALLOW = 'autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; accelerometer; gyroscope; web-share';
+
+  function makePoster(v) {
+    const p = h('button', { class: 'poster', type: 'button', 'aria-label': 'Play ' + v.title });
+    if (v.info.thumb) p.style.backgroundImage = `url("${v.info.thumb}")`;
+    else p.classList.add('nothumb');
+    p.appendChild(h('span', { class: 'play', 'aria-hidden': 'true' }, '▶'));
+    p.onclick = () => startQueue(v.key);
+    return p;
+  }
 
   function mountPlayer(v, card) {
     destroyPlayer();
@@ -395,48 +437,51 @@
       }).catch(() => { if (token === mountSeq) markBroken(media); });
 
     } else if (v.info.provider === 'file') {
-      const vid = h('video', { src: v.info.embed, controls: '', autoplay: '', playsinline: '', preload: 'auto' });
+      const vid = h('video', { src: v.info.embed, controls: '', playsinline: '', preload: 'auto' });
       vid.addEventListener('ended', () => { if (token === mountSeq) onEnded(); });
       vid.addEventListener('error', () => { if (token === mountSeq) markBroken(media, 'This video file could not be played. Use “Original” to open it.'); });
       media.appendChild(vid);
       player = vid;
-      vid.play().catch(() => {});   // browsers may block autoplay; the controls still work
+      vid.play().catch(() => {});
 
     } else {
-      // Generic web embed: plays in a frame; no auto-advance because the page can't see its state
       media.appendChild(h('iframe', { src: v.info.embed, allow: FRAME_ALLOW, allowfullscreen: '', title: v.title }));
     }
   }
 
   function resetCard(key) {
-    const old = document.getElementById(key);
-    const v = videos.find(x => x.key === key);
-    if (old && v) old.replaceWith(buildCard(v));
+    const card = cards.get(key), v = byKey.get(key);
+    if (!card || !v) return;
+    card.classList.remove('playing');
+    const media = card.querySelector('.media');
+    media.innerHTML = '';
+    media.appendChild(makePoster(v));
   }
 
   function playIndex(i, scroll) {
     if (i < 0 || i >= queue.length) return stop();
     const v = queue[i];
+    const card = cards.get(v.key);
+    if (!card) return stop();
     const prev = activeKey;
     qIdx = i; activeKey = v.key;
     if (prev && prev !== v.key) resetCard(prev);
-    const card = document.getElementById(v.key);
-    if (!card) return stop();
     mountPlayer(v, card);
     updateNow();
     if (scroll) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function startQueue(key) {
-    if (!filtered.length) return;
+    const list0 = visibleList();
+    if (!list0.length) return;
     let list;
     if (mode() === 'shuffle') {
       if (key) {
-        const first = filtered.find(v => v.key === key);
-        list = first ? [first, ...shuffle(filtered.filter(v => v.key !== key))] : shuffle(filtered);
-      } else list = shuffle(filtered);
+        const first = list0.find(v => v.key === key);
+        list = first ? [first, ...shuffle(list0.filter(v => v.key !== key))] : shuffle(list0);
+      } else list = shuffle(list0);
     } else {
-      list = [...filtered];
+      list = [...list0];
     }
     const idx = key && mode() !== 'shuffle' ? list.findIndex(v => v.key === key) : 0;
     queue = list;
@@ -476,22 +521,88 @@
     $playAll.textContent = '■ Stop';
   }
 
-  // ---------- Filtering & sorting ----------
-  function getFiltered() {
+  // ---------- Cards (built once; filtering only shows/hides them, so playback is never interrupted) ----------
+  function buildCard(v) {
+    const card = h('article', { class: 'card', id: v.key });
+    const media = h('div', { class: 'media' });
+    media.appendChild(makePoster(v));
+    card.appendChild(media);
+
+    const body = h('div', { class: 'body' });
+    const meta = h('div', { class: 'meta' });
+
+    meta.appendChild(h('span', { class: 'pill prov' }, PROVIDER_LABEL[v.info.provider] || 'Video'));
+
+    const playBtn = h('button', { class: 'pill', type: 'button' }, '▶ Play');
+    playBtn.onclick = () => startQueue(v.key);
+
+    const fsBtn = h('button', { class: 'pill', type: 'button', title: 'Full screen', 'aria-label': 'Full screen' }, '⛶ Full screen');
+    fsBtn.onclick = () => {
+      if (activeKey !== v.key) startQueue(v.key);
+      const m = cards.get(v.key)?.querySelector('.media');
+      if (m && m.requestFullscreen) m.requestFullscreen().catch(() => {});
+    };
+
+    const orig = h('a', { class: 'pill', href: v.info.open, target: '_blank', rel: 'noopener' }, '↗ Original');
+
+    const favOn = favs.has(v.key);
+    const favBtn = h('button', {
+      class: 'pill icon' + (favOn ? ' on' : ''), type: 'button',
+      title: favOn ? 'Saved' : 'Save', 'aria-label': favOn ? 'Remove from saved' : 'Save video'
+    }, favOn ? '♥' : '♡');
+    favBtn.onclick = () => {
+      const on = !favs.has(v.key);
+      on ? favs.add(v.key) : favs.delete(v.key);
+      store.set('cv-fav', [...favs]);
+      favBtn.className = 'pill icon' + (on ? ' on' : '');
+      favBtn.textContent = on ? '♥' : '♡';
+      favBtn.setAttribute('aria-label', on ? 'Remove from saved' : 'Save video');
+    };
+
+    const shareBtn = h('button', { class: 'pill icon', type: 'button', title: 'Copy link', 'aria-label': 'Copy link' }, '🔗');
+    shareBtn.onclick = async () => {
+      const link = location.href.split('#')[0] + '#' + v.key;
+      try { await navigator.clipboard.writeText(link); toast('Link copied'); }
+      catch (e) { window.prompt('Copy this link:', link); }
+    };
+
+    meta.append(playBtn, fsBtn, orig, h('span', { class: 'spacer' }), favBtn, shareBtn);
+    body.appendChild(meta);
+    body.appendChild(h('h2', {}, v.title));
+
+    if (v.tags.length) {
+      const chips = h('div', { class: 'chips' });
+      v.tags.forEach(t => chips.appendChild(h('span', { class: 'chip' }, t)));
+      body.appendChild(chips);
+    }
+    card.appendChild(body);
+    return card;
+  }
+
+  // ---------- Filtering ----------
+  function applyFilter() {
     const q = $search.value.trim().toLowerCase();
-    const list = videos.filter(v => {
-      if ($fav.checked && !favs.has(v.key)) return false;
-      if (activeTag !== 'All' && !v.tags.includes(activeTag)) return false;
-      if (!q) return true;
-      return (v.title + ' ' + v.note + ' ' + v.tags.join(' ')).toLowerCase().includes(q);
+    visible = new Set();
+    videos.forEach(v => {
+      const tagOk = activeTag === 'All' || v.tags.includes(activeTag);
+      const textOk = !q || (v.title + ' ' + v.note + ' ' + v.tags.join(' ')).toLowerCase().includes(q);
+      const ok = tagOk && textOk;
+      if (ok) visible.add(v.key);
+      cards.get(v.key).hidden = !ok;
     });
-    const s = $sort.value;
-    return list.sort((a, b) => {
-      if (s === 'az') return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
-      if (!a.time !== !b.time) return a.time ? -1 : 1;   // undated videos go last
-      const d = s === 'old' ? a.time - b.time : b.time - a.time;
-      return d || a.title.localeCompare(b.title);
-    });
+
+    $empty.hidden = visible.size > 0 && videos.length > 0;
+    $empty.textContent = videos.length ? 'No videos match your search.' : 'No videos yet. Add links to videos.json.';
+
+    // If the playing video was filtered out, stop it; otherwise keep the queue in step
+    if (activeKey) {
+      queue = queue.filter(v => visible.has(v.key));
+      qIdx = queue.findIndex(v => v.key === activeKey);
+      if (qIdx < 0) stop();
+    }
+    renderTags();
+    updateNow();
+    updateStats();
   }
 
   function renderTags() {
@@ -504,133 +615,37 @@
     ['All', ...all].forEach(t => {
       const n = t === 'All' ? videos.length : counts.get(t);
       const b = h('button', {
-        class: 'tag' + (t === activeTag ? ' on' : ''), type: 'button',
-        'aria-pressed': String(t === activeTag)
+        class: 'tag' + (t === activeTag ? ' on' : ''), type: 'button', 'aria-pressed': String(t === activeTag)
       }, `${t} (${n})`);
-      b.onclick = () => { activeTag = t; render(); };
+      b.onclick = () => { activeTag = t; applyFilter(); };
       $tags.appendChild(b);
     });
   }
 
-  // ---------- Cards ----------
-  function buildCard(v) {
-    const c = h('article', { class: 'card', id: v.key });
-    if (theaters.has(v.key)) c.classList.add('theater');
-
-    // Media area: poster with play button
-    const media = h('div', { class: 'media' });
-    const poster = h('button', { class: 'poster', type: 'button', 'aria-label': 'Play ' + v.title });
-    if (v.info.thumb) poster.style.backgroundImage = `url("${v.info.thumb}")`;
-    else poster.classList.add('nothumb');
-    poster.appendChild(h('span', { class: 'play', 'aria-hidden': 'true' }, '▶'));
-    poster.onclick = () => startQueue(v.key);
-    media.appendChild(poster);
-    c.appendChild(media);
-
-    // Body
-    const body = h('div', { class: 'body' });
-    const meta = h('div', { class: 'meta' });
-    meta.appendChild(h('span', { class: 'prov' }, PROVIDER_LABEL[v.info.provider] || 'Video'));
-    if (v.time) meta.appendChild(h('span', {}, new Date(v.time).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })));
-    body.appendChild(meta);
-    body.appendChild(h('h2', {}, v.title));
-    if (v.note) body.appendChild(h('p', { class: 'note' }, v.note));
-    if (v.tags.length) {
-      const chips = h('div', { class: 'chips' });
-      v.tags.forEach(t => chips.appendChild(h('span', { class: 'chip' }, t)));
-      body.appendChild(chips);
-    }
-
-    // Actions
-    const acts = h('div', { class: 'acts' });
-    const playBtn = h('button', { class: 'act', type: 'button' }, '▶ Play');
-    playBtn.onclick = () => startQueue(v.key);
-
-    const fsBtn = h('button', { class: 'act', type: 'button', title: 'Full screen' }, '⛶ Full screen');
-    fsBtn.onclick = () => {
-      if (activeKey !== v.key) startQueue(v.key);
-      const m = document.querySelector(`#${CSS.escape(v.key)} .media`);
-      if (m && m.requestFullscreen) m.requestFullscreen().catch(() => {});
-    };
-
-    const thBtn = h('button', { class: 'act', type: 'button', title: 'Wider view' }, theaters.has(v.key) ? '▣ Normal' : '▭ Theater');
-    thBtn.onclick = () => {
-      const on = !theaters.has(v.key);
-      on ? theaters.add(v.key) : theaters.delete(v.key);
-      const cur = document.getElementById(v.key);
-      if (cur) cur.classList.toggle('theater', on);
-      thBtn.textContent = on ? '▣ Normal' : '▭ Theater';
-    };
-    acts.append(playBtn, fsBtn, thBtn);
-
-    const favOn = favs.has(v.key);
-    const favBtn = h('button', { class: 'act' + (favOn ? ' on' : ''), type: 'button' }, favOn ? '♥ Saved' : '♡ Save');
-    favBtn.onclick = () => {
-      const on = !favs.has(v.key);
-      on ? favs.add(v.key) : favs.delete(v.key);
-      store.set('cv-fav', [...favs]);
-      favBtn.className = 'act' + (on ? ' on' : '');
-      favBtn.textContent = on ? '♥ Saved' : '♡ Save';
-      updateStats();
-      if ($fav.checked) render();
-    };
-
-    const shareBtn = h('button', { class: 'act', type: 'button' }, '🔗 Share');
-    shareBtn.onclick = async () => {
-      const link = location.href.split('#')[0] + '#' + v.key;
-      try { await navigator.clipboard.writeText(link); toast('Link copied'); }
-      catch (e) { window.prompt('Copy this link:', link); }
-    };
-    acts.append(favBtn, shareBtn, h('a', { class: 'act', href: v.info.open, target: '_blank', rel: 'noopener' }, '↗ Original'));
-    body.appendChild(acts);
-    c.appendChild(body);
-    return c;
-  }
-
-  // ---------- Rendering ----------
-  function render() {
-    filtered = getFiltered();
-    renderTags();
-    $grid.innerHTML = '';
-
-    if (!videos.length) {
-      $grid.appendChild(h('div', { class: 'status' }, 'No videos yet. Add entries to videos.json.'));
-    } else if (!filtered.length) {
-      $grid.appendChild(h('div', { class: 'status' }, 'No videos match your filters.'));
-    } else {
-      filtered.forEach(v => $grid.appendChild(buildCard(v)));
-    }
-
-    // Keep the playing video going if it is still visible
-    if (activeKey) {
-      const keep = new Set(filtered.map(v => v.key));
-      queue = queue.filter(v => keep.has(v.key));
-      qIdx = queue.findIndex(v => v.key === activeKey);
-      if (qIdx < 0) stop();
-      else mountPlayer(queue[qIdx], document.getElementById(activeKey));
-    }
-    updateNow();
-    updateStats();
-    updateFooter();
-  }
-
   function updateStats() {
+    const n = videos.length;
     const topics = new Set(videos.flatMap(v => v.tags)).size;
-    const saved = [...favs].filter(k => videos.some(v => v.key === k)).length;
-    $stats.textContent = `${videos.length} videos · ${topics} topics · ${saved} saved`;
+    $stats.textContent = visible.size === n
+      ? `${n} video${n === 1 ? '' : 's'} · ${topics} topic${topics === 1 ? '' : 's'}`
+      : `Showing ${visible.size} of ${n} videos`;
   }
 
-  function updateFooter() {
-    $foot.textContent = 'Paste any link in videos.json: YouTube, Vimeo, direct video files (.mp4, .webm…), or other web video pages.';
-  }
-
-  function focusHash() {
-    const key = decodeURIComponent(location.hash.slice(1));
-    const card = key && document.getElementById(key);
-    if (!card) return;
-    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    card.classList.add('flash');
-    setTimeout(() => card.classList.remove('flash'), 3500);
+  // ---------- Background: faded floating chess pieces ----------
+  function buildBackground() {
+    const pieces = ['♔', '♕', '♖', '♗', '♘', '♙', '♚', '♛', '♜', '♝', '♞', '♟'];
+    const count = window.innerWidth < 700 ? 14 : 26;
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+      const s = h('span', { class: 'bgp' }, pieces[Math.floor(Math.random() * pieces.length)]);
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.top = (Math.random() * 100) + '%';
+      s.style.fontSize = (34 + Math.random() * 96) + 'px';
+      s.style.animationDuration = (16 + Math.random() * 18) + 's';
+      s.style.animationDelay = (-Math.random() * 20) + 's';
+      s.style.setProperty('--rot', (Math.random() * 40 - 20) + 'deg');
+      frag.appendChild(s);
+    }
+    $bg.appendChild(frag);
   }
 
   // ---------- Theme ----------
@@ -642,9 +657,7 @@
   $theme.onclick = () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
 
   // ---------- Controls ----------
-  $search.addEventListener('input', render);
-  $sort.addEventListener('change', () => { store.set('cv-sort', $sort.value); render(); });
-  $fav.addEventListener('change', render);
+  $search.addEventListener('input', applyFilter);
   $mode.addEventListener('change', () => store.set('cv-mode', $mode.value));
   $playAll.onclick = () => (activeKey ? stop() : startQueue(null));
   $prev.onclick = () => go(-1, true);
@@ -658,6 +671,15 @@
     if (e.key === 'ArrowLeft' || e.key === 'p') go(-1, true);
     if (e.key === 'Escape') stop();
   });
+
+  function focusHash() {
+    const key = decodeURIComponent(location.hash.slice(1));
+    const card = key && cards.get(key);
+    if (!card || card.hidden) return;
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.add('flash');
+    setTimeout(() => card.classList.remove('flash'), 3500);
+  }
 
   // ---------- Load data ----------
   async function load() {
@@ -674,34 +696,39 @@
           const url = normalizeUrl(v.url);
           const info = parseVideo(url);
           let key = `${info.provider}-${info.id}`;
-          if (seen.has(key)) key += `-${i}`;          // duplicate links stay distinct
+          if (seen.has(key)) key += `-${i}`;
           seen.add(key);
           const [y, m, d] = String(v.date || '').split('-').map(Number);
           return {
             key, info, url,
             title: String(v.title || 'Untitled'),
-            date: v.date || '',
             time: y ? new Date(y, (m || 1) - 1, d || 1).getTime() : 0,
             note: String(v.note || ''),
             tags: (Array.isArray(v.tags) ? v.tags : []).map(t => String(t).trim()).filter(Boolean)
           };
-        });
+        })
+        // Newest first by date (undated last); the date itself is not displayed
+        .sort((a, b) => b.time - a.time);
 
-      $sort.value = store.get('cv-sort', 'new');
+      byKey = new Map(videos.map(v => [v.key, v]));
+      videos.forEach(v => {
+        const card = buildCard(v);
+        cards.set(v.key, card);
+        $grid.insertBefore(card, $empty);
+      });
+
       $mode.value = store.get('cv-mode', 'once');
-
-      render();
+      applyFilter();
       focusHash();
     } catch (e) {
-      $grid.innerHTML = '';
-      $grid.appendChild(h('div', { class: 'status' },
-        'Could not load videos.json. Keep it in the same folder as index.html and open the page through a web server ' +
-        '(for example: python -m http.server), not by double-clicking the file.'));
-      $stats.textContent = 'Data not loaded';
+      $empty.hidden = false;
+      $empty.textContent = 'Could not load videos.json. Keep it in the same folder as index.html and open the page through a web server (for example: python -m http.server), not by double-clicking the file.';
+      $stats.textContent = '';
     }
   }
 
   setTheme(document.documentElement.dataset.theme || 'dark');
+  buildBackground();
   load();
 })();
 </script>
