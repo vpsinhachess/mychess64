@@ -1,0 +1,1 @@
+{"appId":"com.mychess64.app","appName":"MyChess64","webDir":"www","server":{"url":"https://www.mychess64.com","cleartext":false,"allowNavigation":["www.mychess64.com"]},"ios":{"contentInset":"always","backgroundColor":"#0b1f3a"},"android":{"backgroundColor":"#0b1f3a"}}
