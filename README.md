@@ -1,34 +1,24 @@
-# Ask CHESSA – modular version
+# MyChess64 – website files (GitHub Pages ready)
 
-Open `index.html` through any static host (GitHub Pages, Netlify) or a local server.
-For a single file you can open from a phone, run `build.bat` (or `python build.py`) -> `ask-chessa-bundle.html`.
+Upload everything in this folder to the **root** of your GitHub repository (keep hidden items: `.nojekyll`, `.well-known/`).
 
-## Files and what they answer
-| File | Handles |
-|---|---|
-| data/kb-data.js, kb-extra.js, *your files* | Knowledge entries (topic, title, key, answer, ref) |
-| js/kb.js + js/knowledge.js | Matching, typo fixing, FEN/opening/notation/Elo replies |
-| js/engine.js | Stockfish WASM: FEN best move + evaluation, PGN blunder/mistake review |
-| data/puzzles.js + js/puzzles.js | Playable puzzles (built-in set, Lichess daily, Chess.com) |
-| js/wiki.js | "who is / history of ..." from Wikipedia, cached, with source link |
-| js/live.js | Lichess/Chess.com players, tablebase, tips |
-| js/learn.js | Quiz, opening database, Chess960, explain like a beginner |
-| js/tutor.js | Learn / Analyze / Puzzle / Quiz / Study / Coach modes, levels, coach tips |
-| js/hindi.js | Hindi answers, voice and mic |
-| js/ui.js, js/app.js | Settings, voice speed, suggestions, reply, effects |
-| js/core.js | Module registry; warns if a file is missing |
+## Deploy on GitHub Pages
+1. Create a repo, then from this folder: `git init && git add -A && git commit -m "MyChess64 homepage" && git branch -M main && git remote add origin <repo-url> && git push -u origin main`
+2. Repo → Settings → Pages → Source: *Deploy from a branch* → `main` / `(root)`.
+3. Custom domain: `www.mychess64.com` (file `CNAME` is included). At your DNS: `CNAME www → <username>.github.io`. Tick *Enforce HTTPS*.
+4. Open the site in Chrome/Edge: the **Get App** button (top) and **Install from browser** (bottom) install the PWA.
 
-## How a question flows
-Each module wraps `ask()`. The newest module sees the question first, answers it if it matches
-(FEN/PGN -> engine, "puzzle" -> puzzles, "who is" -> wiki, ...), otherwise passes it down to the
-knowledge module, which searches every knowledge file and replies in the chat.
+## Contents
+- `index.html` homepage (SEO tags, JSON-LD, animated checkmate board, PWA install buttons)
+- `manifest.webmanifest`, `sw.js`, `offline.html`, `404.html`, `browserconfig.xml`, `favicon.ico`, `assets/` PWA and icons
+- `sitemap.xml`, `robots.txt` SEO
+- `.well-known/` Android and iOS app link templates (fill in the placeholders)
+- `downloads/mychess64.apk` put your Android APK here
+- `app-build/` store build files and `BUILD-APPS.md`
 
-## Add knowledge
-1. Create `data/myfile.js` with `const myTopic=[{topic:"..",title:"..",key:"..",answer:"..",ref:".."}];`
-2. Add `["data/myfile.js","myTopic"]` to `data/manifest.js`.
+## Customise
+- Store links: edit `APPS` at the top of the first `<script>` in `index.html`.
+- Games: the `MC64` data in the second `<script>` (UCI moves + SAN).
+- Board colours: `.cg` background and `.co` label colours in the CSS.
 
-## Add puzzles
-Add objects to `data/puzzles.js` (fen, level, theme, moves in SAN). Type "starter puzzle" to try them.
-
-## Work offline
-Copy chess.js 0.10.3 to `lib/chess.min.js` (cdnjs). It is tried before the CDN.
+Chess pieces: cburnet set by Colin M.L. Burnett (CC BY-SA 3.0 / GPL).
