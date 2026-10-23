@@ -141,62 +141,87 @@ body.launched main,body.launched #grid,body.launched .glow{opacity:0;transition:
   }
   tick(); setInterval(tick, 1000);
 
-  /* Synth sound */
-  var ctx, master, muted = false, nb;
+  /* Synth sound (compressed, reverberated, click-free) */
+  var ctx, master, out, nb, muted = false;
   function audio(){
     if(!ctx){
       var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return null;
-      ctx = new AC(); master = ctx.createGain(); master.gain.value = .9; master.connect(ctx.destination);
+      ctx = new AC();
+      master = ctx.createGain(); master.gain.value = .8;
+      var comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -20; comp.knee.value = 24; comp.ratio.value = 8; comp.attack.value = .004; comp.release.value = .3;
+      master.connect(comp); comp.connect(ctx.destination);
+      out = ctx.createGain(); out.gain.value = .7; out.connect(master);
+      var len = Math.floor(ctx.sampleRate*1.8), ir = ctx.createBuffer(2, len, ctx.sampleRate);
+      for(var ch=0; ch<2; ch++){ var dd = ir.getChannelData(ch); for(var i=0;i<len;i++) dd[i] = (Math.random()*2-1)*Math.pow(1-i/len, 2.6); }
+      var cv2 = ctx.createConvolver(); cv2.buffer = ir; var wet = ctx.createGain(); wet.gain.value = .28;
+      out.connect(cv2); cv2.connect(wet); wet.connect(master);
       nb = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
-      var d = nb.getChannelData(0); for(var i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+      var d = nb.getChannelData(0); for(var j=0;j<d.length;j++) d[j] = Math.random()*2-1;
     }
     if(ctx.state === 'suspended') ctx.resume();
     return ctx;
   }
-  function noise(t, dur, f0, q, vol, f1){
+  function pan(node, p){
+    if(ctx.createStereoPanner){ var s = ctx.createStereoPanner(); s.pan.value = p; node.connect(s); return s; } return node;
+  }
+  function noise(t, dur, f0, q, vol, f1, p){
     var s = ctx.createBufferSource(); s.buffer = nb;
     var f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(f0, t); if(f1) f.frequency.exponentialRampToValueAtTime(f1, t+dur); f.Q.value = q;
-    var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t+Math.min(.005, dur/2)); g.gain.exponentialRampToValueAtTime(.001, t+dur);
-    s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random()); s.stop(t+dur+.05);
+    var g = ctx.createGain(), at = Math.min(.012, dur*.3);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t+at); g.gain.setTargetAtTime(0, t+at, dur/4);
+    s.connect(f); f.connect(g); pan(g, p||0).connect(out); s.start(t, Math.random()); s.stop(t+dur*1.6+.1);
   }
   function tone(t, fr, dur, vol, type){
-    var o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
-    o.type = type || 'sawtooth'; o.frequency.value = fr; f.type = 'lowpass'; f.frequency.setValueAtTime(900, t); f.frequency.linearRampToValueAtTime(3400, t+.08);
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t+.03); g.gain.setValueAtTime(vol, t+dur-.12); g.gain.linearRampToValueAtTime(0, t+dur);
-    o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t+dur+.05);
+    [-6, 6].forEach(function(det){
+      var o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+      o.type = type || 'sawtooth'; o.frequency.value = fr; o.detune.value = det;
+      f.type = 'lowpass'; f.Q.value = .5; f.frequency.setValueAtTime(600, t); f.frequency.linearRampToValueAtTime(2200, t+.12);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol/2, t+.07);
+      g.gain.setValueAtTime(vol/2, Math.max(t+.08, t+dur-.15)); g.gain.setTargetAtTime(0, Math.max(t+.08, t+dur-.15), .1);
+      o.connect(f); f.connect(g); g.connect(out); o.start(t); o.stop(t+dur+.8);
+    });
   }
   function clack(t){
-    noise(t, .06, 1100, 6, .9); noise(t, .12, 380, 3, .8);
+    noise(t, .08, 1100, 5, .5); noise(t, .14, 380, 2, .5);
     var o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
-    o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(90, t+.1);
-    g.gain.setValueAtTime(.7, t); g.gain.exponentialRampToValueAtTime(.001, t+.14); o.connect(g); g.connect(master); o.start(t); o.stop(t+.16);
+    o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(90, t+.12);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.4, t+.004); g.gain.setTargetAtTime(0, t+.005, .035);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t+.3);
   }
   function riser(t){
-    noise(t, .9, 300, 1.5, .5, 6000);
-    var o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sawtooth';
-    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(880, t+.9);
-    g.gain.setValueAtTime(.001, t); g.gain.linearRampToValueAtTime(.12, t+.85); g.gain.linearRampToValueAtTime(0, t+.95);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t+1);
+    noise(t, .9, 300, 1.2, .22, 5000);
+    var o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter(); o.type = 'sawtooth'; f.type = 'lowpass'; f.frequency.value = 1500;
+    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(660, t+.9);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.05, t+.8); g.gain.setTargetAtTime(0, t+.85, .04);
+    o.connect(f); f.connect(g); g.connect(out); o.start(t); o.stop(t+1.2);
   }
   function fanfare(t){
-    [[392,0,.22],[392,.24,.22],[392,.48,.22],[523,.72,.7],[440,1.46,.25],[494,1.74,.25],[659,2.02,1.4]].forEach(function(n){
-      tone(t+n[1], n[0], n[2], .16); tone(t+n[1], n[0]*2, n[2], .07, 'square'); tone(t+n[1], n[0]/2, n[2], .12, 'triangle');
+    [[392,0,.24],[392,.26,.24],[392,.52,.24],[523,.78,.7],[440,1.52,.27],[494,1.82,.27],[659,2.12,1.5]].forEach(function(n){
+      tone(t+n[1], n[0], n[2], .075); tone(t+n[1], n[0]*2, n[2], .03, 'triangle'); tone(t+n[1], n[0]/2, n[2], .05, 'triangle');
     });
-    noise(t+2.02, 1.5, 5000, .7, .14);
+    noise(t+2.12, 1.6, 5000, .6, .05);
   }
   function applause(t, secs){
-    noise(t, secs, 2600, .5, .09);
-    var n = Math.floor(secs*55);
-    for(var i=0;i<n;i++){
-      var p = i/n, den = Math.sin(Math.PI*Math.pow(p,.6));
-      if(Math.random() > .25+.75*den) continue;
-      noise(t+p*secs+Math.random()*.03, .05+Math.random()*.05, 1400+Math.random()*2400, 1.2+Math.random()*2, .25+Math.random()*.4*den);
-    }
+    var s = ctx.createBufferSource(); s.buffer = nb; s.loop = true;
+    var f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2200; f.Q.value = .4;
+    var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.05, t+1.6); g.gain.setValueAtTime(.05, t+secs-2); g.gain.linearRampToValueAtTime(0, t+secs);
+    s.connect(f); f.connect(g); g.connect(out); s.start(t); s.stop(t+secs+.1);
+    /* schedule claps one second at a time to keep CPU smooth */
+    var sec = 0;
+    (function step(){
+      for(var i=0;i<30;i++){
+        var p = (sec+i/30)/secs, den = Math.sin(Math.PI*Math.pow(p,.6));
+        if(Math.random() > .2+.7*den) continue;
+        noise(t+sec+Math.random(), .07+Math.random()*.06, 1500+Math.random()*2200, 1+Math.random()*1.5, .05+Math.random()*.1*den, 0, Math.random()*1.6-.8);
+      }
+      if(++sec < secs) setTimeout(step, 900);
+    })();
   }
-  function sparkle(t){ for(var i=0;i<7;i++) tone(t+i*.05, 1200+i*260, .25, .05, 'sine'); }
+  function sparkle(t){ for(var i=0;i<7;i++) tone(t+i*.06, 1200+i*260, .3, .02, 'sine'); }
   $('mute').addEventListener('click', function(){
     muted = !muted; this.textContent = muted ? 'Sound off' : 'Sound on'; this.setAttribute('aria-pressed', muted);
-    if(master) master.gain.value = muted ? 0 : .9;
+    if(master) master.gain.setTargetAtTime(muted ? 0 : .8, ctx.currentTime, .05);
   });
 
   /* Canvas particles */
