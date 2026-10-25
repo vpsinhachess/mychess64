@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="MyChess64 Tournament Resources — upcoming chess tournaments in India based on AICF All Events.">
+<title>MyChess64 — Tournament Resources</title>
+<style>
+:root{
+ --bg:#f4f1e8;--panel:#ffffff;--panel2:#f8f6ef;--text:#24201a;--muted:#6f6a61;
+ --gold:#b88628;--gold2:#c99738;--line:rgba(62,49,29,.12);
+ --green:#16845d;--blue:#4777b9;--purple:#7655a8;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+background:
+ radial-gradient(circle at 12% 0%,rgba(201,151,56,.10),transparent 30%),
+ radial-gradient(circle at 90% 10%,rgba(71,119,185,.07),transparent 28%),
+ linear-gradient(180deg,#faf9f5 0%,#f2eee4 100%);
+position:relative;min-height:100vh}
+body:before{
+ content:"♞";
+ position:fixed;
+ right:-55px;
+ top:90px;
+ font-family:Georgia,"Times New Roman",serif;
+ font-size:520px;
+ line-height:1;
+ color:rgba(68,57,39,.35);
+ transform:rotate(-7deg);
+ pointer-events:none;
+ z-index:-1;
+}
+body:after{
+ content:"♟";
+ position:fixed;
+ left:-95px;
+ bottom:-130px;
+ font-family:Georgia,"Times New Roman",serif;
+ font-size:430px;
+ line-height:1;
+ color:rgba(184,134,40,.28);
+ transform:rotate(8deg);
+ pointer-events:none;
+ z-index:-1;
+}
+a{color:inherit;text-decoration:none}.container{width:min(1240px,92%);margin:auto}
+header{position:sticky;top:0;z-index:30;background:rgba(250,249,245,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);box-shadow:0 5px 22px rgba(65,50,25,.05)}
+.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.2px}.logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+ background:linear-gradient(145deg,#e2bd67,#b88628);color:#fff;font-size:25px;box-shadow:0 8px 25px rgba(217,164,65,.18)}
+.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:1.7px;text-transform:uppercase;margin-top:2px}
+.navlinks{display:flex;gap:25px;color:#625d55;font-size:13px;font-weight:800}.navlinks a:hover{color:#fff}
+.hero{position:relative;padding:68px 0 35px;text-align:center;overflow:hidden}.hero-watermark{position:absolute;left:50%;top:-115px;transform:translateX(-50%);font-family:Georgia,"Times New Roman",serif;font-size:520px;line-height:1;color:rgba(68,57,39,.12);pointer-events:none;z-index:0}.hero>.container{position:relative;z-index:1}.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:999px;
+ background:rgba(184,134,40,.08);border:1px solid rgba(184,134,40,.22);color:#94691d;font-size:10px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase}
+.hero h1{font-size:clamp(40px,6vw,70px);line-height:.98;margin:19px auto 15px;letter-spacing:-2.8px;max-width:900px}.hero h1 span{color:var(--gold2)}
+.hero p{max-width:750px;margin:auto;color:#5e584f;font-size:16px;line-height:1.65;font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:32px 0}.stat{background:rgba(255,255,255,.78);
+ border:1px solid var(--line);border-radius:18px;padding:18px;text-align:left}.stat b{font-size:27px;display:block}.stat span{color:var(--muted);font-size:11px;font-weight:700}
+.toolbar{position:sticky;top:72px;z-index:20;background:rgba(250,249,245,.90);backdrop-filter:blur(16px);padding:14px 0;border-block:1px solid var(--line);box-shadow:0 4px 18px rgba(65,50,25,.04)}
+.filters{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1fr auto;gap:9px}
+input,select{width:100%;background:#fffdf8;color:#29251f;border:1px solid var(--line);border-radius:12px;padding:13px 14px;outline:none;font:inherit;font-size:13px}
+input:focus,select:focus{border-color:rgba(217,164,65,.55);box-shadow:0 0 0 3px rgba(184,134,40,.08)}
+button,.btn{border:0;border-radius:12px;padding:13px 16px;background:var(--gold);color:#17120a;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+button:hover,.btn:hover{filter:brightness(1.08)}.secondary{background:#fffdf8;color:#4d463c;border:1px solid var(--line)}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:38px 0 18px}.section-head h2{margin:0;font-size:27px;letter-spacing:-.5px;color:#29251f}.live-dot{font-size:10px;color:var(--green);font-weight:800;margin-left:7px}.pdf-note{font-size:10px!important;color:#8795aa!important;margin-top:3px!important}.live-dot.offline{color:var(--muted)}.section-head p{margin:5px 0 0;color:#716a60;font-size:12px;font-weight:600}
+.month{margin:34px 0 0}.month-title{display:flex;align-items:center;gap:12px;margin-bottom:15px}.month-title h2{margin:0;font-size:23px}.month-title span{color:var(--muted);font-size:11px;font-weight:700}.month-line{height:1px;background:var(--line);flex:1}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{position:relative;background:rgba(255,255,255,.92);border:1px solid rgba(62,49,29,.11);border-radius:20px;overflow:hidden;transition:.2s;box-shadow:0 10px 28px rgba(70,54,30,.09)}
+.card:hover{transform:translateY(-4px);border-color:rgba(184,134,40,.34);box-shadow:0 22px 55px rgba(70,54,30,.15)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 18px 0}.badge{font-size:9px;font-weight:900;letter-spacing:.75px;text-transform:uppercase;padding:7px 9px;border-radius:8px;
+ background:rgba(69,211,155,.11);color:var(--green);border:1px solid rgba(69,211,155,.17)}.badge.national{color:var(--gold2);background:rgba(217,164,65,.11);border-color:rgba(217,164,65,.19)}
+.badge.international{color:var(--blue);background:rgba(110,168,255,.1);border-color:rgba(110,168,255,.17)}.badge.special{color:var(--purple);background:rgba(185,149,255,.1);border-color:rgba(185,149,255,.17)}
+.datebox{text-align:right;color:var(--gold2);font-weight:900;font-size:11px;line-height:1.45;white-space:nowrap}.datebox small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.7px}
+.card-body{padding:12px 18px 18px}.card h3{font-size:17px;line-height:1.34;margin:4px 0 12px;letter-spacing:-.15px;font-weight:800}.meta{display:grid;gap:8px;color:var(--muted);font-size:12px}.meta div{display:flex;gap:9px;align-items:flex-start}.icon{width:18px;text-align:center;color:var(--gold2);flex:0 0 18px}
+.code-row{margin-top:13px;display:flex;justify-content:space-between;gap:10px;align-items:center}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#95a4bd;font-size:10px}.format{padding:6px 8px;border-radius:8px;background:#f1ece1;color:#655d50;font-size:9px;font-weight:900;text-transform:uppercase}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0}.tag{font-size:9px;padding:5px 8px;border-radius:999px;background:#1a2741;color:#bfc9db}.card-actions{display:flex;gap:8px;margin-top:14px}.card-actions a{flex:1}.card-actions .btn{width:100%;font-size:11px;padding:10px}.card-actions .download{background:#edf7f2;color:#147650;border:1px solid rgba(22,132,93,.16)}
+.empty{padding:55px;text-align:center;border:1px dashed var(--line);border-radius:18px;color:var(--muted);grid-column:1/-1}.note{margin:40px 0;padding:20px;border-radius:18px;background:rgba(71,119,185,.045);border:1px solid rgba(71,119,185,.13);color:#68635b;font-size:12px;line-height:1.65}.note b{color:#fff}
+footer{margin-top:50px;border-top:1px solid var(--line);padding:30px 0 45px;color:#777168;font-size:11px;background:rgba(255,255,255,.32)}.foot{display:flex;justify-content:space-between;gap:20px}.gold{color:var(--gold2);font-weight:800}
+
+/* Modern tournament-card redesign */
+.card{
+ position:relative;
+ isolation:isolate;
+ border:1px solid rgba(55,45,30,.12);
+ border-radius:24px;
+ background:rgba(255,255,255,.96);
+ box-shadow:0 10px 28px rgba(53,43,27,.08),0 2px 5px rgba(53,43,27,.04);
+ overflow:hidden;
+ transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.card:before{
+ content:"";
+ position:absolute;left:0;right:0;top:0;height:4px;
+ background:linear-gradient(90deg,#b88628,#e0bc67,#b88628);
+ opacity:.9;
+}
+.card:after{
+ content:"♞";
+ position:absolute;right:-24px;bottom:-55px;
+ font-family:Georgia,"Times New Roman",serif;
+ font-size:180px;line-height:1;
+ color:rgba(64,52,34,.045);
+ pointer-events:none;z-index:-1;
+}
+.card:hover{
+ transform:translateY(-7px);
+ border-color:rgba(184,134,40,.34);
+ box-shadow:0 22px 48px rgba(53,43,27,.14),0 4px 10px rgba(53,43,27,.06);
+}
+.card-top{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ padding:22px 20px 0;
+}
+.badge{
+ display:inline-flex;align-items:center;gap:5px;
+ font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;
+ padding:7px 10px;border-radius:999px;
+ background:#eaf7f1;color:#167650;border:1px solid rgba(22,118,80,.13);
+}
+.badge.national{background:#fbf3df;color:#966a1d;border-color:rgba(184,134,40,.18)}
+.badge.international{background:#edf3fb;color:#416fa8;border-color:rgba(71,119,185,.16)}
+.badge.special{background:#f3effa;color:#7655a8;border-color:rgba(118,85,168,.14)}
+.datebox{
+ min-width:100px;text-align:right;
+ color:#8e6419;font-weight:900;font-size:12px;line-height:1.5;
+ letter-spacing:.05px;
+}
+.datebox small{
+ display:block;margin-bottom:2px;color:#91887b;
+ font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:800;
+}
+.card-body{padding:13px 20px 20px}
+.card h3{
+ color:#25221d;
+ font-size:18px;line-height:1.32;
+ margin:5px 0 15px;
+ letter-spacing:-.25px;font-weight:850;
+}
+.meta{
+ display:grid;gap:9px;
+ color:#514b42;font-size:13px;font-weight:600;
+}
+.meta div{display:flex;gap:9px;align-items:flex-start}
+.icon{
+ width:20px;height:20px;display:grid;place-items:center;
+ flex:0 0 20px;border-radius:6px;
+ background:#f4efe5;color:#a5741f;font-size:11px;
+}
+.code-row{
+ margin-top:15px;padding-top:12px;
+ border-top:1px solid rgba(55,45,30,.08);
+ display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#756d62;font-size:10px;font-weight:700}
+.format{
+ padding:6px 9px;border-radius:7px;
+ background:#f2ede4;color:#5d554a;
+ font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0 15px}
+.tag{
+ font-size:9px;font-weight:750;
+ padding:6px 9px;border-radius:999px;
+ background:#f6f3ec;color:#696157;
+ border:1px solid rgba(55,45,30,.06);
+}
+.card-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.card-actions .btn{
+ width:100%;min-height:40px;font-size:10px;padding:9px 10px;
+ border-radius:11px;font-weight:850;
+}
+.card-actions .download{
+ background:#edf7f2;color:#147650;
+ border:1px solid rgba(22,132,93,.17);
+}
+.card-actions .download:hover{background:#e3f3eb}
+.card-actions a:last-child{
+ background:#b88628;color:#fff;
+ border:1px solid #b88628;
+}
+.card-actions a:last-child:hover{background:#9e731f}
+
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.navlinks{display:none}.toolbar{top:72px}.hero{padding:50px 0 30px}.hero h1{letter-spacing:-1.6px}.hero p{font-size:14px}.filters{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.section-head{display:block}.section-head .btn{margin-top:12px}.foot{display:block}.foot div+div{margin-top:9px}}
+</style>
+</head>
+<body>
+<header><div class="container nav">
+<a class="brand" href="#"><div class="logo">♞</div><div>MyChess64<small>Tournament Resources</small></div></a>
+<nav class="navlinks"><a href="#events">Tournaments</a><a href="#about">Information</a><a href="https://aicf.in/all-events/" target="_blank" rel="noopener">AICF All Events ↗</a></nav>
+</div></header>
+
+<main>
+<section class="hero"><div class="hero-watermark">♜</div><div class="container">
+<div class="eyebrow">🇮🇳 AICF Event Calendar • Player Resource</div>
+<h1>Find Your Next <span>Tournament.</span></h1>
+<p>Discover upcoming chess tournaments across India. Search, filter and explore AICF-listed events in a simple player-friendly format.</p>
+<div class="stats">
+<div class="stat"><b id="count">0</b><span>Upcoming Events</span></div>
+<div class="stat"><b id="states">0</b><span>States / Regions</span></div>
+<div class="stat"><b id="national">0</b><span>National Events</span></div>
+<div class="stat"><b id="months">0</b><span>Calendar Months</span></div>
+</div>
+</div></section>
+
+<section class="toolbar"><div class="container"><div class="filters">
+<input id="search" type="search" placeholder="🔎  Search tournament, city, state, event code...">
+<select id="state"><option value="">All State</option></select>
+<select id="place"><option value="">All Place</option></select><select id="format"><option value="">All Format</option></select>
+<select id="month"><option value="">All Month</option></select>
+<button id="reset">Reset</button>
+</div></div></section>
+
+<section id="events" class="container">
+<div class="section-head"><div><h2>Upcoming Tournaments</h2><p id="result">Loading events… <span id="liveStatus" class="live-dot">● Live AICF sync</span></p><p class="pdf-note">⬇ Brochure PDF opens the official AICF PDF directly.</p></div>
+<a class="btn secondary" href="https://aicf.in/all-events/" target="_blank" rel="noopener">View AICF All Events ↗</a></div>
+<div id="eventArea"></div>
+</section>
+
+<section id="about" class="container"><div class="note">
+<b>Official-source note:</b> Tournament information is organized from the AICF <b>All Events</b> listing. Dates, venues, eligibility, entry fees, registration deadlines and brochures can change. Always check the latest official AICF event/brochure before registering or travelling.
+<br><br><b>Reference:</b> All India Chess Federation — <span class="gold">All Events</span> · Checked 30 September 2026
+</div></section>
+</main>
+
+<footer><div class="container foot"><div>© 2026 MyChess64 · Learn. Play. Improve.</div><div>Official source: <a class="gold" href="https://aicf.in/all-events/" target="_blank" rel="noopener">AICF All Events ↗</a></div></div></footer>
+
+<script>
+const events = [
+  {title:"26th Mizoram Open – 2026 (FIDE Rated Rapid Chess Tournament)",code:"485576",start:"2026-10-01",end:"2026-10-03",place:"Mizoram",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/26th-Mizoram-Open-prospectus.pdf"},
+  {title:"ICC – CHESSFEE International FIDE Rated OPEN Chess Tournament 2026 – 3rd Edition",code:"437623",start:"2026-10-01",end:"2026-10-04",place:"Tamil Nadu",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/ICC-%E2%80%93-CHESSFEE-International-FIDE-Rated-OPEN-Chess-Tournament-2026-%E2%80%93-3rd-Edition.pdf"},
+  {title:"6th Resha International Open FIDE Blitz Rating Chess Tournament 2026",code:"494343",start:"2026-10-02",end:"2026-10-02",place:"Nashik, Maharashtra",format:"Blitz",brochure:"https://aicf.in/wp-content/uploads/2026/08/Resha-International-Open-Nashik-Sep-2026.pdf"},
+  {title:"First Move Open FIDE Rapid Rated Chess Tournament",code:"494719",start:"2026-10-02",end:"2026-10-02",place:"Mysuru, Karnataka",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/First-Move-Open-2026.pdf"},
+  {title:"Playu – Below 1800 International FIDE Rated Open Chess Tournament",code:"471846",start:"2026-10-02",end:"2026-10-04",place:"Tamil Nadu",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/Playu-Below-1800-International-FIDE-Rated-Open-Chess-Tournament-01.pdf"},
+  {title:"Madhya Pradesh State Senior Fide Rating Chess Championship 2026",code:"484858",start:"2026-10-02",end:"2026-10-04",place:"Indore, MP",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/07/Madhya-Pradesh-Senior-State-Chess-Championship-2026-by-UICC.pdf"},
+  {title:"9th Late Shri Chandrakant Naik Memorial All India FIDE Rapid Rating Chess Tournament 2026",code:"489380",start:"2026-10-03",end:"2026-10-04",place:"Goa",format:"Rapid",brochure:""},
+  {title:"SATISH ANNA ALL INDIA OPEN INTERNATIONAL FIDE RAPID RATING CHESS TOURNAMENT 2026",code:"491484",start:"2026-10-03",end:"2026-10-04",place:"Karnataka",format:"Rapid",brochure:""},
+  {title:"1st Kota International Open Fide Rapid Rating Chess Tournament 2026",code:"494569",start:"2026-10-03",end:"2026-10-04",place:"Kota, Rajasthan",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/08/1st-Kota-International-Open-Fide-Rapid-Rating-Chess-Tournament-2026-2.pdf"},
+  {title:"1st Late Bharatji Budhmalji Kunkulol Memorial Rapid Chess tournament 2026",code:"484619",start:"2026-10-03",end:"2026-10-04",place:"Maharashtra",format:"Rapid",brochure:""},
+  {title:"2nd Late Bharatji Budhmalji Kunkulol Memorial Blitz Chess tournament 2026",code:"484620",start:"2026-10-04",end:"2026-10-04",place:"Maharashtra",format:"Blitz",brochure:""},
+  {title:"1st G H Raisoni Memorial Wardha International FIDE Rapid Rating Chess Tournament 2026",code:"500998",start:"2026-10-04",end:"2026-10-04",place:"Wardha, Maharashtra",format:"Rapid",brochure:""},
+  {title:"1st Saakar Foundation All India Open Fide Rapid Rating Chess Tournament 2026",code:"488808",start:"2026-10-04",end:"2026-10-04",place:"Maharashtra",format:"Rapid",brochure:""},
+  {title:"Eight Square Chess Academy – 3rd International FIDE Rated Open Chess Tournament – 2026",code:"485051",start:"2026-10-07",end:"2026-10-11",place:"Chennai",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/07/ECA_OPEN_Prospectus_Oct2026.pdf"},
+  {title:"Nexchess International Open Fide Rating Chess tournament",code:"492654",start:"2026-10-07",end:"2026-10-11",place:"Delhi",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/NexChess-International-Open-Final-Brochure.pdf"},
+  {title:"Grandeur 10 – International Open FIDE Blitz Rating Chess Tournament, Vadodara 2026",code:"487596",start:"2026-10-09",end:"2026-10-09",place:"Vadodara, Gujarat",format:"Blitz",brochure:""},
+  {title:"Grandeur 10 – International Open FIDE Rapid Rating Chess Tournament, Vadodara 2026",code:"487595",start:"2026-10-10",end:"2026-10-11",place:"Vadodara, Gujarat",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/08/Grandeur-10-by-Dhruvik-Chess-Academy.pdf"},
+  {title:"1st CHESS – TITANS FIDE RATED RAPID CHESS TOURNAMENT",code:"494630",start:"2026-10-11",end:"2026-10-11",place:"Bangalore, Karnataka",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/08/1st-Chess-Titans-FIDE-Rated-Rapid-Chess-Tournament-AICF.pdf"},
+  {title:"Bhadra Chess Academy All India Open FIDE Rated Rapid Chess Tournament",code:"495345",start:"2026-10-11",end:"2026-10-11",place:"Karnataka",format:"Rapid",brochure:""},
+  {title:"GKCA & MMCA 1st International Open FIDE Rating Rapid Chess Tournament 2026",code:"491332",start:"2026-10-11",end:"2026-10-11",place:"Chengalpattu, Tamil Nadu",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/GKCA_MMCA_Prospectus_491332.pdf"},
+  {title:"National Under 15",code:"487696/487697",start:"2026-10-12",end:"2026-10-20",place:"Hyderabad",format:"National",brochure:"https://aicf.in/wp-content/uploads/2026/09/Under-15.pdf"},
+  {title:"11th CHESSMII INTERNATIONAL BELOW 1700 FIDE RATED CHESS TOURNAMENT",code:"469820",start:"2026-10-16",end:"2026-10-18",place:"Kerala",format:"Classical",brochure:""},
+  {title:"BKG Global School All India Open FIDE Rated Rapid Chess Tournament 2026",code:"493831",start:"2026-10-17",end:"2026-10-18",place:"Sandur, Karnataka",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/Final-BKG-Global-School-Sandur-1-1.pdf"},
+  {title:"SHRI SANJAY AGARWAL MEMORIAL INTERNATIONAL FIDE RATED RAPID CHESS TOURNAMENT",code:"495857",start:"2026-10-17",end:"2026-10-18",place:"Bareilly, UP",format:"Rapid",brochure:""},
+  {title:"KHELO CHESS INDIA 94.0 CLASSICAL FIDE RATING TOURNAMENT 2026",code:"502133",start:"2026-10-17",end:"2026-10-22",place:"Bhopal, MP",format:"Classical",brochure:""},
+  {title:"2nd Rotaract RUAS – Children Chess Academy All India Open FIDE Rated Rapid Chess Tournament",code:"493788",start:"2026-10-18",end:"2026-10-18",place:"Bengaluru",format:"Rapid",brochure:""},
+  {title:"All Assam Inter District Open FIDE Rating Chess Tournament 2026",code:"491153",start:"2026-10-18",end:"2026-10-22",place:"Guwahati, Assam",format:"Classical",brochure:""},
+  {title:"1st Manchester City International open fide Rated Tournament",code:"486239",start:"2026-10-17",end:"2026-10-21",place:"Coimbatore",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/07/Manchester-final.pdf"},
+  {title:"2nd Suseema Trophy All India Open FIDE Rated Classical Chess Tournament 2026",code:"497418",start:"2026-10-22",end:"2026-10-25",place:"Ambikapur, Chhattisgarh",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/2nd-Suseema-Trophy-2026-Brochure.pdf"},
+  {title:"All Assam Inter District Open Blitz FIDE Rating Chess Tournament 2026",code:"491156",start:"2026-10-23",end:"2026-10-23",place:"Guwahati, Assam",format:"Blitz",brochure:""},
+  {title:"AICFB National Team Chess Championship for the Visually Challenged, 2026",code:"502255",start:"2026-10-23",end:"2026-10-25",place:"Gujarat",format:"National",brochure:""},
+  {title:"5TH SAKATAM INTERNATIONAL OPEN FIDE RATING CHESS TOURNAMENT 2026",code:"490157",start:"2026-10-24",end:"2026-10-25",place:"Assam",format:"Classical",brochure:""},
+  {title:"1st Rajesh Pilot Memorial Open FIDE Rated Rapid Chess Tournament 2026",code:"502618",start:"2026-10-24",end:"2026-10-25",place:"Chandigarh",format:"Rapid",brochure:""},
+  {title:"1st Lions Club of Belgaum & Leo Club of Belgaum All India Open FIDE Rating rapid chess tournament",code:"487839",start:"2026-10-24",end:"2026-10-25",place:"Belagavi, Karnataka",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/07/lions-1_compressed.pdf"},
+  {title:"Dasara Cup – Shimoga District Chess Association in association with Nalanda Chess Academy All India Open FIDE Rated Rapid Chess Tournament 2026",code:"493830",start:"2026-10-24",end:"2026-10-25",place:"Shivamogga, Karnataka",format:"Rapid",brochure:""},
+  {title:"2nd Little Star Chess Academy All India Open FIDE Rapid Rating Chess Tournament 2026",code:"496019",start:"2026-10-25",end:"2026-10-25",place:"Maharashtra",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/2nd-Little-Star-Chess-Academy-All-India-Open-FIDE-Rapid-Rating-Chess-Tournament-2026.pdf"},
+  {title:"1st Lions Club of Belgaum & Leo Club of Belgaum all India Open FIDE Rating Blitz Chess Tournament",code:"487840",start:"2026-10-25",end:"2026-10-25",place:"Belagavi, Karnataka",format:"Blitz",brochure:"https://aicf.in/wp-content/uploads/2026/07/lions-1_compressed.pdf"},
+  {title:"Sooriya Chess Academy – 1st International FIDE Rated RAPID Chess Tournament",code:"489378",start:"2026-10-25",end:"2026-10-25",place:"Tamil Nadu",format:"Rapid",brochure:""},
+  {title:"9th N L Pandiyar Memorial International Open Fide Rating Chess Tournament 2026",code:"485005",start:"2026-10-25",end:"2026-10-29",place:"Udaipur, Rajasthan",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/06/16.06.2026-Final-9th-NL-Pandiyar-Lakecity-Open-25-28-Oct-2026-Final.pdf"},
+  {title:"2nd Jalpaiguri CPPF International FIDE Rated Open Classical Chess Tournament 2026",code:"492657",start:"2026-10-28",end:"2026-11-02",place:"Jalpaiguri, WB",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/2nd-Jalpaiguri-CPPF-International-Fide-Rated-Classical-Open-Chess-TMT-2026.pdf"},
+  {title:"7TH SSS INTERNATIONAL BELOW 1800 FIDE RATED CHESS TOURNAMENT",code:"490387",start:"2026-10-30",end:"2026-11-01",place:"Pudukkottai, Tamil Nadu",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/7th-SSS-international-2_11zon.pdf"},
+  {title:"1st Chola Chess Open International Grandmasters Chess Tournament 2026",code:"500978",start:"2026-10-30",end:"2026-11-07",place:"Chennai, Tamil Nadu",format:"Classical",brochure:""},
+  {title:"Lambardar Gaya Prasad Memorial FIDE rated Open Rapid Tournament",code:"496209",start:"2026-10-31",end:"2026-11-01",place:"UP",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/LGM_-Fide-rated-Rapid-and-Blitz-2026-tournament_Bah_flyer.pdf"},
+  {title:"Lambardar Gya Prasad Memorial FIDE-RATED OPEN BLITZ CHESS TOURNAMENT",code:"496210",start:"2026-11-01",end:"2026-11-01",place:"UP",format:"Blitz",brochure:"https://aicf.in/wp-content/uploads/2026/09/LGM_-Fide-rated-Rapid-and-Blitz-2026-tournament_Bah_flyer.pdf"},
+  {title:"The NEST School 1st International FIDE Rated Rapid Chess Tournament – 2026",code:"489381",start:"2026-11-01",end:"2026-11-01",place:"Chennai, Tamil Nadu",format:"Rapid",brochure:""},
+  {title:"3rd T-RERA Open FIDE Rating International Chess Tournament, 2026",code:"499402",start:"2026-11-04",end:"2026-11-10",place:"Tripura",format:"Classical",brochure:""},
+  {title:"2nd Shefali Memorial International Open FIDE Rating Rapid Chess Tournament 2026",code:"499400",start:"2026-11-07",end:"2026-11-08",place:"Tripura",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/2nd-Shafali-Rapid-Prospuctus.pdf"},
+  {title:"1st T-RERA International Open FIDE Rating Blitz Chess Tournament, 2026",code:"499401",start:"2026-11-10",end:"2026-11-10",place:"Tripura",format:"Blitz",brochure:""},
+  {title:"Sivakasi Chess Club FIDE Rated Open Tournament 2026",code:"499398",start:"2026-11-12",end:"2026-11-15",place:"Tamil Nadu",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/Prospectus_Sivakasi-Chess-Club-FIDE-Rated-Open-2026-1.pdf"},
+  {title:"UNSTOPPABLE LBHM 2026 – 25th LBHM All India Open FIDE Rating Chess Tournament",code:"495836",start:"2026-11-10",end:"2026-11-14",place:"Pune, Maharashtra",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/Revised_LBHM-UNSTOPPABLE-NOV-2026_1.9-mb.pdf"},
+  {title:"All India Open Shantikumarji Firodiya Classical Fide Rating Chess Tournament",code:"488296",start:"2026-11-11",end:"2026-11-15",place:"Maharashtra",format:"Classical",brochure:""},
+  {title:"Eight Square Chess Academy – 3rd International FIDE Rated (Below 1700) Chess Tournament 2026",code:"485052",start:"2026-11-13",end:"2026-11-15",place:"Chennai",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/ECA_Below1700_Nov2026.pdf"},
+  {title:"UNSTOPPABLE LBHM 2026 – 27th LBHM All India Open FIDE Blitz Rating Chess Tournament",code:"495841",start:"2026-11-14",end:"2026-11-14",place:"Pune, Maharashtra",format:"Blitz",brochure:"https://aicf.in/wp-content/uploads/2026/09/Revised_LBHM-UNSTOPPABLE-NOV-2026_1.9-mb.pdf"},
+  {title:"UNSTOPPABLE LBHM 2026 – 28th LBHM All India Open FIDE Rapid Rating Chess Tournament",code:"495845",start:"2026-11-15",end:"2026-11-15",place:"Pune, Maharashtra",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/Revised_LBHM-UNSTOPPABLE-NOV-2026_1.9-mb.pdf"},
+  {title:"Dr. Ajit Kasliwal Memorial All India Open Fide rapid rating Chess Tournament 2026",code:"501913",start:"2026-11-15",end:"2026-11-15",place:"MP",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/Dr.-Ajit-Kasliwal-Memorial-All-India-Open-Fide-Rapid-Rating-Chess-Tournament-2026.pdf"},
+  {title:"Late Shri Vasudeva V Dempo FIDE Rating Chess Tournament 2026",code:"496022",start:"2026-11-15",end:"2026-11-20",place:"Goa",format:"Classical",brochure:""},
+  {title:"7th Khannur Open FIDE Rated Classical Chess Tournament",code:"499270",start:"2026-11-17",end:"2026-11-22",place:"Mumbai, Maharashtra",format:"Classical",brochure:""},
+  {title:"Khannur FIDE Rated Blitz Chess Tournament",code:"499273",start:"2026-11-20",end:"2026-11-20",place:"Mumbai, Maharashtra",format:"Blitz",brochure:""},
+  {title:"Khannur FIDE Rated Rapid Chess Tournament",code:"499272",start:"2026-11-21",end:"2026-11-22",place:"Mumbai, Maharashtra",format:"Rapid",brochure:""},
+  {title:"1st CastleMasters International Open Rapid FIDE Rated Chess Tournament 2026",code:"492568",start:"2026-11-21",end:"2026-11-22",place:"Haryana",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/Final04_1st_CastleMasters_FIDE_Tournament.pdf"},
+  {title:"3rd Power Chess Academy All India Open FIDE Rapid Rating Chess Tournament 2026",code:"498898",start:"2026-11-22",end:"2026-11-22",place:"Washim, Maharashtra",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/Washim-Chess-NOV-Brochure.pdf"},
+  {title:"International FIDE Rated Above 1800 Open Chess Tournament 2026",code:"487788",start:"2026-11-26",end:"2026-12-01",place:"Goa",format:"Classical",brochure:""},
+  {title:"International FIDE Rated Below 1800 Open Chess Tournament 2026",code:"487790",start:"2026-11-27",end:"2026-11-28",place:"Goa",format:"Classical",brochure:""},
+  {title:"2nd Manchester City International Below 1800 Fide Rated Tournament",code:"486240",start:"2026-11-27",end:"2026-11-29",place:"Coimbatore",format:"Classical",brochure:""},
+  {title:"SARJI RENUKA DEVADHAR ALL INDIA FIDE RAPID RATING OPEN CHESS TOURNAMENT",code:"499268",start:"2026-11-29",end:"2026-11-29",place:"Haveri, Karnataka",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/SARJI-RENUKA-ALL-INDIA-OPEN-FIDE-RAPID-RATING-CHESS-TOURNAMENT-2-1-1.pdf"},
+  {title:"Khannur Rapid Rated Chess Tournament – Bengaluru",code:"501318",start:"2026-11-29",end:"2026-11-29",place:"Karnataka",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/Rapid-Brochure_compressed.pdf"},
+  {title:"2nd MVIT King Trophy International Rapid FIDE Rating Chess Tournament 2026",code:"500404",start:"2026-11-29",end:"2026-11-29",place:"Pondicherry",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/MVIT_King_Trophy_2026_HD_300DPI_compressed-1.pdf"},
+  {title:"63rd National Chess Championship – 2026",code:"485283",start:"2026-11-29",end:"2026-12-09",place:"Varanasi, UP",format:"National",brochure:""},
+  {title:"52nd NATIONAL WOMEN CHESS CHAMPIONSHIP 2026",code:"496730",start:"2026-11-30",end:"2026-12-10",place:"Telangana",format:"National",brochure:""},
+  {title:"8th Tarabai Shinde FIDE Rapid Rating Chess Tournament, Nerul, Navi Mumbai",code:"484749",start:"2026-12-06",end:"2026-12-06",place:"Navi Mumbai, Maharashtra",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/8th-Tarabai-2-1.pdf"},
+  {title:"International FIDE Open Rating Chess Tournament- 2026",code:"484348",start:"2026-12-10",end:"2026-12-13",place:"Visakhapatnam",format:"Classical",brochure:""},
+  {title:"1st SCC All India FIDE Rated Rapid Chess Tournament 2026",code:"487700",start:"2026-12-12",end:"2026-12-13",place:"Goa",format:"Rapid",brochure:""},
+  {title:"Winter Cup Below 1700 International Fide Rating Chess Tournament 2026",code:"485006",start:"2026-12-22",end:"2026-12-24",place:"Udaipur, Rajasthan",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/06/16.06.2026-Final-Winter-Below-1700-Lakecity-22-24-Dec-2026-Final.pdf"},
+  {title:"Athens of the East 6th International Grandmaster Chess Tournament – Category A Above 2100",code:"482567",start:"2026-12-22",end:"2026-12-31",place:"Madurai",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/Athens-of-the-east-6th-GM.pdf"},
+  {title:"Athens of the East 6th International Grandmaster Open – Category B Below 2100",code:"482568",start:"2026-12-22",end:"2026-12-25",place:"Madurai",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/Athens-of-the-east-6th-GM.pdf"},
+  {title:"3rd Rotaract RUAS – Children Chess Academy All India Open FIDE Rated Classical Chess Tournament",code:"494566",start:"2026-12-23",end:"2026-12-27",place:"Bengaluru",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/Brochure-23rd-Dec.pdf-2-1-1.pdf"},
+  {title:"2nd MAHARATHI INTERNATIONAL OPEN CLASSICAL FIDE RATED CHESS TOURNAMENT",code:"471843",start:"2026-12-24",end:"2026-12-28",place:"Delhi",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/2nd-Maharathi-Classical-December-Updated-1.pdf"},
+  {title:"Pune Grand Slam Chess Festival – CLASSICAL",code:"484584",start:"2026-12-24",end:"2026-12-28",place:"Pune",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/PUNE-GRANDSLAM-Chess-Tournament-2026-Revised.pdf"},
+  {title:"Athens of the East 6th International Grandmaster Open – Category C Blitz",code:"482570",start:"2026-12-25",end:"2026-12-25",place:"Madurai",format:"Blitz",brochure:"https://aicf.in/wp-content/uploads/2026/08/Athens-of-the-east-6th-GM.pdf"},
+  {title:"3rd Bhilwara International Open FIDE Classical Rating Chess Tournament 2026",code:"471849",start:"2026-12-25",end:"2026-12-30",place:"Bhilwara, Rajasthan",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/03/Bhilwara-Chess-Festival-2026.pdf"},
+  {title:"10th Kurukshetra Open FIDE Rating Chess Tournament 2026",code:"484279",start:"2026-12-25",end:"2026-12-30",place:"Dibrugarh, Assam",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/10th-Kurukshetra-Brochure-1.pdf"},
+  {title:"3rd Ramabai Ranade FIDE Classical Rating Chess Tournament",code:"480521",start:"2026-12-25",end:"2026-12-30",place:"Maharashtra",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/05/3rdRamabaiRanadeClassical.pdf"},
+  {title:"1st Bhilwara International Open FIDE Rapid Rating Chess Tournament 2026",code:"471850",start:"2026-12-26",end:"2026-12-27",place:"Bhilwara, Rajasthan",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/03/Bhilwara-Chess-Festival-2026.pdf"},
+  {title:"Athens of the East 6th International Grandmaster Open – Category D Below 1800",code:"482569",start:"2026-12-26",end:"2026-12-28",place:"Madurai",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/Athens-of-the-east-6th-GM.pdf"},
+  {title:"Pune Grand Slam Chess Festival – BLITZ",code:"484587",start:"2026-12-27",end:"2026-12-27",place:"Pune",format:"Blitz",brochure:"https://aicf.in/wp-content/uploads/2026/08/PUNE-GRANDSLAM-Chess-Tournament-2026-Revised.pdf"},
+  {title:"4th Rotaract RUAS – Children Chess Academy Below 1800 All India FIDE Rated Classical Chess Tournament",code:"494627",start:"2026-12-28",end:"2026-12-30",place:"Bengaluru",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/Brochure-28th-Dec-3-1-1-2.pdf"},
+  {title:"Pune Grand Slam Chess Festival – RAPID",code:"484586",start:"2026-12-29",end:"2026-12-29",place:"Pune",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/08/PUNE-GRANDSLAM-Chess-Tournament-2026-Revised.pdf"},
+  {title:"Athens of the East 6th International Grandmaster Open – Category E Below 1600",code:"482662",start:"2026-12-29",end:"2026-12-31",place:"Madurai",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/08/Athens-of-the-east-6th-GM.pdf"},
+  {title:"17th Chennai Open International Grandmaster Chess Tournament 2026 for Sakthi Group Dr. N. Mahalingam Trophy",code:"482602",start:"2027-01-02",end:"2027-01-09",place:"Chennai",format:"Classical",brochure:"https://aicf.in/wp-content/uploads/2026/09/INT-01.TN_.26-27-F01-1.pdf"},
+  {title:"1st DPSS Rapid Rating Chess Tournament 2027",code:"499438",start:"2027-01-03",end:"2027-01-04",place:"Sagar, MP",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/09/DELHI-PUBLIC-SCHOOL-SAGAR-3-1_compressed.pdf"},
+  {title:"4th Jabalpur International Open Fide Rapid Rating Chess Tournament 2027",code:"490886",start:"2027-01-09",end:"2027-01-10",place:"Jabalpur",format:"Rapid",brochure:"https://aicf.in/wp-content/uploads/2026/08/4TH-JABALPUR-INTERNATIONAL-OPEN-FIDE-RAPID-RATING-CHESS-TOURNAMENT-2027_.pdf"},
+  {title:"1st Akshaya International Grandmaster Open Chess Tournament – 2027 (Category A above 2000)",code:"482202",start:"2027-01-11",end:"2027-01-18",place:"Coimbatore",format:"Classical",brochure:""}
+];
+
+const $=id=>document.getElementById(id);
+const fmt=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+const monthName=d=>new Date(d+"T00:00:00").toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+const monthSort=d=>new Date(d+"T00:00:00").getTime();
+function isNational(e){return /national|championship/i.test(e.title)}
+function isInternational(e){return /international|grandmaster/i.test(e.title)}
+function placeKey(p){return p.split(",").slice(-1)[0].trim()}
+function category(e){return isNational(e)?"National":isInternational(e)?"International":"Open"}
+
+function fillFilters(){
+ [...new Set(events.map(e=>placeKey(e.place)))].sort().forEach(x=>$("state").insertAdjacentHTML("beforeend",`<option>${x}</option>`));
+ [...new Set(events.map(e=>e.place))].sort().forEach(x=>$("place").insertAdjacentHTML("beforeend",`<option>${x}</option>`));
+ [...new Set(events.map(e=>e.format))].sort().forEach(x=>$("format").insertAdjacentHTML("beforeend",`<option>${x}</option>`));
+ [...new Set(events.map(e=>monthName(e.start)))].forEach(x=>$("month").insertAdjacentHTML("beforeend",`<option>${x}</option>`));
+}
+function filtered(){
+ const q=$("search").value.toLowerCase().trim(),s=$("state").value,p=$("place").value,f=$("format").value,m=$("month").value;
+ return events.filter(e=>
+ (!q||`${e.title} ${e.code} ${e.place} ${e.format}`.toLowerCase().includes(q))&&
+ (!s||placeKey(e.place)===s)&&(!p||e.place===p)&&(!f||e.format===f)&&(!m||monthName(e.start)===m)
+ ).sort((a,b)=>monthSort(a.start)-monthSort(b.start));
+}
+function tagsFor(e){
+ const tags=[e.format];
+ if(/below 1800/i.test(e.title)) tags.push("Below 1800");
+ if(/below 1700/i.test(e.title)) tags.push("Below 1700");
+ if(/below 1600/i.test(e.title)) tags.push("Below 1600");
+ if(/above 2100|above 2000/i.test(e.title)) tags.push("2000+");
+ if(/women/i.test(e.title)) tags.push("Women");
+ if(isNational(e)) tags.push("National");
+ if(/junior|youth|under 15/i.test(e.title)) tags.push("Junior");
+ return [...new Set(tags)].slice(0,4);
+}
+function downloadButton(e){
+ if(e.brochure){
+   return `<a class="btn download" href="${e.brochure}" target="_blank" rel="noopener" download="AICF-${e.code}-Brochure.pdf" title="Open the official AICF brochure PDF">⬇ Brochure PDF</a>`;
+ }
+ return `<span class="btn download" style="opacity:.55;cursor:not-allowed" title="AICF has not provided a brochure link for this event">PDF Not Available</span>`;
+}
+function card(e){
+ const cat=category(e), cls=cat==="National"?"national":cat==="International"?"international":"";
+ return `<article class="card">
+   <div class="card-top">
+    <span class="badge ${cls}">${cat}</span>
+    <div class="datebox"><small>Event Dates</small>${fmt(e.start)}<br>— ${fmt(e.end)}</div>
+   </div>
+   <div class="card-body">
+    <h3>${e.title}</h3>
+    <div class="meta">
+      <div><span class="icon">📍</span><span>${e.place}</span></div>
+      <div><span class="icon">♟</span><span>${e.format} tournament</span></div>
+    </div>
+    <div class="code-row"><span class="code">AICF Event Code: ${e.code}</span><span class="format">${e.format}</span></div>
+    <div class="tags">${tagsFor(e).map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+    <div class="card-actions">
+      ${downloadButton(e)}
+      <a class="btn" href="https://aicf.in/all-events/" target="_blank" rel="noopener">AICF Listing ↗</a>
+    </div>
+   </div>
+ </article>`;
+}
+function render(){
+ const list=filtered();
+ $("result").childNodes[0].textContent=`Showing ${list.length} upcoming event${list.length===1?"":"s"} from AICF`;
+ if(!list.length){$("eventArea").innerHTML=`<div class="empty">No tournaments match your search or filters.<br><br><button onclick="resetFilters()">Clear Filters</button></div>`;return}
+ const groups={};list.forEach(e=>(groups[monthName(e.start)]??=[]).push(e));
+ $("eventArea").innerHTML=Object.entries(groups).map(([month,arr])=>`
+  <div class="month">
+   <div class="month-title"><h2>${month}</h2><span>${arr.length} event${arr.length===1?"":"s"}</span><div class="month-line"></div></div>
+   <div class="grid">${arr.map(card).join("")}</div>
+  </div>`).join("");
+}
+function resetFilters(){$("search").value="";$("state").value="";$("place").value="";$("format").value="";$("month").value="";render()}
+
+function normalizePlace(s){
+ return (s||"").replace(/\s+/g," ").replace(/\n/g," ").trim();
+}
+function inferFormat(name){
+ const n=name.toLowerCase();
+ if(n.includes("blitz")) return "Blitz";
+ if(n.includes("rapid")) return "Rapid";
+ return "Classical";
+}
+function parseAICFDate(s){
+ const m=(s||"").trim().match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
+ if(!m)return null;
+ return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+}
+function cleanText(s){return (s||"").replace(/\s+/g," ").trim()}
+
+async function refreshFromAICF(){
+ const status=$("liveStatus");
+ try{
+   const response=await fetch("https://aicf.in/all-events/",{cache:"no-store"});
+   if(!response.ok) throw new Error("AICF request failed");
+   const text=await response.text();
+   const doc=new DOMParser().parseFromString(text,"text/html");
+   const rows=[...doc.querySelectorAll("table tr")];
+   const live=[];
+   const now=new Date(); now.setHours(0,0,0,0);
+   for(const tr of rows){
+     const cells=[...tr.querySelectorAll("td")];
+     if(cells.length<5) continue;
+     const title=cleanText(cells[0].innerText);
+     const code=cleanText(cells[1].innerText);
+     const start=parseAICFDate(cells[2].innerText);
+     const end=parseAICFDate(cells[3].innerText);
+     const place=normalizePlace(cells[4].innerText);
+     if(!title||!start||!end||!place) continue;
+     const startDate=new Date(start+"T00:00:00");
+     if(startDate<now) continue;
+     const link=(cells[5]?.querySelector("a[href]")||cells[cells.length-1]?.querySelector("a[href]"))?.href||"";
+     live.push({title,code,start,end,place,format:inferFormat(title),brochure:link});
+   }
+   // Deduplicate by event code + title and sort by date.
+   const seen=new Set();
+   const clean=live.filter(e=>{
+     const k=(e.code+"|"+e.title).toLowerCase();
+     if(seen.has(k)) return false; seen.add(k); return true;
+   }).sort((a,b)=>monthSort(a.start)-monthSort(b.start));
+   if(clean.length){
+     events.length=0; events.push(...clean);
+     $("count").textContent=events.length;
+     $("states").textContent=new Set(events.map(e=>placeKey(e.place))).size;
+     $("national").textContent=events.filter(isNational).length;
+     $("months").textContent=new Set(events.map(e=>monthName(e.start))).size;
+     $("state").innerHTML='<option value="">All State</option>';
+     $("place").innerHTML='<option value="">All Place</option>';
+     $("format").innerHTML='<option value="">All Format</option>';
+     $("month").innerHTML='<option value="">All Month</option>';
+     fillFilters(); render();
+     status.textContent="● Live AICF sync";
+     status.classList.remove("offline");
+   } else {
+     throw new Error("No future rows parsed");
+   }
+ }catch(err){
+   status.textContent="● AICF live sync unavailable — using saved verified data";
+   status.classList.add("offline");
+ }
+}
+
+$("search").addEventListener("input",render);
+["state","place","format","month"].forEach(id=>$(id).addEventListener("change",render));
+$("reset").addEventListener("click",resetFilters);
+$("count").textContent=events.length;
+$("states").textContent=new Set(events.map(e=>placeKey(e.place))).size;
+$("national").textContent=events.filter(isNational).length;
+$("months").textContent=new Set(events.map(e=>monthName(e.start))).size;
+fillFilters();render();
+refreshFromAICF();
+
+</script>
+</body>
+</html>
+<style>select option{background:#fffdf8;color:#29251f}.code{color:#777064}.datebox{color:#9a6d1f}.meta{color:#6f6a61}</style>

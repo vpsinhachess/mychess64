@@ -1,0 +1,21 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "a": { "$id": {
+      ".write": "!data.exists() && newData.child('h').isString() && newData.child('h').val().matches(/^[0-9a-f]{64}$/) && $id.matches(/^CT-[A-HJ-NP-Z2-9]{6}$/)",
+      "pub": { ".read": true },
+      "ok": { "$h": { ".read": true } }
+    }},
+    "s": { "$id": { "$h": {
+      ".read": true,
+      ".write": "root.child('a/'+$id+'/h').val() === $h",
+      ".validate": "newData.child('j').isString() && newData.child('j').val().length < 1500000"
+    }}},
+    "t": { "$id": {
+      ".write": "newData.child('k').val() === root.child('a/'+$id+'/h').val()",
+      ".validate": "newData.hasChildren(['k','pub'])",
+      "pub": { ".read": true }
+    }}
+  }
+}

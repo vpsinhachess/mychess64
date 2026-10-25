@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyChess64 – Find the Best Chess Coaches &amp; Tutors</title>
+<meta name="description" content="Find verified, FIDE-rated chess coaches and tutors online or at home. Book a free demo class with MyChess64.">
+<meta name="theme-color" content="#06142e">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<meta property="og:title" content="MyChess64 – Find the Best Chess Coaches &amp; Tutors"><meta property="og:description" content="Verified, FIDE-rated chess coaches online or at home. First demo class free."><meta property="og:type" content="website">
+</head><body>
+<noscript><p style="padding:20px;text-align:center">Please enable JavaScript to use MyChess64.</p></noscript>
+<div id="fatal" class="fatal" style="display:none"></div>
+<div class="topbar">🎓 Your first demo class is <b>free</b> · <a href="#enquire">Book yours →</a></div><header class="nav" id="top"><div class="wrap in"><a href="#top"><img src="assets/header-logo.webp" alt="MyChess64 – Learn. Play. Improve."></a>
+<nav class="links"><a href="#coaches">Find Coaches</a><a href="#why">Why MyChess64</a><a href="#how">How it works</a><a href="#reviews">Reviews</a><a href="#join">Become a Coach</a><a href="#faq">FAQ</a></nav>
+<div class="act"><button class="ib" onclick="theme()" aria-label="Toggle theme">◐</button><button id="loginBtn" class="btn o lgn" onclick="openLogin()">Login</button><a class="btn g" href="#enquire">Book free demo</a><button class="ib hb" onclick="menu()" aria-label="Menu">☰</button></div></div>
+<div class="mm" id="mm" onclick="menu(1)"><a href="#coaches">Find Coaches</a><a href="#why">Why MyChess64</a><a href="#how">How it works</a><a href="#reviews">Reviews</a><a href="#join">Become a Coach</a><a href="#faq">FAQ</a><a href="#" onclick="openLogin();return false">Login</a><a class="btn g" href="#enquire" style="text-align:center">Book free demo</a></div></header>
+
+<div class="hero"><div class="wrap">
+<div><span class="pill"><i></i>Coaches available now · Free demo class</span>
+<h1>Learn chess from <em>verified champions</em></h1>
+<p class="s">India’s trusted platform to find FIDE-rated chess coaches and tutors — online or at home, for kids, adults and tournament players.</p>
+<div class="search"><input id="q" placeholder="Search coach or city…"><select id="lv" onchange="applySearch()"><option value="">Any level</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select><button class="btn" onclick="applySearch()">Find coaches</button></div>
+<div class="chips"><button onclick="quick('Kids')">♟ Chess for Kids</button><button onclick="quick('Adults')">♞ For Adults</button><button onclick="quick('Tournament')">♛ Tournament Prep</button><button onclick="quick('Openings')">♝ Openings</button></div>
+<div class="trust"><div class="stack"><i style="background:#0b6bde">AS</i><i style="background:#c2410c">PN</i><i style="background:#6d28d9">RV</i><i style="background:#0f766e">SI</i></div><span><b style="color:#fff">500+ students</b> already improving · ★ 4.9 rated</span></div></div>
+<div class="stage"><div class="ring"></div><img class="ic2" src="assets/hero-logo.webp" alt="MyChess64 logo">
+<div class="gl" style="top:4%;left:-6%"><span style="color:#f9a825">★ 4.9</span> Avg. rating<small>from 400+ reviews</small></div>
+<div class="gl" style="top:38%;right:-8%;animation-delay:-2s">✓ Verified coaches<small>FIDE &amp; AICF rated</small></div>
+<div class="gl" style="bottom:2%;left:4%;animation-delay:-3.5s">⏱ Free demo class<small>No payment needed</small></div></div>
+</div></div>
+
+<div class="wrap"><div class="stats rv"><div class="stat"><b data-n="500" data-s="+">0</b><span>Active students</span></div><div class="stat"><b data-n="60" data-s="+">0</b><span>Verified coaches</span></div><div class="stat"><b data-n="49" data-s="★">0</b><span>Average rating (÷10)</span></div><div class="stat"><b>Free</b><span>First demo class</span></div></div></div>
+
+<section id="coaches"><div class="wrap"><div class="sh rv"><div class="k">Our coaches</div><h2>Find your perfect chess coach</h2><p>Hand-picked, background-checked and rated by real students.</p></div>
+<div class="tabs" id="tabs"></div>
+<div class="bar"><span id="cnt"></span><span><select id="md2" onchange="draw()"><option value="">Any mode</option><option>Online</option><option>Home</option></select><select id="so" onchange="draw()"><option value="">Sort: Recommended</option><option value="r">Top rated</option><option value="pl">Price: low to high</option><option value="ph">Price: high to low</option><option value="e">Most experienced</option></select><button class="btn o" style="padding:7px 14px" onclick="resetAll()">Reset</button></span></div>
+<div class="grid" id="grid"></div></div></section>
+
+<section id="why"><div class="wrap"><div class="sh rv"><div class="k">Why MyChess64</div><h2>Everything you need to improve</h2><p>A modern, safe and transparent way to learn chess.</p></div>
+<div class="fg">
+<div class="f rv"><i>✓</i><h3>Verified coaches</h3><p>Titles, ratings and teaching experience are checked before anyone is listed.</p></div>
+<div class="f rv"><i>⚡</i><h3>Free demo class</h3><p>Try a live session first. Pay only when you’re happy with your coach.</p></div>
+<div class="f rv"><i>🎯</i><h3>Personalised plans</h3><p>Lessons built around your level, goals, age and tournament calendar.</p></div>
+<div class="f rv"><i>🌍</i><h3>Anytime, anywhere</h3><p>Learn online from home or book in-person coaching in your city.</p></div>
+<div class="f rv"><i>₹</i><h3>Transparent pricing</h3><p>See every coach’s hourly fee upfront. No hidden charges, ever.</p></div>
+<div class="f rv"><i>★</i><h3>Real reviews</h3><p>Choose with confidence using ratings from verified students.</p></div></div></div></section>
+
+<section id="how"><div class="wrap"><div class="sh rv"><div class="k">How it works</div><h2>From first move to first trophy</h2></div>
+<div class="fg">
+<div class="f step rv"><em>1</em><i>📝</i><h3>Tell us your goal</h3><p>Share age, level and what you want to achieve.</p></div>
+<div class="f step rv"><em>2</em><i>🤝</i><h3>Get matched</h3><p>We shortlist coaches for your goals, budget and schedule.</p></div>
+<div class="f step rv"><em>3</em><i>🎥</i><h3>Attend a free demo</h3><p>A live class, with no payment and no obligation.</p></div>
+<div class="f step rv"><em>4</em><i>🏆</i><h3>Keep improving</h3><p>Train regularly and watch your rating climb.</p></div></div></div></section>
+
+<section id="reviews" style="display:none"><div class="wrap"><div class="sh rv"><div class="k">Reviews</div><h2>Loved by students and parents</h2></div><div class="tg" id="rvg"></div></div></section>
+
+<section id="enquire"><div class="wrap"><div class="cta rv">
+<div><h2>Not sure who to pick? Let us match you.</h2><p>Share a few details and we’ll connect you with the right coach within 24 hours — free.</p></div>
+<form id="ef" onsubmit="return subDemo(event)"><input id="e_n" required placeholder="Your name"><input id="e_p" required type="tel" inputmode="tel" pattern="[0-9+ ]{10,15}" title="Enter a valid phone number" placeholder="Phone / WhatsApp"><select id="e_c"><option>Chess for Kids</option><option>Chess for Adults</option><option>Tournament Prep</option></select><button class="btn g">Request free demo</button><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><p class="fine">By submitting you agree to be contacted about your demo class.</p><div class="ok" id="e_ok"></div></form></div></div></section>
+
+<section id="join"><div class="wrap"><div class="cta l rv">
+<div><div class="sh" style="margin:0"><div class="k">For coaches</div></div><h2>Teach chess. Grow your practice.</h2><p>Create your profile, receive student enquiries and set your own fee — zero listing charges.</p></div>
+<form id="jf" onsubmit="return subJoin(event)"><input id="j_n" required placeholder="Full name"><input id="j_r" required placeholder="Rating / title (e.g. FIDE 2100)"><input id="j_e" required type="email" placeholder="Email"><input id="j_c" required placeholder="City"><button class="btn">Apply to teach</button><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="ok" id="j_ok"></div></form></div></div></section>
+
+<section id="faq"><div class="wrap"><div class="sh rv"><div class="k">FAQ</div><h2>Questions? Answered.</h2></div>
+<details><summary>Is the first demo class really free?</summary><p>Yes. Every new student gets one free demo class with no payment and no obligation.</p></details>
+<details><summary>Are lessons online or at home?</summary><p>Both. Each coach card shows the mode; most offer live online lessons over video call.</p></details>
+<details><summary>How are coaches verified?</summary><p>We check ratings, titles and teaching experience, and students review every coach.</p></details>
+<details><summary>What age can my child start?</summary><p>Children from age 5 can begin with beginner-friendly coaches.</p></details></div></section>
+
+<footer><div class="wrap"><div class="fw"><div><img src="assets/footer-logo.webp" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere.</p><div id="fcontact" class="fcon"></div></div>
+<div><h4>Explore</h4><a href="#coaches">Find coaches</a><a href="#how">How it works</a><a href="#reviews">Reviews</a></div>
+<div><h4>Coaches</h4><a href="#join">Become a coach</a><a href="#" onclick="openLogin();return false">Login</a></div>
+<div><h4>Get started</h4><a href="#enquire">Book a free demo</a><a href="#top">Back to top</a></div></div>
+<div class="cp"><span>© 2026 MyChess64 · Chess Coach Portal</span><span>Made for chess lovers ♞</span></div></div></footer>
+<button class="top" id="tp" onclick="scrollTo({top:0})" aria-label="Back to top">↑</button>
+<div class="md" id="md" onclick="if(event.target===this)closeM()"><div class="pm2" id="pm"></div></div><div class="ov" id="app"></div><div class="toast" id="ts"></div>
+<script>window.addEventListener('error',function(e){var b=document.getElementById('fatal');if(b&&!window.__mc64){b.style.display='block';b.textContent='\u26a0 Script error: '+e.message+' \u2014 see README (Troubleshooting).'}});setTimeout(function(){var b=document.getElementById('fatal');if(!window.__mc64&&b){b.style.display='block';b.innerHTML='\u26a0 The site scripts did not load. Make sure the <b>js/</b> folder is uploaded next to index.html.'}},3000);</script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body></html>

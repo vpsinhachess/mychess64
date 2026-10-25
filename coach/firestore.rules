@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // An admin is any signed-in user whose UID has a document in /admins (create it by hand, see README)
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function signedIn() { return request.auth != null; }
+
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Public coach profiles (doc id == the coach's Auth UID). No private data lives here.
+    match /coaches/{id} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (signedIn() && request.auth.uid == id
+            && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status']));
+    }
+
+    // Coach login emails – visible only to admin
+    match /coachPrivate/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /reviews/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Classes: public to read, coaches manage their own
+    match /classes/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || (signedIn() && request.resource.data.cid == request.auth.uid);
+      allow update, delete: if isAdmin() || (signedIn() && resource.data.cid == request.auth.uid);
+    }
+
+    // Anonymous seat counter (no personal data) so the site can show "x seats left"
+    match /seatlog/{id} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['cls', 'ts'])
+                    && request.resource.data.cls is string && request.resource.data.cls.size() < 60;
+      allow update, delete: if isAdmin();
+    }
+
+    // Demo-class requests from players: anyone can submit, only admin / the chosen coach can read
+    match /requests/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['ts', 'name', 'phone', 'cat', 'cid', 'cls', 'slot', 'status'])
+                    && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() < 100
+                    && request.resource.data.phone is string && request.resource.data.phone.size() >= 7 && request.resource.data.phone.size() < 20
+                    && request.resource.data.status == 'new';
+      allow read: if isAdmin() || (signedIn() && resource.data.cid == request.auth.uid);
+      allow update: if isAdmin()
+        || (signedIn() && resource.data.cid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']));
+      allow delete: if isAdmin();
+    }
+
+    // "Apply to teach" submissions: anyone can submit, only admin can read/manage
+    match /apps/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['ts', 'name', 'rating', 'email', 'city', 'status'])
+                    && request.resource.data.name is string && request.resource.data.name.size() < 100
+                    && request.resource.data.email is string && request.resource.data.email.size() < 120
+                    && request.resource.data.status == 'new';
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

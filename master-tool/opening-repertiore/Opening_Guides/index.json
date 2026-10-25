@@ -1,0 +1,296 @@
+[
+ {
+  "fam": "Sicilian Defense",
+  "eco": "B20-B99",
+  "n": 400,
+  "file": "01_Sicilian_Defense.pdf",
+  "cls": "Sicilian family"
+ },
+ {
+  "fam": "Ruy Lopez",
+  "eco": "C60-C99",
+  "n": 235,
+  "file": "02_Ruy_Lopez.pdf",
+  "cls": "Ruy Lopez family"
+ },
+ {
+  "fam": "French Defense",
+  "eco": "C00-C19",
+  "n": 211,
+  "file": "03_French_Defense.pdf",
+  "cls": "French family"
+ },
+ {
+  "fam": "Queen's Gambit Declined",
+  "eco": "D02-D69",
+  "n": 211,
+  "file": "04_Queen_s_Gambit_Declined.pdf",
+  "cls": "Queen's Gambit / Slav family"
+ },
+ {
+  "fam": "Italian Game",
+  "eco": "C50-C59",
+  "n": 187,
+  "file": "05_Italian_Game.pdf",
+  "cls": "Italian / Two Knights family"
+ },
+ {
+  "fam": "English Opening",
+  "eco": "A10-C20",
+  "n": 176,
+  "file": "06_English_Opening.pdf",
+  "cls": "Flank openings (English, Reti, Bird, KIA)"
+ },
+ {
+  "fam": "King's Gambit Accepted",
+  "eco": "C33-C39",
+  "n": 137,
+  "file": "07_King_s_Gambit_Accepted.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "King's Indian Defense",
+  "eco": "E60-E99",
+  "n": 119,
+  "file": "08_King_s_Indian_Defense.pdf",
+  "cls": "Nimzo / Queen's Indian / Catalan family"
+ },
+ {
+  "fam": "Caro-Kann Defense",
+  "eco": "B10-B19",
+  "n": 110,
+  "file": "09_Caro_Kann_Defense.pdf",
+  "cls": "Caro-Kann family"
+ },
+ {
+  "fam": "Nimzo-Indian Defense",
+  "eco": "E20-E59",
+  "n": 104,
+  "file": "10_Nimzo_Indian_Defense.pdf",
+  "cls": "Nimzo / Queen's Indian / Catalan family"
+ },
+ {
+  "fam": "Queen's Pawn Game",
+  "eco": "A40-D05",
+  "n": 82,
+  "file": "11_Queen_s_Pawn_Game.pdf",
+  "cls": "Queen's Gambit / Slav family"
+ },
+ {
+  "fam": "Semi-Slav Defense",
+  "eco": "D30-D49",
+  "n": 72,
+  "file": "12_Semi_Slav_Defense.pdf",
+  "cls": "Queen's Gambit / Slav family"
+ },
+ {
+  "fam": "Dutch Defense",
+  "eco": "A80-A99",
+  "n": 69,
+  "file": "13_Dutch_Defense.pdf",
+  "cls": "Dutch family"
+ },
+ {
+  "fam": "Benoni Defense",
+  "eco": "A40-A79",
+  "n": 66,
+  "file": "14_Benoni_Defense.pdf",
+  "cls": "King's Indian / Gr\u00fcnfeld / Benoni family"
+ },
+ {
+  "fam": "Queen's Gambit Accepted",
+  "eco": "D20-D29",
+  "n": 63,
+  "file": "15_Queen_s_Gambit_Accepted.pdf",
+  "cls": "Queen's Gambit / Slav family"
+ },
+ {
+  "fam": "Gr\u00fcnfeld Defense",
+  "eco": "A56-E60",
+  "n": 59,
+  "file": "16_Gr_nfeld_Defense.pdf",
+  "cls": "King's Indian / Gr\u00fcnfeld / Benoni family"
+ },
+ {
+  "fam": "Queen's Indian Defense",
+  "eco": "E12-E19",
+  "n": 58,
+  "file": "17_Queen_s_Indian_Defense.pdf",
+  "cls": "Nimzo / Queen's Indian / Catalan family"
+ },
+ {
+  "fam": "Alekhine Defense",
+  "eco": "B02-B05",
+  "n": 56,
+  "file": "18_Alekhine_Defense.pdf",
+  "cls": "Semi-open / hypermodern defenses"
+ },
+ {
+  "fam": "Indian Defense",
+  "eco": "A43-E60",
+  "n": 53,
+  "file": "19_Indian_Defense.pdf",
+  "cls": "Nimzo / Queen's Indian / Catalan family"
+ },
+ {
+  "fam": "King's Gambit Declined",
+  "eco": "C30-C32",
+  "n": 53,
+  "file": "20_King_s_Gambit_Declined.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "Scotch Game",
+  "eco": "C44-C45",
+  "n": 53,
+  "file": "21_Scotch_Game.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "Slav Defense",
+  "eco": "D10-D19",
+  "n": 52,
+  "file": "22_Slav_Defense.pdf",
+  "cls": "Queen's Gambit / Slav family"
+ },
+ {
+  "fam": "Petrov's Defense",
+  "eco": "C42-C43",
+  "n": 50,
+  "file": "23_Petrov_s_Defense.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "Four Knights Game",
+  "eco": "C47-C50",
+  "n": 49,
+  "file": "24_Four_Knights_Game.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "Zukertort Opening",
+  "eco": "A04-A41",
+  "n": 47,
+  "file": "25_Zukertort_Opening.pdf",
+  "cls": "Flank openings (English, Reti, Bird, KIA)"
+ },
+ {
+  "fam": "Scandinavian Defense",
+  "eco": "B01",
+  "n": 45,
+  "file": "26_Scandinavian_Defense.pdf",
+  "cls": "Semi-open / hypermodern defenses"
+ },
+ {
+  "fam": "Philidor Defense",
+  "eco": "C41",
+  "n": 44,
+  "file": "27_Philidor_Defense.pdf",
+  "cls": "Semi-open / hypermodern defenses"
+ },
+ {
+  "fam": "R\u00e9ti Opening",
+  "eco": "A09-A14",
+  "n": 43,
+  "file": "28_R_ti_Opening.pdf",
+  "cls": "Flank openings (English, Reti, Bird, KIA)"
+ },
+ {
+  "fam": "Nimzowitsch Defense",
+  "eco": "B00",
+  "n": 43,
+  "file": "29_Nimzowitsch_Defense.pdf",
+  "cls": "Semi-open / hypermodern defenses"
+ },
+ {
+  "fam": "Bishop's Opening",
+  "eco": "C23-C43",
+  "n": 41,
+  "file": "30_Bishop_s_Opening.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "Vienna Game",
+  "eco": "C25-C29",
+  "n": 41,
+  "file": "31_Vienna_Game.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "Modern Defense",
+  "eco": "A04-B27",
+  "n": 39,
+  "file": "32_Modern_Defense.pdf",
+  "cls": "Semi-open / hypermodern defenses"
+ },
+ {
+  "fam": "King's Pawn Game",
+  "eco": "B00-C44",
+  "n": 38,
+  "file": "33_King_s_Pawn_Game.pdf",
+  "cls": "Open games (1.e4 e5)"
+ },
+ {
+  "fam": "Van Geet Opening",
+  "eco": "A00-C31",
+  "n": 33,
+  "file": "34_Van_Geet_Opening.pdf",
+  "cls": "Flank openings (English, Reti, Bird, KIA)"
+ },
+ {
+  "fam": "Pterodactyl Defense",
+  "eco": "A40-B27",
+  "n": 33,
+  "file": "35_Pterodactyl_Defense.pdf",
+  "cls": "Flank openings (English, Reti, Bird, KIA)"
+ },
+ {
+  "fam": "Catalan Opening",
+  "eco": "E00-E09",
+  "n": 32,
+  "file": "36_Catalan_Opening.pdf",
+  "cls": "Nimzo / Queen's Indian / Catalan family"
+ },
+ {
+  "fam": "Bird Opening",
+  "eco": "A02-B21",
+  "n": 28,
+  "file": "37_Bird_Opening.pdf",
+  "cls": "Flank openings (English, Reti, Bird, KIA)"
+ },
+ {
+  "fam": "Pirc Defense",
+  "eco": "B00-B09",
+  "n": 28,
+  "file": "38_Pirc_Defense.pdf",
+  "cls": "Semi-open / hypermodern defenses"
+ },
+ {
+  "fam": "Tarrasch Defense",
+  "eco": "D32-D34",
+  "n": 27,
+  "file": "39_Tarrasch_Defense.pdf",
+  "cls": "Queen's Gambit / Slav family"
+ },
+ {
+  "fam": "Polish Opening",
+  "eco": "A00-A05",
+  "n": 25,
+  "file": "40_Polish_Opening.pdf",
+  "cls": "Flank openings (English, Reti, Bird, KIA)"
+ },
+ {
+  "fam": "Queen's Gambit",
+  "eco": "D06",
+  "n": 1,
+  "file": "41_Queen_s_Gambit.pdf",
+  "cls": "Queen's Gambit / Slav family"
+ },
+ {
+  "fam": "London System",
+  "eco": "A48-D02",
+  "n": 4,
+  "file": "42_London_System.pdf",
+  "cls": "d4 systems (London, Colle, Torre, Trompowsky)"
+ }
+]

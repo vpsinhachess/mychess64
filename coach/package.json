@@ -1,0 +1,6 @@
+{
+  "name": "mychess64",
+  "private": true,
+  "scripts": { "build": "esbuild src/main.js --bundle --format=iife --target=es2019 --outfile=js/app.js" },
+  "devDependencies": { "esbuild": "^0.21.0" }
+}
