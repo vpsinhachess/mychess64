@@ -1,0 +1,20 @@
+# nginx server block for MyChess64 Endgame Training. Replace mychess64.com and the root path.
+server {
+  server_name mychess64.com www.mychess64.com;
+  root /var/www/endgame-training;
+  index index.html;
+  autoindex off;
+
+  types { application/wasm wasm; text/javascript js; }
+
+  add_header X-Frame-Options "SAMEORIGIN" always;
+  add_header Content-Security-Policy "frame-ancestors 'self'; worker-src 'self'; script-src 'self' 'wasm-unsafe-eval'" always;
+  add_header X-Content-Type-Options "nosniff" always;
+
+  # Hot-link protection
+  location ~* \.(js|wasm|css|png)$ {
+    valid_referers none server_names ~\.mychess64\.com;
+    if ($invalid_referer) { return 403; }
+    expires 7d;
+  }
+}
