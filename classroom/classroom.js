@@ -1,178 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b1d33">
-<title>Classroom · MyChess64</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230b1d33%27/%3E%3Cpath d=%27M20 50h24M24 46l2-16h12l2 16M28 30V22h8v8M26 22h12M32 14v8%27 fill=%27none%27 stroke=%27white%27 stroke-width=%275%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0-beta.8/chess.min.js"></script>
-<style>
-:root{
-  --navy:#0b1d33; --navy2:#123b67; --blue:#0969e8; --bg:#f4f7fb; --panel:#ffffff;
-  --text:#10253e; --muted:#66758a; --border:#d9e2ec; --soft:#f7f9fc;
-  --lt:#f0d9b5; --dk:#b58863; --sel:#f6d365; --ok:#2b9a58; --bad:#c44343;
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:radial-gradient(circle at top,#eef5ff 0,var(--bg) 50%,#edf2f8 100%);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;padding-bottom:env(safe-area-inset-bottom,0px)}
-button,input{font:inherit}
-button{cursor:pointer;border:0;border-radius:9px;padding:10px 14px;font-weight:700;background:linear-gradient(135deg,#0869e8,#0757c9);color:#fff;box-shadow:0 4px 10px rgba(9,105,232,.16)}
-button.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none;font-weight:600}
-button.soft{background:#eef5ff;color:#075fcf;border:1px solid #a9c9f3;box-shadow:none}
-button:disabled{opacity:.45;cursor:default}
-button:focus-visible,input:focus-visible{outline:3px solid rgba(9,105,232,.3);outline-offset:2px}
-input{width:100%;padding:11px 13px;border-radius:9px;border:1px solid var(--border);background:var(--soft);color:var(--text)}
-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(9,105,232,.12)}
-.hidden{display:none!important}
-.muted{color:var(--muted);font-size:.88rem}
-
-/* Header */
-.topbar{background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;position:sticky;top:0;z-index:10}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
-.brand svg{width:34px;height:34px}
-.brand b{font-size:1.1rem;letter-spacing:-.01em}
-.brand span{font-size:.78rem;opacity:.7;margin-left:4px;padding-left:10px;border-left:1px solid rgba(255,255,255,.25)}
-.chip{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:999px;white-space:nowrap}
-.dot{width:8px;height:8px;border-radius:50%;background:#d99a18;flex:none}
-.dot.on{background:#5fd38a}
-.dot.off{background:#5b6e62}
-
-main{max-width:1040px;margin:0 auto;padding:22px 16px 40px}
-
-/* Home */
-.hero{text-align:center;margin:18px 0 26px}
-.hero h1{font-size:clamp(1.5rem,3.5vw,2rem);margin:0 0 6px;letter-spacing:-.02em;color:var(--navy)}
-.hero p{margin:0 auto;max-width:520px;color:var(--muted)}
-.cards{display:grid;gap:16px;grid-template-columns:1fr;max-width:820px;margin:0 auto}
-@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(14,40,70,.07)}
-.card h2{margin:0 0 6px;font-size:1.1rem;color:var(--navy)}
-.card p{margin:0 0 14px}
-.stack{display:grid;gap:10px}
-.stack button{width:100%;margin:0}
-
-/* Class view */
-.classhead{background:var(--navy);color:#fff;border-radius:16px;padding:18px 20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
-.classhead .label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
-.codebox{display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap}
-.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:1.9rem;letter-spacing:.18em;color:#f6d365;font-weight:800}
-.classhead .btns button{margin:0 0 0 6px}
-.classhead button.ghost{color:#fff;border-color:rgba(255,255,255,.55)}
-.note{margin-top:6px;font-size:.84rem;opacity:.85}
-.grid{display:grid;gap:16px;grid-template-columns:1fr}
-@media(min-width:840px){.grid{grid-template-columns:320px 1fr}}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;min-width:0}
-.panel h2{margin:0 0 12px;font-size:1.02rem;color:var(--navy);display:flex;justify-content:space-between;align-items:center}
-.count{font-size:.78rem;color:var(--muted);font-weight:600}
-
-.student{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:10px;cursor:pointer}
-.student:hover{background:var(--soft)}
-.student.off{opacity:.6;cursor:default}
-.student input{width:16px;height:16px;margin:0;padding:0;accent-color:var(--blue);flex:none}
-.avatar{width:30px;height:30px;border-radius:50%;background:#e6eefb;color:#075fcf;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex:none}
-.sname{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.state{font-size:.76rem;color:var(--muted);white-space:nowrap}
-.state.on{color:var(--ok);font-weight:700}
-.pairbar{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
-.pairbar button{width:100%;margin:0}
-.pairbar p{margin:8px 0 0;font-size:.82rem;color:var(--muted)}
-
-.game{border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;background:var(--soft)}
-.game-title{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;margin-bottom:8px}
-.game-title small{font-weight:600;color:var(--muted)}
-.turn{font-size:.85rem;margin:8px 0 0;font-weight:600;color:var(--muted)}
-.turn.mine{color:var(--blue)}
-.results{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.results button{margin:0;padding:7px 10px;font-size:.8rem}
-.empty{color:var(--muted);font-size:.92rem;text-align:center;padding:14px 6px}
-.sub{font-size:.95rem;margin:16px 0 8px;color:var(--navy)}
-
-/* Board */
-.board{display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,380px);aspect-ratio:1;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.18);margin:0 auto}
-.sq{position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,6.4vw,38px);line-height:1;user-select:none}
-.sq.light{background:var(--lt)}
-.sq.dark{background:var(--dk)}
-.sq.last{box-shadow:inset 0 0 0 999px rgba(246,211,101,.32)}
-.sq.sel{box-shadow:inset 0 0 0 4px var(--sel)}
-.sq.tgt::after{content:'';position:absolute;width:26%;height:26%;border-radius:50%;background:rgba(54,100,48,.7)}
-.sq.clickable{cursor:pointer}
-.sq.w{color:#fff;text-shadow:0 0 2px #000,0 0 1px #000}
-.sq.b{color:#111}
-
-#say{min-height:1.4em;font-size:.88rem;margin-top:12px;color:var(--muted)}
-#say.err{color:var(--bad)}
-#say.ok{color:var(--ok)}
-</style>
-</head>
-<body>
-
-<header class="topbar">
-  <a class="brand" href="index.html" aria-label="MyChess64 home">
-    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#123b67"/><path d="M20 50h24M24 46l2-16h12l2 16M28 30V22h8v8M26 22h12M32 14v8" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <b>MyChess64</b><span>Classroom</span>
-  </a>
-  <div class="chip"><span class="dot" id="connDot"></span><span id="connText">Connecting…</span></div>
-</header>
-
-<main>
-  <section id="home">
-    <div class="hero">
-      <h1>Learn chess, one to one</h1>
-      <p>Teachers open a classroom and share the code. Students join with the code and can leave and return any time. Their seat and games are kept.</p>
-    </div>
-    <div class="cards">
-      <div class="card">
-        <h2>I'm the teacher</h2>
-        <p class="muted">Open your classroom. If you already have one, it reopens with your students and games.</p>
-        <div class="stack"><button id="bTeach">Open my classroom</button></div>
-      </div>
-      <div class="card">
-        <h2>I'm a student</h2>
-        <p class="muted">Enter the code your teacher shared, and your name.</p>
-        <div class="stack">
-          <input id="inCode" placeholder="Class code (6 characters)" maxlength="6" autocapitalize="characters" autocomplete="off">
-          <input id="inName" placeholder="Your name" maxlength="30" autocomplete="name">
-          <button id="bJoin">Join classroom</button>
-        </div>
-      </div>
-    </div>
-    <p id="homeMsg" class="muted" style="text-align:center;margin-top:18px;min-height:1.4em"></p>
-  </section>
-
-  <section id="app" class="hidden">
-    <div class="classhead">
-      <div>
-        <div class="label" id="roleLabel"></div>
-        <div class="codebox"><span class="code" id="codeShow"></span><button class="soft" id="bCopy">Copy code</button></div>
-        <div class="note" id="liveNote"></div>
-      </div>
-      <div class="btns">
-        <button class="ghost hidden" id="bLeave">Leave classroom</button>
-        <button class="ghost hidden" id="bDelete">Delete classroom</button>
-      </div>
-    </div>
-
-    <div class="grid">
-      <aside class="panel">
-        <h2>Students <span class="count" id="count"></span></h2>
-        <div id="roster"></div>
-        <div class="pairbar hidden" id="pairbar">
-          <button id="bPair" disabled>Start game</button>
-          <p id="pairHint"></p>
-        </div>
-      </aside>
-      <section class="panel">
-        <h2 id="gamesTitle">Games</h2>
-        <div id="games"></div>
-      </section>
-    </div>
-    <p id="say"></p>
-  </section>
-</main>
-
-<script>
 const SUPABASE_URL = 'https://ysdmbcnhelvqaccgloal.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_cmmQuPzq7-iFsvAWkUJyMw_JojK1Td7';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -217,7 +42,15 @@ function drawBoard(el, fen, o = {}){
     const d = document.createElement('div');
     d.className = 'sq ' + ((r + f) % 2 ? 'dark' : 'light')
       + (sq === sel ? ' sel' : '') + (tg.includes(sq) ? ' tgt' : '') + (last.includes(sq) ? ' last' : '');
-    if (p){ d.textContent = GLYPH[p.type]; d.classList.add(p.color === 'w' ? 'w' : 'b'); }
+    if (p){
+      const img = document.createElement('img');
+      img.className = 'piece ' + (p.color === 'w' ? 'piece-w' : 'piece-b');
+      img.alt = ''; img.draggable = false;
+      img.src = 'https://lichess.org/assets/piece/cburnett/' + p.color + p.type.toUpperCase() + '.svg';
+      d.appendChild(img);
+    }
+    if (r === 7){ const fc = document.createElement('span'); fc.className = 'coord file'; fc.textContent = sq[0]; d.appendChild(fc); }
+    if (f === 7){ const rc = document.createElement('span'); rc.className = 'coord rank'; rc.textContent = sq[1]; d.appendChild(rc); }
     if (o.side){ d.classList.add('clickable'); d.onclick = () => clickSquare(el, g, sq, o); }
     el.appendChild(d);
   }
@@ -349,7 +182,7 @@ async function sendMove(g, from, to){
   const pos = new Chess(g.fen);
   let mv = null; try { mv = pos.move({ from, to, promotion: 'q' }); } catch(e){}
   if (!mv){ say('That move is not legal.', 'err'); return; }
-  const result = pos.isGameOver() ? (pos.isCheckmate() ? (mv.color === 'w' ? '1-0' : '0-1') : '1/2-1/2') : null;
+  const result = pos.game_over() ? (pos.in_checkmate() ? (mv.color === 'w' ? '1-0' : '0-1') : '1/2-1/2') : null;
   const { data, error } = await db.rpc('record_move', { p_game: g.id, p_fen: pos.fen(), p_san: mv.san, p_last: [mv.from, mv.to], p_result: result });
   if (error) say('Move not saved: ' + error.message, 'err');
   else if (!data) say('It is not your move right now.', 'err');
@@ -386,6 +219,9 @@ function renderRoster(active){
   }).join('') : '<p class="empty">No students yet. Share the code above.</p>';
   if (teacher) renderPairBar();
 }
+let watchGameId = null;
+function watchGame(id){ watchGameId = id; render(); }
+
 function renderTeacherGames(active){
   const done = games.length - active.length;
   $('gamesTitle').textContent = 'Games' + (done ? ' · ' + done + ' finished' : '');
@@ -393,66 +229,61 @@ function renderTeacherGames(active){
     $('games').innerHTML = '<p class="empty">No active games. Tick a student on the left and press Start game.</p>';
     return;
   }
-  $('games').innerHTML = active.map(g => `
+  if (!active.find(g => g.id === watchGameId)) watchGameId = active[0].id;
+  const cur = active.find(g => g.id === watchGameId);
+  const others = active.filter(g => g.id !== watchGameId);
+  $('games').innerHTML = `
     <div class="game">
-      <div class="game-title"><span>${esc(nameOf(g.white))} <small>(white)</small> vs ${esc(nameOf(g.black))} <small>(black)</small></span>
-        <small>${g.san.length} moves</small></div>
-      <div id="b_${g.id}"></div>
-      <p class="turn" id="t_${g.id}"></p>
+      <div class="game-title"><span>${esc(nameOf(cur.white))} <small>(white)</small> vs ${esc(nameOf(cur.black))} <small>(black)</small></span>
+        <small>${cur.san.length} moves</small></div>
+      <div id="board"></div>
+      <p class="turn" id="turnLine"></p>
       <div class="results">
-        <button class="soft" onclick="endGame('${g.id}','1-0')">White wins</button>
-        <button class="soft" onclick="endGame('${g.id}','0-1')">Black wins</button>
-        <button class="soft" onclick="endGame('${g.id}','1/2-1/2')">Draw</button>
-        <button class="ghost" onclick="endGame('${g.id}','ended')">End</button>
-      </div></div>`).join('');
-  active.forEach(g => {
-    const side = g.white === me ? 'w' : g.black === me ? 'b' : null;
-    const el = $('b_' + g.id);
-    el.id = 'b_' + g.id;
-    drawBoard(el, g.fen, {
-      last: g.last_move || [], flip: side === 'b', side,
-      sel: selected[el.id] || null,
-      onMove: (f, t) => sendMove(g, f, t)
-    });
-    const turnSide = new Chess(g.fen).turn();
-    const t = $('t_' + g.id);
-    t.textContent = (turnSide === 'w' ? 'White' : 'Black') + ' to move' + (side ? ' · you are playing' : '');
-    t.className = 'turn' + (side ? ' mine' : '');
+        <button class="soft" onclick="endGame('${cur.id}','1-0')">White wins</button>
+        <button class="soft" onclick="endGame('${cur.id}','0-1')">Black wins</button>
+        <button class="soft" onclick="endGame('${cur.id}','1/2-1/2')">Draw</button>
+        <button class="ghost" onclick="endGame('${cur.id}','ended')">End</button>
+      </div>
+    </div>
+    ${others.length ? '<p class="muted">Other games: ' + others.map(g =>
+      `<button class="ghost" onclick="watchGame('${g.id}')">${esc(nameOf(g.white))} vs ${esc(nameOf(g.black))}</button>`).join(' ') + '</p>' : ''}`;
+  const side = cur.white === me ? 'w' : cur.black === me ? 'b' : null;
+  drawBoard($('board'), cur.fen, {
+    last: cur.last_move || [], flip: side === 'b', side,
+    sel: selected['board'] || null, onMove: (f, t) => sendMove(cur, f, t)
   });
+  const turnSide = new Chess(cur.fen).turn();
+  const t = $('turnLine');
+  t.textContent = (turnSide === 'w' ? 'White' : 'Black') + ' to move' + (side ? ' · you are playing' : '');
+  t.className = 'turn' + (side ? ' mine' : '');
 }
+
 function renderStudentGames(active){
   const mine = active.find(g => g.white === me || g.black === me);
   let h = '';
   if (mine){
     const opp = nameOf(mine.white === me ? mine.black : mine.white);
     h += `<div class="game"><div class="game-title"><span>You vs ${esc(opp)}</span><small>${mine.san.length} moves</small></div>
-      <div id="myboard"></div><p class="turn" id="myturn"></p></div>`;
+      <div id="board"></div><p class="turn" id="turnLine"></p></div>`;
   } else {
     h += '<p class="empty">Waiting for your teacher to start your game. You can stay here.</p>';
   }
   const others = games.filter(g => g !== mine);
-  if (others.length){
-    h += '<h3 class="sub">Other games</h3>' + others.map(g =>
-      `<div class="game"><div class="game-title"><span>${esc(nameOf(g.white))} vs ${esc(nameOf(g.black))}</span>
-        <small>${g.result ? esc(g.result) : 'In progress'}</small></div><div id="w_${g.id}"></div></div>`
-    ).join('');
-  }
+  if (others.length) h += '<p class="muted">Other games: ' + others.map(g =>
+    `${esc(nameOf(g.white))} vs ${esc(nameOf(g.black))}${g.result ? ' (' + esc(g.result) + ')' : ''}`).join(' · ') + '</p>';
   $('games').innerHTML = h;
   if (mine){
     const side = mine.white === me ? 'w' : 'b';
-    const el = $('myboard');
-    el.id = 'myboard';
-    drawBoard(el, mine.fen, {
+    drawBoard($('board'), mine.fen, {
       flip: side === 'b', side, last: mine.last_move || [],
-      sel: selected[el.id] || null,
-      onMove: (f, t) => sendMove(mine, f, t)
+      sel: selected['board'] || null, onMove: (f, t) => sendMove(mine, f, t)
     });
     const yourTurn = new Chess(mine.fen).turn() === side;
-    const t = $('myturn');
+    const t = $('turnLine');
     t.textContent = yourTurn ? 'Your move' : 'Waiting for your opponent';
     t.className = 'turn' + (yourTurn ? ' mine' : '');
   }
-  others.forEach(g => drawBoard($('w_' + g.id), g.fen, { last: g.last_move || [] }));
+  $('gamesTitle').textContent = 'Games';
 }
 
 /* ---------- Wiring ---------- */
@@ -476,6 +307,18 @@ $('bCopy').onclick = async () => {
   catch(e){ say('Code: ' + code); }
 };
 
+$('themeBtn').onclick = () => {
+  const dark = !document.body.classList.contains('dark-theme');
+  document.body.classList.toggle('dark-theme', dark);
+  try { localStorage.setItem('mc64-theme', dark ? 'dark' : 'light'); } catch(e){}
+};
+$('focusBtn').onclick = () => {
+  const on = !document.body.classList.contains('board-only');
+  document.body.classList.toggle('board-only', on);
+  $('focusBtn').textContent = on ? 'Show panels' : 'Board only';
+};
+try { if (localStorage.getItem('mc64-theme') === 'dark') document.body.classList.add('dark-theme'); } catch(e){}
+
 (async () => {
   const q = new URLSearchParams(location.search);
   if (q.get('code')) $('inCode').value = q.get('code').toUpperCase().slice(0, 6);
@@ -487,6 +330,3 @@ $('bCopy').onclick = async () => {
     msg('Could not connect to the classroom server: ' + e.message);
   }
 })();
-</script>
-</body>
-</html>
