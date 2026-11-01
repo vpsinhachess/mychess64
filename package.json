@@ -1,0 +1,17 @@
+{
+  "name": "mychess64-site",
+  "private": true,
+  "type": "module",
+  "description": "Build step for mychess64.com: minify and obfuscate before publishing.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:debug": "OBFUSCATE=0 node scripts/build.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "html-minifier-terser": "^7.2.0",
+    "javascript-obfuscator": "^4.1.0",
+    "terser": "^5.31.0"
+  }
+}
