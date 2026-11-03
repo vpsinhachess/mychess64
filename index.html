@@ -567,14 +567,17 @@ document.querySelectorAll('.hero,.fe,.sxw,.ag').forEach(function(el){o.observe(e
 </div>
 <script id="cx-js">(function(){
 /* ===== CHESSA floating assistant ===== */
-var CHAT_URL='ask-chessa/';      /* path of your existing Ask CHESSA app */
+var CHAT_URL='/chessa/';         /* your existing Ask CHESSA app */
 var PANEL=true;                  /* true = open it in an in-page panel (iframe); false = navigate to CHAT_URL */
-var A='assets/chessa/',WEBM=A+'chessa.webm',STACK=A+'chessa-stack.mp4';
+var A='assets/chessa/',V='?v=3',WEBM=A+'chessa.webm'+V,STACK=A+'chessa-stack.mp4'+V;   /* ?v= busts old cached/silent copies; bump it when you replace the videos */
+var SK='mc64_chessa';   /* localStorage flag: this visitor has chatted with CHESSA before */
+function saved(){try{var o=JSON.parse(localStorage.getItem(SK)||'null');return!!o&&Date.now()-o.t<2592e6}catch(e){return false}}
+function save(){try{localStorage.setItem(SK,JSON.stringify({t:Date.now()}))}catch(e){}}
 var root=document.getElementById('cx');if(!root)return;
 var $=function(i){return document.getElementById(i)},wm=$('wm'),fig=$('cxfig'),btn=$('cxbtn'),bub=$('cxb'),chat=$('cxc'),fr=$('cxfr'),html=document.documentElement;
 var rm=matchMedia('(prefers-reduced-motion:reduce)').matches,cn=navigator.connection||{},lite=cn.saveData||/(^|-)2g$/.test(cn.effectiveType||'');
 var ua=navigator.userAgent,webkit=window.CHESSA_FORCE_CANVAS||/iP(hone|ad|od)/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)||(/safari/i.test(ua)&&!/chrome|chromium|crios|fxios|edg|android/i.test(ua));
-var shown=false,chatOpen=false,chatMin=false,minAt=0,dwell,fade,popupSeen=false,ready=false,playing=false,primed=false,replays=0,vid,cv,ctx,tmr,btm,bdone=false,lastFocus;
+var shown=false,chatOpen=false,chatMin=false,minAt=0,dwell,fade,popupSeen=false,ready=false,playing=false,primed=false,replays=0,vid,cv,ctx,tmr,btm,bdone=false,lastFocus,armed=false;
 function setW(){html.style.setProperty('--cxw',root.offsetWidth+'px')}
 function popupOpen(){return !!wm&&!wm.hidden}
 /* ---------- video (lazy, muted, no audio track) ---------- */
@@ -604,29 +607,33 @@ function play(){if(!vid||!ready||!shown||chatOpen||document.hidden||playing)retu
 function greet(){play()}
 function sched(){clearTimeout(tmr);if(!shown||replays>=5)return;tmr=setTimeout(function(){replays++;play()},28000)}
 /* ---------- show / hide ---------- */
-function showBubble(){if(bdone||!shown)return;bub.classList.add('on');clearTimeout(btm);btm=setTimeout(hideBubble,chatMin?14000:9000)}
+function showBubble(m){if(bdone||!shown)return;m=m===2?2:(chatMin?1:0);setMsg(m);bub.classList.add('on');clearTimeout(btm);btm=setTimeout(hideBubble,m?6000:9000)}
+function silent(was){vid.muted=true;var q=vid.play();q&&q.then&&q.then(function(){playing=true;root.classList.add('live');if(cv&&!was)loop()},function(){});if(!bdone){showBubble(2);arm()}}
+function arm(){if(armed)return;armed=true;var f=function(){document.removeEventListener('pointerdown',f,true);document.removeEventListener('keydown',f,true);armed=false;if(shown&&!chatOpen)say()};document.addEventListener('pointerdown',f,true);document.addEventListener('keydown',f,true)}
 function say(){if(!vid||!ready||!shown||chatOpen)return;clearInterval(fade);clearTimeout(tmr);var was=playing;
- vid.volume=1;vid.muted=false;try{vid.currentTime=0}catch(e){}
+ var ua2=navigator.userActivation;try{vid.currentTime=0}catch(e){}
+ if(ua2&&!ua2.hasBeenActive){silent(was);return}   /* browser blocks sound until the visitor has clicked/tapped the page once */
+ vid.volume=1;vid.muted=false;
  var ok=function(){playing=true;root.classList.add('live');if(cv&&!was)loop()};
  var p=vid.play();
- if(p&&p.then)p.then(ok,function(){vid.muted=true;var q=vid.play();q&&q.then&&q.then(ok,function(){})});else ok()}   /* sound needs a prior click/tap on the page; otherwise she just waves silently */
-function hush(){if(!vid||vid.muted)return;clearInterval(fade);fade=setInterval(function(){if(vid.volume>.13)vid.volume-=.13;else{clearInterval(fade);vid.muted=true;vid.volume=1}},40)}
+ if(p&&p.then)p.then(ok,function(){silent(was)});else ok()}   /* sound needs a prior click/tap on the page; otherwise she just waves silently */
+function hush(){if(!vid||vid.muted||chatOpen)return;clearInterval(fade);fade=setInterval(function(){if(vid.volume>.13)vid.volume-=.13;else{clearInterval(fade);vid.muted=true;vid.volume=1}},40)}
 function hideBubble(){bub.classList.remove('on');clearTimeout(btm)}
 function show(){if(shown||popupOpen()||chatOpen)return;shown=true;prime();setW();
  requestAnimationFrame(function(){root.classList.add('on');html.classList.add('cx-on')});
  setTimeout(function(){if(shown)greet()},650);setTimeout(showBubble,1100)}
-function hide(){shown=false;root.classList.remove('on');html.classList.remove('cx-on');hideBubble();clearTimeout(tmr);if(vid&&playing){vid.pause();playing=false}}
+function hide(keep){shown=false;root.classList.remove('on');html.classList.remove('cx-on');hideBubble();clearTimeout(tmr);if(vid&&playing&&!keep){vid.pause();playing=false}}
 /* ---------- chat (one panel; minimise keeps the conversation, nothing reloads) ---------- */
-function setMsg(c){$('cxbt').innerHTML=c?'Continue Talking with <b>CHESSA</b>':'Hi! I\u2019m <b>CHESSA</b>. Ask me anything about chess!'}
+function setMsg(m){$('cxbt').innerHTML=m===2?'Click anywhere to hear <b>CHESSA</b> \ud83d\udd0a':m?'Continue Talking with <b>CHESSA</b>':'Hi! I\u2019m <b>CHESSA</b>. Ask me anything about chess!'}
 function openChat(){
  if(window.AskChessa&&typeof window.AskChessa.open==='function'){window.AskChessa.open();return}
  if(!PANEL){location.href=CHAT_URL;return}
- if(chatOpen)return;clearTimeout(dwell);chatOpen=true;chatMin=false;bdone=true;lastFocus=document.activeElement;hide();
+ if(chatOpen)return;clearTimeout(dwell);chatOpen=true;chatMin=false;bdone=true;lastFocus=document.activeElement;save();hide(!!vid&&!vid.muted);   /* a voice greeting already playing finishes */
  if(fr.getAttribute('src')==='about:blank')fr.src=CHAT_URL;
  chat.hidden=false;if(matchMedia('(max-width:600px)').matches)document.body.style.overflow='hidden';
  requestAnimationFrame(function(){requestAnimationFrame(function(){chat.classList.add('on');$('cxcl').focus({preventScroll:true})})})}
 function minimiseChat(){if(!chatOpen)return;chatOpen=false;chatMin=true;minAt=Date.now();chat.classList.remove('on');document.body.style.overflow='';
- setMsg(true);bdone=false;setTimeout(show,220);
+ bdone=false;setTimeout(show,220);
  if(lastFocus&&lastFocus.focus)setTimeout(function(){if(root.classList.contains('on'))btn.focus({preventScroll:true})},700)}
 window.openAskChessa=openChat;
 btn.addEventListener('click',openChat);$('cxbt').addEventListener('click',openChat);
@@ -636,9 +643,11 @@ document.addEventListener('pointerdown',function(e){if(chatOpen&&!chat.contains(
 document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(chatOpen)minimiseChat();else if(bub.classList.contains('on')){bdone=true;hideBubble()}});
 addEventListener('message',function(e){if(e.origin===location.origin&&(e.data==='askchessa:close'||e.data==='askchessa:minimise'))minimiseChat()});
 $('cxnew').href=CHAT_URL;
+if(saved()){chatMin=true;minAt=0}   /* came back later: "Continue Talking with CHESSA" and hover/click reopens the previous chat */
 btn.addEventListener('pointerenter',function(e){if(e.pointerType==='touch'||!shown)return;
- if(chatMin){clearTimeout(dwell);if(Date.now()-minAt>800)dwell=setTimeout(openChat,150);return}   /* hover reopens the same chat */
- if(!bdone)showBubble();say()});
+ if(chatMin){if(Date.now()-minAt<800)return;if(fr.getAttribute('src')==='about:blank')fr.src=CHAT_URL;clearTimeout(dwell);dwell=setTimeout(openChat,700)}   /* hover reopens the same chat */
+ else if(!bdone)showBubble();
+ say()});
 btn.addEventListener('pointerleave',function(){clearTimeout(dwell);hush()});
 btn.addEventListener('focus',function(){if(shown&&!bdone)showBubble()});
 document.addEventListener('visibilitychange',function(){if(document.hidden){if(vid&&playing){vid.pause();playing=false}clearTimeout(tmr)}else sched()});
