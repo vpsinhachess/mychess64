@@ -33,12 +33,21 @@ function stopV(){sg++;if(window.speechSynthesis)speechSynthesis.cancel();body.cl
 $("vc").onclick=()=>{vOn=!vOn;localStorage.cv=vOn?"1":"0";$("vc").textContent=vOn?"🔊":"🔇";$("vc").classList.toggle("on",vOn);if(!vOn)stopV()};
 $("vc").textContent=vOn?"🔊":"🔇";$("vc").classList.toggle("on",vOn);
 const sc=()=>main.scrollTo({top:main.scrollHeight});
+/* ---------- chat history: stays on this device (sessionStorage + localStorage), restored on reload / next visit ---------- */
+const HX=(()=>{const K="cch",MAX=40,TTL=30*864e5;let L=[];
+ const rd=s=>{try{const o=JSON.parse(s.getItem(K)||"null");return o&&o.v==1&&Date.now()-o.t<TTL&&Array.isArray(o.m)?o:null}catch(e){return null}};
+ const wr=()=>{const s=JSON.stringify({v:1,t:Date.now(),m:L});try{sessionStorage.setItem(K,s)}catch(e){}try{localStorage.setItem(K,s)}catch(e){}};
+ return{load(){let a=null,b=null;try{a=rd(sessionStorage)}catch(e){}try{b=rd(localStorage)}catch(e){}const o=a&&b?(a.t>=b.t?a:b):a||b;L=o?o.m:[];return L},
+  push(x){L.push(x);if(L.length>MAX)L=L.slice(-MAX);wr()},
+  clear(){L=[];try{sessionStorage.removeItem(K)}catch(e){}try{localStorage.removeItem(K)}catch(e){}}}})();
+window.CHESSA_HISTORY=HX;
 function think(){if(th)th.remove();th=el("div","msg bot");th.innerHTML='<div class="av" aria-hidden="true">♛</div><div class="bubble" aria-label="CHESSA is typing"><div class="dots"><i></i><i></i><i></i></div></div>';chat.append(th);sc()}
-function add(role,text){body.classList.add("chat");stopV();const r=el("div","msg "+role),b=el("div","bubble");b.textContent=text;r.append(b);chat.append(r);sc();if(role=="user")think()}
+function add(role,text){body.classList.add("chat");stopV();HX.push({r:role,t:String(text).slice(0,700)});const r=el("div","msg "+role),b=el("div","bubble");b.textContent=text;r.append(b);chat.append(r);sc();if(role=="user")think()}
 /* A "wait" message (<i class="wait">…</i>) is a temporary status line: shown at once, never spoken, removed by its caller. */
 const isWait=h=>/class="wait"/.test(h);window.isWait=isWait;
 window.botUI=function(html,meta,chips){
- const wait=isWait(html),row=el("div","msg bot"),a=el("div","av"),b=el("div","bubble"),t=el("div","txt");a.textContent="♛";a.setAttribute("aria-hidden","true");t.innerHTML=html;b.append(t);row.append(a,b);
+ const wait=isWait(html);if(!wait&&typeof html=="string")HX.push(/style="[^"]*grid|class="pz|<button|<canvas|onclick|<input/.test(html)||html.length>8000?{r:"bot",h:"<i>(interactive board or tool \u2014 ask again to reopen it)</i>",m:[],c:[]}:{r:"bot",h:html,m:meta||[],c:chips||[]});
+ const row=el("div","msg bot"),a=el("div","av"),b=el("div","bubble"),t=el("div","txt");a.textContent="♛";a.setAttribute("aria-hidden","true");t.innerHTML=html;b.append(t);row.append(a,b);
  const go=()=>{if(th){th.remove();th=null}chat.append(row);row.style.display="";if(wait){sc();return}
   const sp=(t.cloneNode(true));sp.querySelectorAll('[style*="grid"]').forEach(x=>x.remove());const say=sp.textContent;
   /* screen readers get the plain text; the animated per-letter copy is hidden from them */
@@ -47,9 +56,21 @@ window.botUI=function(html,meta,chips){
   speak(say);const iv=setInterval(sc,120);setTimeout(()=>{clearInterval(iv);sc()},d+700)};
  if(wait){if(th){th.remove();th=null}go()}else{row.style.display="none";setTimeout(go,th?700:0)}
  return b};
-$("clear").onclick=()=>{stopV();chat.innerHTML="";th=null;lastTopic="";body.classList.remove("chat")};
+$("clear").onclick=()=>{stopV();chat.innerHTML="";th=null;lastTopic="";body.classList.remove("chat");HX.clear()};
 send.onclick=()=>{const v=q.value.trim();if(v){q.value="";ask(v)}};
-q.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing&&e.keyCode!==229){e.preventDefault();send.click()}};
+let ce=0;q.addEventListener("compositionend",()=>{ce=Date.now()});   /* Safari fires a stray Enter right after a composition ends */
+q.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&Date.now()-ce>60){e.preventDefault();send.click()}};
 /* a promise that rejects somewhere in the module chain must never leave the typing dots on screen forever */
 addEventListener("unhandledrejection",e=>{console.warn("CHESSA:",e.reason);if(th){th.remove();th=null;window.botUI("Sorry, something went wrong. Please try again.")}});
 var ask;
+
+/* restore the previous conversation (static: no typing animation, no voice) once every module has loaded */
+function restoreChat(){const L=HX.load();if(!L.length||chat.children.length)return;body.classList.add("chat");
+ const note=el("div","msg");note.style.cssText="justify-content:center;animation:none;color:var(--mu);font-size:12px;margin:6px 0";note.textContent="— your previous chat —";chat.append(note);
+ L.forEach(x=>{const row=el("div","msg "+(x.r=="user"?"user":"bot")),b=el("div","bubble");row.style.animation="none";
+  if(x.r=="user"){b.textContent=x.t;row.append(b)}
+  else{const a=el("div","av"),t=el("div","txt");a.textContent="\u265b";a.setAttribute("aria-hidden","true");t.innerHTML=x.h;b.append(t);row.append(a,b);
+   const m=el("div","meta");m.style.cssText="opacity:1;animation:none";(x.m||[]).forEach(z=>{const s=el("span");s.innerHTML=z;m.append(s)});
+   (x.c||[]).forEach(z=>{const s=el("span","rl");s.textContent="\u21aa "+z;s.tabIndex=0;s.setAttribute("role","button");const run=()=>{q.value=z;send.click()};s.onclick=run;s.onkeydown=e=>{if(e.key=="Enter"||e.key==" "){e.preventDefault();run()}};m.append(s)});if(m.children.length)b.append(m)}
+  chat.append(row)});sc()}
+addEventListener("load",()=>setTimeout(()=>{try{restoreChat()}catch(e){console.warn("CHESSA history:",e)}},50));
