@@ -326,14 +326,14 @@ body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .cx-bx:hover{background:color-mix(in srgb,var(--mut) 18%,transparent)}.cx-bx:focus-visible{outline:2px solid var(--or)}.cx-bx .i{width:12px;height:12px;margin:0;vertical-align:0}
 html.cx-on .btt{right:calc(var(--cxw,120px) + 18px)}
 /* chat panel hosting the existing Ask CHESSA app */
-.cx-chat{position:fixed;z-index:120;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:min(400px,calc(100vw - 32px));height:min(640px,calc(100vh - 32px));height:min(640px,calc(100dvh - 32px));display:flex;flex-direction:column;overflow:hidden;border-radius:22px;background:var(--card);border:1px solid var(--ln);box-shadow:0 28px 70px rgba(7,26,54,.4);opacity:0;transform:translateY(24px) scale(.96);transform-origin:100% 100%;transition:opacity .22s,transform .32s var(--ease)}
-.cx-chat.on{opacity:1;transform:none}
+.cx-chat{position:fixed;z-index:120;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:min(400px,calc(100vw - 32px));height:min(640px,calc(100vh - 32px));height:min(640px,calc(100dvh - 32px));display:flex;flex-direction:column;overflow:hidden;border-radius:22px;background:var(--card);border:1px solid var(--ln);box-shadow:0 28px 70px rgba(7,26,54,.4);opacity:0;visibility:hidden;pointer-events:none;transform:translate(0,10px) scale(.12);transform-origin:100% 100%;transition:opacity .25s,transform .42s cubic-bezier(.2,.85,.25,1),visibility 0s .42s}
+.cx-chat.on{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition-delay:0s}
 .cx-ch{flex:none;display:flex;align-items:center;gap:8px;padding:10px 10px 10px 16px;color:#fff;background:linear-gradient(135deg,var(--navy2),var(--navy));padding-top:max(10px,env(safe-area-inset-top))}
 .cx-ct{flex:1;font-weight:700;font-size:.95rem}
 .cx-ch a,.cx-ch button{all:unset;box-sizing:border-box;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;cursor:pointer;color:#fff;background:rgba(255,255,255,.1);transition:background .15s}
 .cx-ch a:hover,.cx-ch button:hover{background:rgba(255,255,255,.22)}.cx-ch a:focus-visible,.cx-ch button:focus-visible{outline:2px solid var(--or)}.cx-ch .i{width:18px;height:18px;margin:0;vertical-align:0}
 .cx-cb{flex:1;min-height:0;background:var(--card)}.cx-cb iframe{display:block;width:100%;height:100%;border:0}
-@media(max-width:600px){.cx-chat{inset:0;width:auto;height:auto;border-radius:0;border:0;transform:translateY(100%)}.cx-chat.on{transform:none}}
+@media(max-width:600px){.cx-chat{inset:0;width:auto;height:auto;border-radius:0;border:0}}
 @media print{.cx,.cx-chat{display:none!important}}
 </style>
 </head>
@@ -562,7 +562,7 @@ document.querySelectorAll('.hero,.fe,.sxw,.ag').forEach(function(el){o.observe(e
 <button class="cx-btn" id="cxbtn" type="button" aria-haspopup="dialog" aria-label="Ask CHESSA: open the chess assistant"><span class="cx-fig" id="cxfig"><img src="assets/chessa/chessa-poster.webp" width="360" height="640" alt="" decoding="async" fetchpriority="low"></span></button>
 </aside>
 <div class="cx-chat" id="cxc" role="dialog" aria-modal="true" aria-label="Ask CHESSA chat" hidden>
-<div class="cx-ch"><span class="cx-ct">Ask CHESSA</span><a id="cxnew" href="ask-chessa/" target="_blank" rel="noopener" aria-label="Open Ask CHESSA in a new tab"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg></a><button id="cxcl" type="button" aria-label="Close chat"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-x"/></svg></button></div>
+<div class="cx-ch"><span class="cx-ct">Ask CHESSA</span><a id="cxnew" href="ask-chessa/" target="_blank" rel="noopener" aria-label="Open Ask CHESSA in a new tab"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg></a><button id="cxcl" type="button" aria-label="Minimise chat" title="Minimise"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button></div>
 <div class="cx-cb"><iframe id="cxfr" title="Ask CHESSA chat" src="about:blank" allow="clipboard-write"></iframe></div>
 </div>
 <script id="cx-js">(function(){
@@ -574,7 +574,7 @@ var root=document.getElementById('cx');if(!root)return;
 var $=function(i){return document.getElementById(i)},wm=$('wm'),fig=$('cxfig'),btn=$('cxbtn'),bub=$('cxb'),chat=$('cxc'),fr=$('cxfr'),html=document.documentElement;
 var rm=matchMedia('(prefers-reduced-motion:reduce)').matches,cn=navigator.connection||{},lite=cn.saveData||/(^|-)2g$/.test(cn.effectiveType||'');
 var ua=navigator.userAgent,webkit=window.CHESSA_FORCE_CANVAS||/iP(hone|ad|od)/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)||(/safari/i.test(ua)&&!/chrome|chromium|crios|fxios|edg|android/i.test(ua));
-var shown=false,chatOpen=false,popupSeen=false,ready=false,playing=false,primed=false,replays=0,vid,cv,ctx,tmr,btm,bdone=false,lastFocus;
+var shown=false,chatOpen=false,chatMin=false,minAt=0,dwell,fade,popupSeen=false,ready=false,playing=false,primed=false,replays=0,vid,cv,ctx,tmr,btm,bdone=false,lastFocus;
 function setW(){html.style.setProperty('--cxw',root.offsetWidth+'px')}
 function popupOpen(){return !!wm&&!wm.hidden}
 /* ---------- video (lazy, muted, no audio track) ---------- */
@@ -597,38 +597,49 @@ function draw(){if(!ctx||!vid||vid.readyState<2)return;
  ctx.putImageData(od,0,0)}
 function loop(){if(!playing)return;draw();vid.requestVideoFrameCallback?vid.requestVideoFrameCallback(loop):requestAnimationFrame(loop)}
 function play(){if(!vid||!ready||!shown||chatOpen||document.hidden||playing)return;clearTimeout(tmr);
- try{vid.currentTime=0}catch(e){}
+ vid.muted=true;try{vid.currentTime=0}catch(e){}
  var p=vid.play();
  var go=function(){playing=true;root.classList.add('live');if(cv)loop()};
  p&&p.then?p.then(go,function(){}):go()}
 function greet(){play()}
 function sched(){clearTimeout(tmr);if(!shown||replays>=5)return;tmr=setTimeout(function(){replays++;play()},28000)}
 /* ---------- show / hide ---------- */
-function showBubble(){if(bdone||!shown)return;bub.classList.add('on');clearTimeout(btm);btm=setTimeout(hideBubble,9000)}
+function showBubble(){if(bdone||!shown)return;bub.classList.add('on');clearTimeout(btm);btm=setTimeout(hideBubble,chatMin?14000:9000)}
+function say(){if(!vid||!ready||!shown||chatOpen)return;clearInterval(fade);clearTimeout(tmr);var was=playing;
+ vid.volume=1;vid.muted=false;try{vid.currentTime=0}catch(e){}
+ var ok=function(){playing=true;root.classList.add('live');if(cv&&!was)loop()};
+ var p=vid.play();
+ if(p&&p.then)p.then(ok,function(){vid.muted=true;var q=vid.play();q&&q.then&&q.then(ok,function(){})});else ok()}   /* sound needs a prior click/tap on the page; otherwise she just waves silently */
+function hush(){if(!vid||vid.muted)return;clearInterval(fade);fade=setInterval(function(){if(vid.volume>.13)vid.volume-=.13;else{clearInterval(fade);vid.muted=true;vid.volume=1}},40)}
 function hideBubble(){bub.classList.remove('on');clearTimeout(btm)}
 function show(){if(shown||popupOpen()||chatOpen)return;shown=true;prime();setW();
  requestAnimationFrame(function(){root.classList.add('on');html.classList.add('cx-on')});
  setTimeout(function(){if(shown)greet()},650);setTimeout(showBubble,1100)}
 function hide(){shown=false;root.classList.remove('on');html.classList.remove('cx-on');hideBubble();clearTimeout(tmr);if(vid&&playing){vid.pause();playing=false}}
-/* ---------- chat ---------- */
+/* ---------- chat (one panel; minimise keeps the conversation, nothing reloads) ---------- */
+function setMsg(c){$('cxbt').innerHTML=c?'Continue Talking with <b>CHESSA</b>':'Hi! I\u2019m <b>CHESSA</b>. Ask me anything about chess!'}
 function openChat(){
  if(window.AskChessa&&typeof window.AskChessa.open==='function'){window.AskChessa.open();return}
  if(!PANEL){location.href=CHAT_URL;return}
- if(chatOpen)return;chatOpen=true;bdone=true;lastFocus=document.activeElement;hide();
+ if(chatOpen)return;clearTimeout(dwell);chatOpen=true;chatMin=false;bdone=true;lastFocus=document.activeElement;hide();
  if(fr.getAttribute('src')==='about:blank')fr.src=CHAT_URL;
  chat.hidden=false;if(matchMedia('(max-width:600px)').matches)document.body.style.overflow='hidden';
  requestAnimationFrame(function(){requestAnimationFrame(function(){chat.classList.add('on');$('cxcl').focus({preventScroll:true})})})}
-function closeChat(){if(!chatOpen)return;chatOpen=false;chat.classList.remove('on');document.body.style.overflow='';
- setTimeout(function(){chat.hidden=true},260);setTimeout(show,180);
- if(lastFocus&&lastFocus.focus)setTimeout(function(){if(root.classList.contains('on'))btn.focus({preventScroll:true})},500)}
+function minimiseChat(){if(!chatOpen)return;chatOpen=false;chatMin=true;minAt=Date.now();chat.classList.remove('on');document.body.style.overflow='';
+ setMsg(true);bdone=false;setTimeout(show,220);
+ if(lastFocus&&lastFocus.focus)setTimeout(function(){if(root.classList.contains('on'))btn.focus({preventScroll:true})},700)}
 window.openAskChessa=openChat;
 btn.addEventListener('click',openChat);$('cxbt').addEventListener('click',openChat);
 $('cxbx').addEventListener('click',function(){bdone=true;hideBubble()});
-$('cxcl').addEventListener('click',closeChat);
-document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(chatOpen)closeChat();else if(bub.classList.contains('on')){bdone=true;hideBubble()}});
-addEventListener('message',function(e){if(e.origin===location.origin&&e.data==='askchessa:close')closeChat()});
+$('cxcl').addEventListener('click',minimiseChat);
+document.addEventListener('pointerdown',function(e){if(chatOpen&&!chat.contains(e.target)&&!root.contains(e.target))minimiseChat()},true);   /* click anywhere outside the chat */
+document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(chatOpen)minimiseChat();else if(bub.classList.contains('on')){bdone=true;hideBubble()}});
+addEventListener('message',function(e){if(e.origin===location.origin&&(e.data==='askchessa:close'||e.data==='askchessa:minimise'))minimiseChat()});
 $('cxnew').href=CHAT_URL;
-btn.addEventListener('mouseenter',function(){if(shown&&!playing&&ready)play();if(shown&&!bdone)showBubble()});
+btn.addEventListener('pointerenter',function(e){if(e.pointerType==='touch'||!shown)return;
+ if(chatMin){clearTimeout(dwell);if(Date.now()-minAt>800)dwell=setTimeout(openChat,150);return}   /* hover reopens the same chat */
+ if(!bdone)showBubble();say()});
+btn.addEventListener('pointerleave',function(){clearTimeout(dwell);hush()});
 btn.addEventListener('focus',function(){if(shown&&!bdone)showBubble()});
 document.addEventListener('visibilitychange',function(){if(document.hidden){if(vid&&playing){vid.pause();playing=false}clearTimeout(tmr)}else sched()});
 addEventListener('resize',function(){if(shown)setW()});
