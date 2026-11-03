@@ -1,0 +1,6 @@
+/* CHESSA service worker: app shell works offline; live APIs (Wikipedia, Lichess, Chess.com) always go to the network. */
+const V="chessa-v2.1",SHELL=["./","index.html","manifest.webmanifest","assets/mark.png","assets/logo-horizontal.png","assets/logo-stacked.png","js/core.js","js/kb.js","js/app.js","js/knowledge.js","js/live.js","js/hindi.js","js/learn.js","js/puzzles.js","js/engine.js","js/wiki.js","js/tutor.js","js/ui.js","js/extras.js","js/kids.js","data/kb-kids.js","data/my-knowledge-1.js","data/my-knowledge-2.js","data/kb-data.js","data/kb-extra.js","data/manifest.js","data/puzzles.js"];
+self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
+self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
+self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET"||new URL(r.url).origin!==location.origin)return;
+ e.respondWith(fetch(r).then(x=>{const c=x.clone();caches.open(V).then(h=>h.put(r,c));return x}).catch(()=>caches.match(r).then(m=>m||caches.match("index.html"))))});
