@@ -83,6 +83,13 @@ body:not(.chat) #sg{display:none}
 ::-webkit-scrollbar{width:0}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}.c{opacity:1}#fx{display:none}}
 @media (max-width:380px){.nm{letter-spacing:.1em;font-size:14px}.ib{width:36px;height:36px}header{gap:7px}}
+/* v2.3 fixes + compact embedded layout */
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.meta,.acts{animation-name:rise!important;animation-fill-mode:both!important}   /* the old fade-in ended at opacity 0, so chips and action buttons never showed (and left a blank gap) */
+.msg.bot .bubble{min-width:0}
+body.embed header{padding:8px 10px 4px;gap:8px}body.embed .brand{width:36px;height:36px;border-radius:10px}body.embed .nm{font-size:14px}body.embed .nm small{display:none}
+body.embed main{padding:4px 10px 12px}body.embed .stage{width:min(112px,28vw)}body.embed h1{font-size:28px;margin:10px 0 0}body.embed .sub{font-size:10.5px}body.embed .tg{margin:4px 0 12px;font-size:13px}body.embed .pb{display:none}
+body.embed .bubble{font-size:15px;padding:11px 14px}body.embed .cred{display:none}body.embed footer{padding:4px 10px max(8px,env(safe-area-inset-bottom))}
 </style></head><body>
 <div id="fx" aria-hidden="true"></div>
 <div class="app">

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061631">
+<meta name="color-scheme" content="dark">
+<title>CHESSA — AI Chess Coach | MyChess64</title>
+<meta name="description" content="CHESSA is the free AI chess coach from MyChess64. Ask about rules, openings, tactics and endgames, analyse a FEN or PGN, solve puzzles and look up chess history on Wikipedia. Learn. Play. Improve. Anytime, Anywhere.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="MyChess64">
+<meta property="og:title" content="CHESSA — AI Chess Coach by MyChess64">
+<meta property="og:description" content="Ask anything about chess: rules, openings, tactics, puzzles, engine analysis and Wikipedia look-ups.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<!--SW--><link rel="manifest" href="manifest.webmanifest"><!--/SW-->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--navy:#061631;--navy2:#0a2a66;--blue:#1473e6;--blue2:#0a4fb3;--cy:#19c4ff;--gold:#ffb02e;--or:#ff9f1c;--pk:#4d9dff;--line:#ffffff1f;--tx:#f1f6ff;--mu:#9db4d8}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:Poppins,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--tx);background:radial-gradient(1000px 600px at 15% -10%,#1473e640,transparent),radial-gradient(900px 600px at 100% 100%,#19c4ff26,transparent),var(--navy);overflow:hidden;-webkit-text-size-adjust:100%}
+a{color:#ffd089}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+#fx i{position:absolute;bottom:-60px;font-style:normal;color:#ffffff0f;animation:up linear infinite}
+@keyframes up{to{transform:translateY(-115vh) rotate(40deg)}}
+.app{position:relative;height:100vh;height:100dvh;max-width:880px;margin:auto;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 10px}
+.brand{flex:none;display:block;width:44px;height:44px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 2px #19c4ff55,0 6px 18px #1473e655;transition:.2s}
+.brand:hover{transform:scale(1.06);box-shadow:0 0 0 2px var(--gold),0 6px 22px #ffb02e55}
+.brand img{display:block;width:100%;height:100%}
+.nm{font-weight:800;letter-spacing:.16em;font-size:16px;line-height:1.15}.nm small{display:block;font-size:9.5px;letter-spacing:.08em;color:#7ef0b4;font-weight:600}
+.sp{flex:1}.ib{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#ffffff0d;color:#fff;font-size:17px;cursor:pointer;backdrop-filter:blur(8px);font-family:inherit}
+.ib:hover{background:#ffffff1c}.ib.on{border-color:var(--gold);box-shadow:0 0 14px #ffb02e55}
+main{flex:1;overflow:auto;padding:6px 14px 20px;scroll-behavior:smooth;overscroll-behavior:contain}
+#hero{text-align:center;padding-top:1.5vh;transition:.5s}body.chat #hero{display:none}
+.stage{position:relative;width:min(220px,52vw);aspect-ratio:1;margin:auto}
+.stage::before{content:"";position:absolute;inset:-8%;border-radius:50%;background:conic-gradient(from 0deg,var(--cy),var(--blue),var(--gold),var(--cy));filter:blur(22px);opacity:.6;animation:spin 8s linear infinite}
+.stage::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid #ffffff30}
+.stage svg{position:relative;z-index:1;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 50% 30%,#1a4fa8,#071a3a);animation:fl 4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes fl{50%{transform:translateY(-6px)}}
+h1{margin:18px 0 2px;font-size:clamp(34px,9vw,50px);letter-spacing:.2em;font-weight:800;color:#fff;text-shadow:0 0 28px #19c4ff66}
+h1 .w:last-child .c:last-child{color:var(--gold)}
+.sub{margin:0;color:var(--cy);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.tg{color:var(--mu);font-size:14px;margin:8px 0 18px}
+#sug{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;max-width:620px;margin:0 auto}
+.chip{border:1px solid #ffb02e55;background:#ffb02e14;color:#ffdca0;border-radius:99px;padding:8px 14px;font-size:13px;cursor:pointer;transition:.2s;font-family:inherit}
+.chip:hover{background:#ffb02e2e;transform:translateY(-2px);box-shadow:0 6px 18px #ffb02e30}
+.chip.wk{border-color:#19c4ff66;background:#19c4ff14;color:#bdeeff}
+.pb{display:inline-flex;align-items:center;gap:10px;margin:22px auto 6px;padding:6px 14px 6px 12px;border-radius:99px;background:#fff;color:#4a5a78;font-size:10.5px;text-decoration:none;box-shadow:0 8px 26px #0006}
+.pb img{display:block;height:30px;width:auto}
+.msg{display:flex;gap:9px;margin:14px 0;align-items:flex-end;animation:in .35s ease both}@keyframes in{from{opacity:0;transform:translateY(10px) scale(.97)}}
+.msg.user{justify-content:flex-end}
+.av{flex:none;width:32px;height:32px;border-radius:10px;font-size:0;color:transparent;background:#0a2a66 url(assets/mark.png) center/cover no-repeat;box-shadow:0 0 12px #19c4ff55;overflow:hidden}
+.bubble{max-width:88%;padding:13px 16px;border-radius:20px;line-height:1.65;font-size:15px;border:1px solid var(--line)}
+.user .bubble{background:linear-gradient(135deg,#1a8cff,#1473e6 55%,#0a4fb3);border-bottom-right-radius:6px;box-shadow:0 8px 24px #1473e655}
+.bot .bubble{background:linear-gradient(160deg,#ffffff16,#ffffff06);backdrop-filter:blur(14px);border-bottom-left-radius:6px;box-shadow:0 8px 28px #0006,inset 0 0 0 1px #19c4ff18}
+.txt{white-space:pre-wrap;overflow-wrap:anywhere}.w{display:inline-block;white-space:nowrap}
+.c{display:inline-block;opacity:0;animation:drop .5s cubic-bezier(.2,.9,.3,1.3) both;color:inherit}
+@keyframes drop{0%{opacity:0;transform:translateY(-22px) rotate(-8deg);filter:blur(3px)}60%{opacity:1;color:var(--cy)}100%{opacity:1;transform:none;filter:none}}
+.txt [style*=grid]{animation:in .8s both}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;opacity:0;animation:in .6s both}
+.meta span{font-size:11px;color:var(--mu);border:1px solid var(--line);border-radius:99px;padding:4px 9px}
+.meta .rl{cursor:pointer;color:#ffdca0;border-color:#ffb02e44}.meta .rl:hover{background:#ffb02e22}
+.meta a{color:#9be4ff}
+.wkc{overflow:hidden}.wkc img{float:right;width:88px;max-height:110px;object-fit:cover;border-radius:12px;margin:2px 0 8px 12px;border:1px solid var(--line)}
+.wkc .wd{color:var(--cy);font-size:12.5px;display:block;margin-bottom:4px}
+.dots{display:flex;gap:5px;padding:6px 2px}.dots i{width:8px;height:8px;border-radius:50%;background:var(--cy);animation:bn 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes bn{50%{transform:translateY(-7px);opacity:.4}}
+footer{padding:8px 12px max(8px,env(safe-area-inset-bottom))}
+.cmp{display:flex;gap:8px;align-items:center;padding:6px;border-radius:30px;border:1px solid #ffffff2b;background:#ffffff12;backdrop-filter:blur(16px);box-shadow:0 10px 40px #0008}
+.cmp:focus-within{border-color:var(--cy);box-shadow:0 0 0 3px #19c4ff22,0 10px 40px #0008}
+#q{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font-size:16px;padding:10px 12px;font-family:inherit}
+#q::placeholder{color:#8aa3cc}
+.cmp button{width:42px;height:42px;border-radius:50%;border:0;cursor:pointer;font-size:18px;background:#ffffff16;color:#fff}
+.cmp #send{background:linear-gradient(135deg,#ffd166,#ff9f1c);color:#2a1700;font-weight:900}.cmp #mic.rec{background:#ff3b6b;animation:pl 1s infinite}
+@keyframes pl{50%{box-shadow:0 0 0 8px #ff3b6b33}}
+.cred{margin:7px 0 0;text-align:center;font-size:10px;line-height:1.5;color:#7d93b8}.cred a{color:#9be4ff;text-decoration:none}.cred a:hover{text-decoration:underline}
+body:not(.chat) #sg{display:none}
+.eye{transform-box:fill-box;transform-origin:center;animation:bl 4.5s infinite}@keyframes bl{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.08)}}
+.mo{display:none;transform-box:fill-box;transform-origin:center}.talk .mo{display:block;animation:tk .28s infinite alternate}.talk .sm{display:none}@keyframes tk{from{transform:scaleY(.5)}to{transform:scaleY(2.6)}}
+.glow{animation:gw 2.5s ease-in-out infinite alternate}@keyframes gw{to{opacity:.55}}
+::-webkit-scrollbar{width:0}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}.c{opacity:1}#fx{display:none}}
+@media (max-width:380px){.nm{letter-spacing:.1em;font-size:14px}.ib{width:36px;height:36px}header{gap:7px}}
+</style></head><body>
+<div id="fx" aria-hidden="true"></div>
+<div class="app">
+<header><a class="brand" href="https://www.mychess64.com" target="_blank" rel="noopener" aria-label="MyChess64 home" title="MyChess64"><img src="assets/mark.png" alt="" width="44" height="44"></a><div class="nm">CHESSA<small>AI COACH · ● ONLINE</small></div><div class="sp"></div><button class="ib on" id="vc" title="Voice" aria-label="Voice on/off">🔊</button><button class="ib" id="clear" title="Clear chat" aria-label="Clear chat">✕</button></header>
+<main id="main">
+ <section id="hero"><div class="stage" id="big"></div><h1 id="t1" aria-label="CHESSA">CHESSA</h1><p class="sub">AI Chess Coach · by MyChess64</p><p class="tg" id="t2">Ask me anything about chess</p><div id="sug"></div>
+  <a class="pb" href="https://www.mychess64.com" target="_blank" rel="noopener"><span>Powered by</span><img src="assets/logo-horizontal.png" alt="MyChess64 — Learn. Play. Improve. Anytime, Anywhere." width="96" height="30"></a></section>
+ <div id="chat" role="log" aria-live="polite" aria-relevant="additions"></div>
+</main>
+<footer><div class="cmp"><input id="q" maxlength="700" placeholder="Ask CHESSA…" autocomplete="off" aria-label="Ask CHESSA a chess question" enterkeyhint="send"><button id="mic" title="Speak" aria-label="Speak your question">🎤</button><button id="send" aria-label="Send">➤</button></div>
+<p class="cred">© <a href="https://www.mychess64.com" target="_blank" rel="noopener">MyChess64</a> · Designed &amp; Developed by VED PRAKASH SINHA · Made in BHARAT</p></footer>
+</div>
+<noscript><p style="position:fixed;inset:auto 0 40% 0;text-align:center;color:#fff">CHESSA needs JavaScript. Please enable it and reload.</p></noscript>
+<script src="js/core.js"></script>
+<script src="data/kb-data.js"></script>
+<script src="data/kb-extra.js"></script>
+<script src="data/kb-kids.js"></script>
+<script src="data/manifest.js"></script>
+<script src="data/puzzles.js"></script>
+<script src="js/kb.js"></script>
+<script src="js/app.js"></script>
+<script src="js/knowledge.js"></script>
+<script src="js/live.js"></script>
+<script src="js/hindi.js"></script>
+<script src="js/learn.js"></script>
+<script src="js/puzzles.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/wiki.js"></script>
+<script src="js/tutor.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/extras.js"></script>
+<script src="js/kids.js"></script>
+<!--SW--><script>if("serviceWorker"in navigator&&/^(https:|http:\/\/localhost)/.test(location.href))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script><!--/SW-->
+</body></html>

@@ -47,7 +47,7 @@ let rp=null;
 function setReply(t){rp=t.slice(0,160);rb.innerHTML="<span>↩</span><i>"+esc(rp)+"</i><button>✕</button>";rb.style.display="flex";rb.querySelector("button").onclick=()=>{rp=null;rb.style.display="none"};q.focus()}
 const say=(t)=>{const o=vOn;vOn=true;speak(t);vOn=o};
 function acts(r,t){const b=r.querySelector(".bubble"),a=E("div","acts"),c=t.querySelectorAll(".c"),tx=()=>t.innerText.replace(/\s+/g," ").trim();
- a.style.animationDelay=(c.length?parseFloat(c[c.length-1].style.animationDelay)+500:0)+"ms";
+ const ad=c.length?parseFloat(c[c.length-1].style.animationDelay)+500:0;a.style.animationDelay=ad+"ms";a.style.display="none";setTimeout(()=>{a.style.display=""},ad);
  [["🔊 Listen",()=>say(tx())],["📋 Copy",e=>{try{navigator.clipboard.writeText(tx())}catch(x){}e.target.textContent="✓ Copied"}],["↩ Reply",()=>setReply(tx())],["👍",e=>{e.target.parentNode.textContent="Thanks! 💛"}],["👎",e=>{try{const m=JSON.parse(localStorage.chessa_miss||"[]");m.push("👎 "+tx().slice(0,80));localStorage.chessa_miss=JSON.stringify(m.slice(-100))}catch(x){}e.target.parentNode.textContent="Thanks — I'll improve."}]]
  .forEach(([l,f])=>{const x=E("button");x.textContent=l;x.onclick=f;a.append(x)});b.append(a)}
 function conf(){for(let i=0;i<26;i++){const s=E("i");s.textContent=["♛","♞","✨","⭐","♟"][i%5];s.style.cssText="position:fixed;top:-20px;left:"+Math.random()*100+"vw;font-size:"+(16+Math.random()*18)+"px;font-style:normal;z-index:30;pointer-events:none;animation:cf "+(1.6+Math.random()*1.4)+"s ease-in forwards";document.body.append(s);setTimeout(()=>s.remove(),3200)}}

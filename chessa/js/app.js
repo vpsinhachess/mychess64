@@ -3,6 +3,7 @@ const AVT='<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><
 const AV=AVT.replace(/@/g,"h");
 const $=id=>document.getElementById(id),el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e};
 const chat=$("chat"),q=$("q"),send=$("send"),main=$("main");
+if(window.top!==window||/[?&]embed=1/.test(location.search))document.body.classList.add("embed");   /* shown inside the website's chat panel */
 $("big").innerHTML=AV;
 const SAMPLE=[["Daily puzzle"],["Quiz me"],["Random opening"],["Top players"],["History of chess","wk"],["Who is Viswanathan Anand?","wk"],["Help"]];
 SAMPLE.forEach(([t,k])=>{const b=el("button","chip"+(k?" "+k:""));b.textContent=(k?"📖 ":"")+t;b.onclick=()=>{q.value=t;send.click()};$("sug").append(b)});
@@ -12,7 +13,7 @@ const RM=window.matchMedia?matchMedia("(prefers-reduced-motion: reduce)"):{match
 /* drop-in letter effect. Text inside inline "grid" blocks (chess boards) is left alone. */
 function drop(root,sp){let n=0,i=0;const w=document.createTreeWalker(root,4),ns=[];while(w.nextNode())ns.push(w.currentNode);
  const inB=x=>x.parentElement.closest('[style*="grid"]');ns.forEach(x=>{if(!inB(x))n+=x.textContent.length});
- const S=RM.matches?0:(sp||Math.max(9,Math.min(26,6000/Math.max(n,1))))*(window.tsm||1);
+ const S=RM.matches?0:(sp||Math.max(6,Math.min(16,4200/Math.max(n,1))))*(window.tsm||1);root.dataset.s=S;
  ns.forEach(x=>{if(inB(x))return;const f=document.createDocumentFragment();x.textContent.split(/(\s+)/).forEach(p=>{if(!p)return;if(/^\s+$/.test(p)){f.append(p);return}const wd=el("span","w");G(p).forEach(ch=>{const s=el("span","c");s.textContent=ch;s.style.animationDelay=(i++*S)+"ms";wd.append(s)});f.append(wd)});x.replaceWith(f)});return i*S+500}
 drop($("t1"),110);drop($("t2"),35);
 /* ---------- voice (chunked: Chrome silently stops utterances longer than ~15 s) ---------- */
@@ -52,12 +53,17 @@ window.botUI=function(html,meta,chips){
   const sp=(t.cloneNode(true));sp.querySelectorAll('[style*="grid"]').forEach(x=>x.remove());const say=sp.textContent;
   /* screen readers get the plain text; the animated per-letter copy is hidden from them */
   if(!t.querySelector("a,button")){const r=el("span","sr");r.textContent=say.replace(/\s+/g," ").trim();b.append(r);t.setAttribute("aria-hidden","true")}
-  const d=drop(t);const m=el("div","meta");m.style.animationDelay=d+"ms";(meta||[]).forEach(x=>{const s=el("span");s.innerHTML=x;m.append(s)});(chips||[]).forEach(x=>{const s=el("span","rl");s.textContent="↪ "+x;s.tabIndex=0;s.setAttribute("role","button");const run=()=>{q.value=x;send.click()};s.onclick=run;s.onkeydown=e=>{if(e.key=="Enter"||e.key==" "){e.preventDefault();run()}};m.append(s)});if(m.children.length)b.append(m);
-  speak(say);const iv=setInterval(sc,120);setTimeout(()=>{clearInterval(iv);sc()},d+700)};
- if(wait){if(th){th.remove();th=null}go()}else{row.style.display="none";setTimeout(go,th?700:0)}
+  const d=drop(t);const m=el("div","meta");m.style.animationDelay=d+"ms";(meta||[]).forEach(x=>{const s=el("span");s.innerHTML=x;m.append(s)});(chips||[]).forEach(x=>{const s=el("span","rl");s.textContent="↪ "+x;s.tabIndex=0;s.setAttribute("role","button");const run=()=>{q.value=x;send.click()};s.onclick=run;s.onkeydown=e=>{if(e.key=="Enter"||e.key==" "){e.preventDefault();run()}};m.append(s)});if(m.children.length){b.append(m);m.style.display="none";setTimeout(()=>{m.style.display="";sc()},d)}   /* no blank gap while the reply is still being typed */
+  speak(say);
+  /* follow the text while it is being typed, so the visitor always sees the newest words (not a blank gap below) */
+  const cs=t.querySelectorAll(".c"),S=+t.dataset.s||14,t0=performance.now();
+  const iv=setInterval(()=>{if(!cs.length){sc();return}const k=Math.min(cs.length-1,Math.floor((performance.now()-t0)/Math.max(S,1))+8),r=cs[k].getBoundingClientRect(),mr=main.getBoundingClientRect(),over=r.bottom-(mr.bottom-28);if(over>0)main.scrollTop+=Math.ceil(over*.6)+3},50);
+  setTimeout(()=>{clearInterval(iv);sc()},d+500);setTimeout(sc,d+1300)};
+ if(wait){if(th){th.remove();th=null}go()}else{row.style.display="none";setTimeout(go,th?300:0)}
  return b};
 $("clear").onclick=()=>{stopV();chat.innerHTML="";th=null;lastTopic="";body.classList.remove("chat");HX.clear()};
-send.onclick=()=>{const v=q.value.trim();if(v){q.value="";ask(v)}};
+send.onclick=()=>{const v=q.value.trim();if(v){q.value="";ask(v);if(matchMedia("(hover:hover)").matches)q.focus({preventScroll:true})}};   /* keep typing without clicking again */
+addEventListener("message",e=>{if(e.origin===location.origin&&e.data==="askchessa:focus"&&matchMedia("(hover:hover)").matches)q.focus({preventScroll:true})});
 let ce=0;q.addEventListener("compositionend",()=>{ce=Date.now()});   /* Safari fires a stray Enter right after a composition ends */
 q.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&Date.now()-ce>60){e.preventDefault();send.click()}};
 /* a promise that rejects somewhere in the module chain must never leave the typing dots on screen forever */
