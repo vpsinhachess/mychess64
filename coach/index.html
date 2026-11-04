@@ -14,8 +14,8 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MyChess64">
 <meta property="og:url" content="https://www.mychess64.com/coach/">
-<meta property="og:image" content="https://www.mychess64.com/coach/assets/og-image.png">
-<meta property="og:image:secure_url" content="https://www.mychess64.com/coach/assets/og-image.png">
+<meta property="og:image" content="https://www.mychess64.com/coach/assets/og-share.png">
+<meta property="og:image:secure_url" content="https://www.mychess64.com/coach/assets/og-share.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -23,7 +23,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MyChess64 – Find the Best Chess Coaches &amp; Tutors">
 <meta name="twitter:description" content="Verified, FIDE-rated chess coaches online or at home. First demo class free.">
-<meta name="twitter:image" content="https://www.mychess64.com/coach/assets/og-image.png">
+<meta name="twitter:image" content="https://www.mychess64.com/coach/assets/og-share.png">
 </head><body>
 <noscript><p style="padding:20px;text-align:center">Please enable JavaScript to use MyChess64.</p></noscript>
 <div id="fatal" class="fatal" style="display:none"></div>
@@ -187,7 +187,7 @@
     else{u.select();document.execCommand('copy');ok()}
   }
   function build(){
-    var e=encodeURIComponent,full=e(text+' '+url);
+    var e=encodeURIComponent,full=e(text+'\n'+url);
     var L=[
       ['wa','WhatsApp','https://wa.me/?text='+full],
       ['fb','Facebook','https://www.facebook.com/sharer/sharer.php?u='+e(url)+'&quote='+e(text)],
@@ -203,11 +203,32 @@
       return i[2].charAt(0)==='#'?'<button data-a="'+i[2]+'">'+inner+'</button>':'<a href="'+i[2]+'" target="_blank" rel="noopener">'+inner+'</a>';
     }).join('');
   }
-  function open(){
+  // --- find the coach's own link (the one that opens the coach popup) ---
+  function idFromDom(nm){
+    if(!nm)return '';
+    var cards=document.querySelectorAll('#grid > *, #grid *[data-id], #grid *[onclick]'),i,j,el,t,mm;
+    for(i=0;i<cards.length;i++){
+      el=cards[i];
+      if(el.textContent.indexOf(nm)<0)continue;
+      var cand=[el].concat([].slice.call(el.querySelectorAll('*')));
+      for(j=0;j<cand.length;j++){
+        t=cand[j];
+        if(t.dataset&&(t.dataset.id||t.dataset.coach))return t.dataset.id||t.dataset.coach;
+        mm=(t.getAttribute('onclick')||'').match(/['"]([A-Za-z]{1,3}\d+)['"]/);
+        if(mm)return mm[1];
+      }
+    }
+    return '';
+  }
+  function finish(found){
     var h=document.querySelector('#pm h1,#pm h2,#pm h3');
     name=h?h.textContent.replace(/[✓✔]/g,'').trim():'';
-    url=location.href;
-    text=(name?name+' – chess coach on MyChess64. ':'Chess coach on MyChess64. ')+'Book a free demo class!';
+    var rating='',chips=document.querySelectorAll('#pm span,#pm div,#pm b'),k;
+    for(k=0;k<chips.length;k++){var tx=chips[k].textContent.trim();if(tx.length<22&&/\b(FIDE|AICF|WFM|WIM|WGM|FM|IM|GM|CM|NM)\b/.test(tx)&&/\d{3,4}/.test(tx)){rating=tx;break}}
+    var fu=found&&(found.match(/https?:\/\/[^\s]+/)||[])[0];
+    var id=fu?'':idFromDom(name);
+    url=fu||(id?location.origin+location.pathname+'#coach='+id:location.href);
+    text='♟ '+(name||'Chess coach')+(rating?' ('+rating+')':'')+' – chess coach on MyChess64. Book a FREE demo class!';
     n.textContent=name||'MyChess64 coach';u.value=url;cb.textContent='Copy link';
     build();m.classList.add('on');
   }
@@ -221,18 +242,29 @@
   document.getElementById('shx').onclick=close;
   m.addEventListener('click',function(e){if(e.target===m)close()});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
-  // Intercept the "Share profile" button inside the coach popup (capture phase = runs before the old handler)
+
+  // Intercept "Share profile": let the site's own share code run once, but capture the link it builds
+  var busy=false;
   document.addEventListener('click',function(e){
     var el=e.target,pm=document.getElementById('pm');
-    if(!pm||!pm.contains(el))return;
+    if(!pm||!pm.contains(el)||busy)return;
     while(el&&el!==pm){
       if(el.textContent&&el.textContent.length<40&&/share profile/i.test(el.textContent)){
-        e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();open();return;
+        busy=true;
+        var found='',keep={},never=function(){return new Promise(function(){})};
+        try{if(navigator.clipboard){keep.cw=navigator.clipboard.writeText;navigator.clipboard.writeText=function(t){found=found||String(t);return never()}}}catch(x){}
+        try{if(navigator.share){keep.sh=navigator.share;navigator.share=function(d){found=found||String((d&&d.url)||'');return never()}}}catch(x){}
+        keep.pr=window.prompt;window.prompt=function(a,b){found=found||String(b||'');return null};
+        setTimeout(function(){
+          try{if(keep.cw)navigator.clipboard.writeText=keep.cw;else delete navigator.clipboard.writeText}catch(x){}
+          try{if(keep.sh)navigator.share=keep.sh;else delete navigator.share}catch(x){}
+          window.prompt=keep.pr;busy=false;finish(found);
+        },150);
+        return; // do NOT stop the event – the site's own handler runs and gives us the link
       }
       el=el.parentNode;
     }
   },true);
 })();
 </script>
-
 </body></html>
