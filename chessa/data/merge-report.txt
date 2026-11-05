@@ -1,0 +1,41 @@
+CLEANED about-chessa.js: removed 228 characters of pasted AI-citation markers
+OK about-chessa.js                -> pack "chessa": 80 entries
+OK attack-defense.js              -> pack "learn": 70 entries
+OK calculation.js                 -> pack "learn": 60 entries
+OK checkmates-patterns.js         -> pack "learn": 70 entries
+OK chess-basics-board.js          -> pack "learn": 50 entries
+OK chess-facts.js                 -> pack "world": 100 entries
+OK chess-gk-world.js              -> pack "world": 200 entries
+OK chess-gk.js                    -> pack "world": 200 entries
+OK chess-history.js               -> pack "world": 80 entries
+OK chess-logic.js                 -> pack "learn": 100 entries
+OK chess-psychology.js            -> pack "learn": 60 entries
+OK chess-rules.js                 -> pack "learn": 70 entries
+OK chessa-talk.js                 -> pack "chessa": 200 entries
+OK chessai-tech.js                -> pack "world": 80 entries
+OK common-mistakes.js             -> pack "learn": 70 entries
+OK endgame-principles.js          -> pack "learn": 60 entries
+OK famous-games.js                -> pack "world": 80 entries
+OK great-players.js               -> pack "world": 100 entries
+OK indian-chess.js                -> pack "world": 100 entries
+OK indian-gms.js                  -> pack "world": 100 entries
+OK middlegame-strategy.js         -> pack "learn": 80 entries
+OK notation-terminology.js        -> pack "learn": 60 entries
+OK opening-principles.js          -> pack "learn": 60 entries
+OK opening-theory-repertoire.js   -> pack "learn": 100 entries
+OK opening-traps.js               -> pack "learn": 70 entries
+OK piece-move.js                  -> pack "learn": 60 entries
+OK positional-chess.js            -> pack "learn": 70 entries
+OK practical-endgames.js          -> pack "learn": 100 entries
+OK puzzles-question.js            -> pack "learn": 70 entries
+OK ratings-careers.js             -> pack "world": 60 entries
+OK tactics-combinations.js        -> pack "learn": 100 entries
+OK thinking-decision.js           -> pack "learn": 70 entries
+OK tournament-chess.js            -> pack "world": 70 entries
+OK training-improvement.js        -> pack "learn": 80 entries
+NOTE 1 "related" id(s) point to entries that do not exist and were dropped
+NOTE 103 titles are used by more than one entry (kept): ABOUT-CHESSA-028/TALK-010, ATTACK-012/MATE-054, ATTACK-032/MATE-014, ATTACK-042/MATE-010, CALC-002/THINK-004, CALC-005/TACTIC-062, CALC-010/THINK-035, CALC-011/THINK-010 ...
+WROTE kb-chessa.js: 280 entries, 132 KB
+WROTE kb-learn.js: 1530 entries, 851 KB
+WROTE kb-world.js: 1170 entries, 651 KB
+TOTAL 2980 entries in 3 packs

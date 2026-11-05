@@ -9,10 +9,12 @@ const st=E("style");st.textContent="body{background:radial-gradient(900px 520px 
 document.querySelector(".nm").after(E("div","wv","<i></i><i></i><i></i><i></i><i></i>"));
 /* ---- knowledge: auto-load files + import ---- */
 const FILES=window.KB_MANIFEST||[];
-function addKB(a,keep,kid){let n=0,bad=0;const seen=new Set(DB.map(e=>e.topic+"|"+e.title)),add2=[];
- (Array.isArray(a)?a:[]).forEach(e=>{if(e&&e.title&&e.answer&&e.key){const k=(e.topic||"")+"|"+e.title;if(!seen.has(k)){seen.add(k);const x={topic:e.topic||"Knowledge",title:e.title,key:e.key,answer:e.answer,ref:e.ref||"Custom KB"};if(kid||e.kid)x.kid=true;DB.push(x);add2.push(x);n++}}else bad++});
+window.KBID=window.KBID||new Map();const KBID=window.KBID;
+function addKB(a,keep,kid){let n=0,bad=0;const seen=new Set(DB.map(e=>e.id||e.topic+"|"+e.title)),add2=[];
+ (Array.isArray(a)?a:[]).forEach(e=>{if(e&&e.title&&e.answer&&(e.key||e.kw)){const k=e.id||(e.topic||"")+"|"+e.title;if(!seen.has(k)){seen.add(k);const x={topic:e.topic||"Knowledge",title:e.title,key:e.key||e.kw.join(" "),answer:e.answer,ref:e.ref||"Custom KB"};
+  if(e.id){x.id=e.id;KBID.set(e.id,x)}if(e.q)x.q=e.q;if(e.kw)x.kw=e.kw;if(e.sg)x.sg=e.sg;if(e.rel)x.rel=e.rel;if(e.lv)x.lv=e.lv;if(kid||e.kid)x.kid=true;DB.push(x);add2.push(x);n++}}else bad++});
  if(bad)console.warn("CHESSA: "+bad+" knowledge entr"+(bad>1?"ies were":"y was")+" skipped (each needs title, key and answer).");
- DB.forEach(e=>toks(e.key+" "+e.title).forEach(t=>window.cx.V.add(t)));
+ DB.forEach(e=>toks(e.key+" "+e.title+" "+(e.q||[]).join(" ")).forEach(t=>window.cx.V.add(t)));
  if(keep&&n){try{const o=JSON.parse(localStorage.ckb||"[]");localStorage.ckb=JSON.stringify(o.concat(add2))}catch(e){}}return n}
 try{addKB(JSON.parse(localStorage.ckb||"[]"))}catch(e){}
 FILES.forEach(([f,n,k])=>{if((0,eval)("typeof "+n)!="undefined"){addKB((0,eval)(n),false,k);return}const s=E("script");s.src=f;s.onload=()=>{try{addKB((0,eval)("typeof "+n+"!='undefined'?"+n+":[]"),false,k)}catch(e){}};s.onerror=()=>{s.remove();console.warn("CHESSA: knowledge file not found:",f)};document.head.append(s)});

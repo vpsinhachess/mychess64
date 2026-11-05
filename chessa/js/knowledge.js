@@ -64,7 +64,8 @@ function explain(m){const P={K:"King",Q:"Queen",R:"Rook",B:"Bishop",N:"Knight"};
 const miss=v=>{if(window.KID&&KID.on())return;try{const a=JSON.parse(localStorage.chessa_miss||"[]");a.push(v);localStorage.chessa_miss=JSON.stringify(a.slice(-100))}catch(e){}};
 window.chessaMisses=()=>{try{return JSON.parse(localStorage.chessa_miss||"[]")}catch(e){return[]}};
 /* Is the best KB match really about the question? (stops "why is the sky blue" answering with Deep Blue) */
-function inScope(fx,e){const nq=norm(fx).replace(/-/g," ");
+function inScope(fx,e,sc){const nq=norm(fx).replace(/-/g," ");
+ if(e.id&&/CHESSA/i.test(e.topic)&&sc>=30)return true;   /* CHESSA's own conversation / about entries count as on topic when they match well */
  if(CH.test(nq))return true;
  if(wb(nq,nz(e.key))||wb(nq,nz(e.title)))return true;
  const qt=toks(nq);if(qt.some(t=>ALIASES[t]))return true;
@@ -73,16 +74,19 @@ function inScope(fx,e){const nq=norm(fx).replace(/-/g," ");
 const WK_OK=/^(Chess History|Opening Theory|Chess Knowledge|Endgame|Tactics|Middlegame|FIDE Rules|Strategy)$/;
 async function kb(v){
  const fx=fix(v),r=ranked(fx),b=r[0],e=DB[b[1]];
- if(!inScope(fx,e)){if(window.KID&&KID.on()&&CHESSA.kid)return CHESSA.kid.offTopic()}
- if(!inScope(fx,e))return bot("♟ I'm CHESSA, the MyChess64 Chess Coach. I answer chess questions only — try rules, openings, tactics, strategy, endgames, FEN or training. For anything else about chess history or players, I can also look things up on Wikipedia.",null,["Castling","How to stop blundering","Lucena position","History of chess"]);
+ if(!inScope(fx,e,b[0])){if(window.KID&&KID.on()&&CHESSA.kid)return CHESSA.kid.offTopic()}
+ if(!inScope(fx,e,b[0]))return bot("♟ I'm CHESSA, the MyChess64 Chess Coach. I answer chess questions only — try rules, openings, tactics, strategy, endgames, FEN or training. For anything else about chess history or players, I can also look things up on Wikipedia.",null,["Castling","How to stop blundering","Lucena position","History of chess"]);
  if(b[0]<10){
   if(window.CHESSA&&CHESSA.wiki&&CHESSA.wiki.fallback&&await CHESSA.wiki.fallback(v))return;
   if(window.KID&&KID.on()&&CHESSA.kid)return CHESSA.kid.lost(r.slice(0,3).map(x=>DB[x[1]].title));
   miss(v);return bot("♟ I couldn't find a reliable match. Did you mean one of these?",null,r.slice(0,3).map(x=>DB[x[1]].title).concat(["Wikipedia: "+(CHESSA.wiki&&CHESSA.wiki.parse?CHESSA.wiki.parse(v).topic:String(v)).slice(0,40)]))}
  lastE=e;seen.add(e.title);lastTopic=e.topic;
- let h=esc(e.answer);const s=r.slice(1).find(x=>DB[x[1]]!==e&&DB[x[1]].title!=e.title);
- if(s&&b[0]-s[0]<5&&s[0]>=20){const f=DB[s[1]];h+="\n\n<b>Also relevant — "+esc(f.title)+" ("+esc(f.topic)+"):</b> "+esc(f.answer);seen.add(f.title)}
- const rel=[];for(const x of r.slice(1,14)){if(x[0]<10)break;const t=DB[x[1]].title;if(t!=e.title&&!rel.includes(t))rel.push(t);if(rel.length>=3)break}
+ const cv=f=>!!f&&!!f.id&&/CHESSA/i.test(f.topic);   /* CHESSA's chat / about entries */
+ let h=esc(e.answer)+(e.id?"<!--nt-->"+(cv(e)?"<!--cv-->":""):"");const s=r.slice(1).find(x=>DB[x[1]]!==e&&DB[x[1]].title!=e.title);
+ if(!cv(e)&&s&&b[0]-s[0]<5&&s[0]>=20){const f=DB[s[1]];h+="\n\n<b>Also relevant — "+esc(f.title)+" ("+esc(f.topic)+"):</b> "+esc(f.answer);seen.add(f.title)}
+ const rel=[],addR=(t,f)=>{if(t&&t!=e.title&&!rel.some(x=>x.replace("\u200b","")==t)&&rel.length<3)rel.push(cv(f)?"\u200b"+t:t)};   /* \u200b = reply-style chip: no "Tell me about" prefix */
+ (e.sg||[]).forEach(t=>addR(t,e));(e.rel||[]).forEach(id=>{const f=window.KBID&&KBID.get(id);if(f)addR(f.title,f)});
+ for(const x of r.slice(1,14)){if(x[0]<10||rel.length>=3)break;addR(DB[x[1]].title,DB[x[1]])}
  if(WK_OK.test(e.topic)&&!/^(how|what|can|why|do|does|should)\b/i.test(e.title))rel.push("Wikipedia: "+e.title);
  bot(h,["♟ "+esc(e.topic),"📚 "+esc(e.ref),"Match "+Math.round(Math.min(1,b[0]/55)*100)+"%"],rel)}
 ask=async function(v){
@@ -95,7 +99,8 @@ ask=async function(v){
   if(await opening(v))return;
   const sm=v.match(/(?:^|[\s(])(O-O(?:-O)?[+#]?|[KQRBN][a-h]?[1-8]?x?[a-h][1-8][+#]?|[a-h]x[a-h][1-8](?:=[QRBN])?[+#]?|[a-h][18]=[QRBN][+#]?)(?=$|[\s?.,!)])/);
   if(sm&&/mean|notation|san|what is|what's|explain|read|decode/i.test(v)){const t=explain(sm[1]);if(t)return bot("<b>"+esc(sm[1])+"</b> — "+t,["♟ Notation Decoder"],["SAN","PGN"])}
-  if(/^(hi|hello|hey|namaste|hii+|good (morning|evening|afternoon))\b/.test(n)||/who are you|your name|what can you do|^help$/.test(n))return bot("Hi, I'm <b>CHESSA</b> ♛ Ask me about rules, openings, tactics or endgames. Paste a FEN or type moves, and I'll analyze them. Try “quiz me”, “random opening” or “daily puzzle”.",null,["1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6","What does Nxe5+ mean","Elo 1500 vs 1700 chance"]);
+  const sk=(()=>{const t=ranked(fix(v))[0];return !!t&&t[0]>=40&&!!DB[t[1]].id})();   /* a knowledge-pack answer beats the built-in greeting */
+  if(!sk&&(/^(hi|hello|hey|namaste|hii+|good (morning|evening|afternoon))\b/.test(n)||/who are you|your name|what can you do|^help$/.test(n)))return bot("Hi, I'm <b>CHESSA</b> ♛ Ask me about rules, openings, tactics or endgames. Paste a FEN or type moves, and I'll analyze them. Try “quiz me”, “random opening” or “daily puzzle”.",null,["1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6","What does Nxe5+ mean","Elo 1500 vs 1700 chance"]);
   if(/thank|thx|great|awesome|nice/.test(n)&&n.split(" ").length<6)return bot("You're welcome! Ask me anything else about chess ♟");
   if(/^(more|tell me more|why|example|examples|go on|continue|what else|next)$/.test(n)&&lastE){const x=DB.find(z=>z.topic==lastE.topic&&!seen.has(z.title));if(x){seen.add(x.title);lastE=x;return bot("<b>"+esc(x.title)+"</b>\n"+esc(x.answer),["♟ "+esc(x.topic),"📚 "+esc(x.ref)])}return bot("That's all I have on this topic — pick another from the cards above or ask something new.")}
   await kb(v)

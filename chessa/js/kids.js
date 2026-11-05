@@ -66,7 +66,7 @@ window.botUI=function(h,m,c){
  if(typeof h=="string"){
   JARGON.forEach(([re,to])=>{h=h.replace(re,to)});
   h=h.replace(/^Hi, I'm <b>CHESSA<\/b> ♛[^\n]*/,"Hi friend! I'm <b>CHESSA</b> ♛ your chess buddy. Ask me how a piece moves, try a puzzle, or say “fun fact”!");
-  if(m.some(x=>/📚/.test(x))&&!/^(Great|Good|Nice|Ooh|Let)/.test(h)&&Math.random()<.6)h=pick(SOFT)+h}
+  if(m.some(x=>/📚/.test(x))&&!/^(Great|Good|Nice|Ooh|Let)/.test(h)&&!/<!--cv-->/.test(h)&&Math.random()<.6)h=pick(SOFT)+h}
  return _b(h,m,c)};
 
 /* ---------- start screen + header ---------- */

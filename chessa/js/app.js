@@ -13,7 +13,7 @@ const RM=window.matchMedia?matchMedia("(prefers-reduced-motion: reduce)"):{match
 /* drop-in letter effect. Text inside inline "grid" blocks (chess boards) is left alone. */
 function drop(root,sp){let n=0,i=0;const w=document.createTreeWalker(root,4),ns=[];while(w.nextNode())ns.push(w.currentNode);
  const inB=x=>x.parentElement.closest('[style*="grid"]');ns.forEach(x=>{if(!inB(x))n+=x.textContent.length});
- const S=RM.matches?0:(sp||Math.max(6,Math.min(16,4200/Math.max(n,1))))*(window.tsm||1);root.dataset.s=S;
+ const S=RM.matches?0:(sp||Math.max(3,Math.min(16,3800/Math.max(n,1))))*(window.tsm||1);root.dataset.s=S;
  ns.forEach(x=>{if(inB(x))return;const f=document.createDocumentFragment();x.textContent.split(/(\s+)/).forEach(p=>{if(!p)return;if(/^\s+$/.test(p)){f.append(p);return}const wd=el("span","w");G(p).forEach(ch=>{const s=el("span","c");s.textContent=ch;s.style.animationDelay=(i++*S)+"ms";wd.append(s)});f.append(wd)});x.replaceWith(f)});return i*S+500}
 drop($("t1"),110);drop($("t2"),35);
 /* ---------- voice (chunked: Chrome silently stops utterances longer than ~15 s) ---------- */
