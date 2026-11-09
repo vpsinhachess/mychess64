@@ -9,28 +9,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<meta property="og:title" content="MyChess64 – Find the Best Chess Coaches &amp; Tutors">
-<meta property="og:description" content="Verified, FIDE-rated chess coaches online or at home. First demo class free.">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="MyChess64">
-<meta property="og:url" content="https://www.mychess64.com/coach/">
-<meta property="og:image" content="https://www.mychess64.com/coach/assets/og-share.png">
-<meta property="og:image:secure_url" content="https://www.mychess64.com/coach/assets/og-share.png">
-<meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="MyChess64 – Learn. Play. Improve. Anytime, Anywhere.">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MyChess64 – Find the Best Chess Coaches &amp; Tutors">
-<meta name="twitter:description" content="Verified, FIDE-rated chess coaches online or at home. First demo class free.">
-<meta name="twitter:image" content="https://www.mychess64.com/coach/assets/og-share.png">
+<meta property="og:title" content="MyChess64 – Find the Best Chess Coaches &amp; Tutors"><meta property="og:description" content="Verified, FIDE-rated chess coaches online or at home. First demo class free."><meta property="og:type" content="website">
 </head><body>
 <noscript><p style="padding:20px;text-align:center">Please enable JavaScript to use MyChess64.</p></noscript>
 <div id="fatal" class="fatal" style="display:none"></div>
 <div class="topbar">🎓 Your first demo class is <b>free</b> · <a href="#enquire">Book yours →</a></div><header class="nav" id="top"><div class="wrap in"><a href="#top"><img src="assets/header-logo.webp" alt="MyChess64 – Learn. Play. Improve."></a>
 <nav class="links"><a href="#coaches">Find Coaches</a><a href="#why">Why MyChess64</a><a href="#how">How it works</a><a href="#reviews">Reviews</a><a href="#join">Become a Coach</a><a href="#faq">FAQ</a></nav>
 <div class="act"><button class="ib" onclick="theme()" aria-label="Toggle theme">◐</button><button id="loginBtn" class="btn o lgn" onclick="openLogin()">Login</button><a class="btn g" href="#enquire">Book free demo</a><button class="ib hb" onclick="menu()" aria-label="Menu">☰</button></div></div>
-<div class="mm" id="mm" onclick="menu(1)"><a href="#coaches">Find Coaches</a><a href="#why">Why MyChess64</a><a href="#how">How it works</a><a href="#reviews">Reviews</a><a href="#join">Become a Coach</a><a href="#faq">FAQ</a><a href="#" onclick="openLogin();return false">Login</a><a class="btn g" href="#enquire" style="text-align:center">Book free demo</a></div></header>
+<div class="mm" id="mm" onclick="menu(1)"><a href="#coaches">Find Coaches</a><a href="#why">Why MyChess64</a><a href="#how">How it works</a><a href="#reviews">Reviews</a><a href="#join">Become a Coach</a><a href="#faq">FAQ</a><a href="coach.html">Coach portal</a><a href="#" onclick="openLogin();return false">Login</a><a class="btn g" href="#enquire" style="text-align:center">Book free demo</a></div></header>
 
 <div class="hero"><div class="wrap">
 <div><span class="pill"><i></i>Coaches available now · Free demo class</span>
@@ -86,7 +72,7 @@
 
 <footer><div class="wrap"><div class="fw"><div><img src="assets/footer-logo.webp" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere.</p><div id="fcontact" class="fcon"></div></div>
 <div><h4>Explore</h4><a href="#coaches">Find coaches</a><a href="#how">How it works</a><a href="#reviews">Reviews</a></div>
-<div><h4>Coaches</h4><a href="#join">Become a coach</a><a href="#" onclick="openLogin();return false">Login</a></div>
+<div><h4>Coaches</h4><a href="#join">Become a coach</a><a href="coach.html">Coach portal</a><a href="#" onclick="openLogin();return false">Login</a></div>
 <div><h4>Get started</h4><a href="#enquire">Book a free demo</a><a href="#top">Back to top</a></div></div>
 <div class="cp"><span>© 2026 MyChess64 · Chess Coach Portal</span><span>Made for chess lovers ♞</span></div></div></footer>
 <button class="top" id="tp" onclick="scrollTo({top:0})" aria-label="Back to top">↑</button>
@@ -94,177 +80,4 @@
 <script>window.addEventListener('error',function(e){var b=document.getElementById('fatal');if(b&&!window.__mc64){b.style.display='block';b.textContent='\u26a0 Script error: '+e.message+' \u2014 see README (Troubleshooting).'}});setTimeout(function(){var b=document.getElementById('fatal');if(!window.__mc64&&b){b.style.display='block';b.innerHTML='\u26a0 The site scripts did not load. Make sure the <b>js/</b> folder is uploaded next to index.html.'}},3000);</script>
 <script src="js/config.js"></script>
 <script src="js/app.js"></script>
-<script>
-/* MyChess64 – form email delivery via Web3Forms (fast, no activation step) */
-(function(){
-  var ACCESS_KEY='d45fca8a-c796-49d4-84b0-383d5cad3d23';   // <-- get it free at web3forms.com
-  var API='https://api.web3forms.com/submit';
-  function toast(m){var t=document.getElementById('ts');if(t){t.textContent=m;t.classList.add('on','show');setTimeout(function(){t.classList.remove('on','show')},3500)}}
-  function show(ok,msg,good){if(ok){ok.textContent=msg;ok.style.display='block'}toast(msg)}
-  function send(formId,okId,subject,fromName,fields,okMsg){
-    var f=document.getElementById(formId), ok=document.getElementById(okId);
-    var hp=f.querySelector('.hp'); if(hp&&hp.value) return false;
-    var btn=f.querySelector('button'), label=btn.textContent;
-    if(ACCESS_KEY.indexOf('PASTE_')===0){show(ok,'Setup incomplete: access key missing in index.html');return false}
-    btn.disabled=true; btn.textContent='Sending…';
-    var data={access_key:ACCESS_KEY,subject:subject,from_name:fromName};
-    for(var k in fields) data[k]=fields[k];
-    var ctl=('AbortController' in window)?new AbortController():null;
-    var to=setTimeout(function(){ctl&&ctl.abort()},12000);
-    fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data),signal:ctl?ctl.signal:undefined})
-      .then(function(r){return r.json()})
-      .then(function(j){
-        if(j.success){f.reset();show(ok,okMsg)}
-        else{console.warn('Web3Forms:',j);show(ok,'Could not send: '+(j.message||'unknown error'))}
-      })
-      .catch(function(e){console.warn(e);show(ok,'Could not send. Please check your internet and try again.')})
-      .finally(function(){clearTimeout(to);btn.disabled=false;btn.textContent=label});
-    return false;
-  }
-  window.subDemo=function(e){
-    if(e&&e.preventDefault)e.preventDefault();
-    return send('ef','e_ok','New FREE DEMO request – MyChess64','MyChess64 Website',{
-      'Name':document.getElementById('e_n').value,
-      'Phone / WhatsApp':document.getElementById('e_p').value,
-      'Interested in':document.getElementById('e_c').value
-    },'Thank you! We will contact you within 24 hours.');
-  };
-  window.subJoin=function(e){
-    if(e&&e.preventDefault)e.preventDefault();
-    return send('jf','j_ok','New COACH application – MyChess64','MyChess64 Website',{
-      'Full name':document.getElementById('j_n').value,
-      'Rating / title':document.getElementById('j_r').value,
-      'Email':document.getElementById('j_e').value,
-      'City':document.getElementById('j_c').value,
-      'replyto':document.getElementById('j_e').value
-    },'Application received! We will get back to you soon.');
-  };
-  window.addEventListener('load',function(){
-    document.querySelectorAll('#ef button,#jf button').forEach(function(b){b.disabled=false;b.removeAttribute('disabled')});
-  });
-})();
-</script>
-
-<style>
-.shm{position:fixed;inset:0;z-index:99999;background:rgba(6,20,46,.6);display:none;align-items:center;justify-content:center;padding:16px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
-.shm.on{display:flex}
-.shb{background:#fff;color:#0b1b3a;border-radius:20px;width:100%;max-width:380px;padding:22px 22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:Inter,system-ui,sans-serif;position:relative}
-.shb h4{margin:0 0 4px;font:700 18px Outfit,Inter,sans-serif}
-.shb p{margin:0 0 16px;font-size:13px;color:#5b6b85}
-.shx{position:absolute;top:10px;right:12px;border:0;background:none;font-size:22px;cursor:pointer;color:#5b6b85;line-height:1}
-.shg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px}
-.shg a,.shg button{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:inherit;background:none;border:0;cursor:pointer;font:500 11.5px Inter,sans-serif}
-.shg i{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-weight:700;font-size:18px;transition:transform .15s}
-.shg a:hover i,.shg button:hover i{transform:scale(1.1)}
-.shg svg{width:24px;height:24px;fill:#fff}
-.shl{margin-top:18px;display:flex;gap:8px;background:#f1f5fb;border-radius:12px;padding:6px 6px 6px 12px;align-items:center}
-.shl input{flex:1;min-width:0;border:0;background:none;font-size:12.5px;color:#0b1b3a;outline:0}
-.shl button{border:0;background:#0b6bde;color:#fff;border-radius:9px;padding:8px 14px;font-weight:600;font-size:12.5px;cursor:pointer}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .shb{background:#10223f;color:#eaf1ff}:root:not([data-theme="light"]) .shl{background:#0a1a33}:root:not([data-theme="light"]) .shl input{color:#eaf1ff}}
-:root[data-theme="dark"] .shb{background:#10223f;color:#eaf1ff}:root[data-theme="dark"] .shl{background:#0a1a33}:root[data-theme="dark"] .shl input{color:#eaf1ff}
-</style>
-<div class="shm" id="shm" role="dialog" aria-modal="true" aria-label="Share profile"><div class="shb">
-<button class="shx" id="shx" aria-label="Close">×</button>
-<h4>Share this profile</h4><p id="shn"></p>
-<div class="shg" id="shg"></div>
-<div class="shl"><input id="shu" readonly><button id="shc">Copy link</button></div></div></div>
-<script>
-(function(){
-  var ICON={
-    wa:'<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>',
-    fb:'<svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
-    x:'<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
-    tg:'<svg viewBox="0 0 24 24"><path d="M21.9 3.2 2.6 10.7c-1 .4-.9 1.8.1 2.1l4.7 1.5 1.8 5.6c.3.9 1.4 1.1 2 .4l2.6-2.7 4.8 3.5c.8.6 1.9.1 2.1-.8L24 4.6c.2-1-.7-1.8-2.1-1.4zM9.6 13.5l8.9-5.6-6.9 6.7-.3 3.1z"/></svg>',
-    in:'in', em:'✉', cp:'🔗', mo:'⋯'
-  };
-  var c={wa:'#25D366',fb:'#1877F2',x:'#000',tg:'#229ED9',in:'#0A66C2',em:'#6b7280',cp:'#0b6bde',mo:'#8b5cf6'};
-  var m=document.getElementById('shm'),g=document.getElementById('shg'),u=document.getElementById('shu'),n=document.getElementById('shn'),cb=document.getElementById('shc');
-  var url='',name='',text='';
-  function toast(t){var e=document.getElementById('ts');if(e){e.textContent=t;e.classList.add('on','show');setTimeout(function(){e.classList.remove('on','show')},2500)}}
-  function copy(){
-    function ok(){cb.textContent='Copied ✓';toast('Link copied');setTimeout(function(){cb.textContent='Copy link'},2000)}
-    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(ok,function(){u.select();document.execCommand('copy');ok()});
-    else{u.select();document.execCommand('copy');ok()}
-  }
-  function build(){
-    var e=encodeURIComponent,full=e(text+'\n'+url);
-    var L=[
-      ['wa','WhatsApp','https://wa.me/?text='+full],
-      ['fb','Facebook','https://www.facebook.com/sharer/sharer.php?u='+e(url)+'&quote='+e(text)],
-      ['x','X','https://twitter.com/intent/tweet?text='+e(text)+'&url='+e(url)],
-      ['tg','Telegram','https://t.me/share/url?url='+e(url)+'&text='+e(text)],
-      ['in','LinkedIn','https://www.linkedin.com/sharing/share-offsite/?url='+e(url)],
-      ['em','Email','mailto:?subject='+e(text)+'&body='+e(text+'\n'+url)],
-      ['cp','Copy link','#copy']
-    ];
-    if(navigator.share)L.push(['mo','More','#native']);
-    g.innerHTML=L.map(function(i){
-      var inner='<i style="background:'+c[i[0]]+'">'+ICON[i[0]]+'</i>'+i[1];
-      return i[2].charAt(0)==='#'?'<button data-a="'+i[2]+'">'+inner+'</button>':'<a href="'+i[2]+'" target="_blank" rel="noopener">'+inner+'</a>';
-    }).join('');
-  }
-  // --- find the coach's own link (the one that opens the coach popup) ---
-  function idFromDom(nm){
-    if(!nm)return '';
-    var cards=document.querySelectorAll('#grid > *, #grid *[data-id], #grid *[onclick]'),i,j,el,t,mm;
-    for(i=0;i<cards.length;i++){
-      el=cards[i];
-      if(el.textContent.indexOf(nm)<0)continue;
-      var cand=[el].concat([].slice.call(el.querySelectorAll('*')));
-      for(j=0;j<cand.length;j++){
-        t=cand[j];
-        if(t.dataset&&(t.dataset.id||t.dataset.coach))return t.dataset.id||t.dataset.coach;
-        mm=(t.getAttribute('onclick')||'').match(/['"]([A-Za-z]{1,3}\d+)['"]/);
-        if(mm)return mm[1];
-      }
-    }
-    return '';
-  }
-  function finish(found){
-    var h=document.querySelector('#pm h1,#pm h2,#pm h3');
-    name=h?h.textContent.replace(/[✓✔]/g,'').trim():'';
-    var rating='',chips=document.querySelectorAll('#pm span,#pm div,#pm b'),k;
-    for(k=0;k<chips.length;k++){var tx=chips[k].textContent.trim();if(tx.length<22&&/\b(FIDE|AICF|WFM|WIM|WGM|FM|IM|GM|CM|NM)\b/.test(tx)&&/\d{3,4}/.test(tx)){rating=tx;break}}
-    var fu=found&&(found.match(/https?:\/\/[^\s]+/)||[])[0];
-    var id=fu?'':idFromDom(name);
-    url=fu||(id?location.origin+location.pathname+'#coach='+id:location.href);
-    text='♟ '+(name||'Chess coach')+(rating?' ('+rating+')':'')+' – chess coach on MyChess64. Book a FREE demo class!';
-    n.textContent=name||'MyChess64 coach';u.value=url;cb.textContent='Copy link';
-    build();m.classList.add('on');
-  }
-  function close(){m.classList.remove('on')}
-  g.addEventListener('click',function(e){
-    var b=e.target.closest('button[data-a]');if(!b)return;
-    if(b.dataset.a==='#copy')copy();
-    else if(navigator.share)navigator.share({title:name||'MyChess64',text:text,url:url}).catch(function(){});
-  });
-  cb.onclick=copy;
-  document.getElementById('shx').onclick=close;
-  m.addEventListener('click',function(e){if(e.target===m)close()});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
-
-  // Intercept "Share profile": let the site's own share code run once, but capture the link it builds
-  var busy=false;
-  document.addEventListener('click',function(e){
-    var el=e.target,pm=document.getElementById('pm');
-    if(!pm||!pm.contains(el)||busy)return;
-    while(el&&el!==pm){
-      if(el.textContent&&el.textContent.length<40&&/share profile/i.test(el.textContent)){
-        busy=true;
-        var found='',keep={},never=function(){return new Promise(function(){})};
-        try{if(navigator.clipboard){keep.cw=navigator.clipboard.writeText;navigator.clipboard.writeText=function(t){found=found||String(t);return never()}}}catch(x){}
-        try{if(navigator.share){keep.sh=navigator.share;navigator.share=function(d){found=found||String((d&&d.url)||'');return never()}}}catch(x){}
-        keep.pr=window.prompt;window.prompt=function(a,b){found=found||String(b||'');return null};
-        setTimeout(function(){
-          try{if(keep.cw)navigator.clipboard.writeText=keep.cw;else delete navigator.clipboard.writeText}catch(x){}
-          try{if(keep.sh)navigator.share=keep.sh;else delete navigator.share}catch(x){}
-          window.prompt=keep.pr;busy=false;finish(found);
-        },150);
-        return; // do NOT stop the event – the site's own handler runs and gives us the link
-      }
-      el=el.parentNode;
-    }
-  },true);
-})();
-</script>
 </body></html>

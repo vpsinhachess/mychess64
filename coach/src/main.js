@@ -1,7 +1,8 @@
 // Entry point
 import { initBackend, B } from './backend.js';
 import { initPublic } from './public.js';
-import { initPanel, sample } from './panel.js';
+import { initPanel } from './panel.js';
+import { sample } from './sample.js';
 import { D, hooks, diag, ls } from './state.js';
 
 document.documentElement.classList.add('js'); window.__mc64 = true;

@@ -6,12 +6,15 @@ requests and "Apply to teach" applications.
 
 ## Files
 ```
-index.html               page markup
-css/style.css            styling (responsive, light/dark)
+index.html               public website
+coach.html               COACH PORTAL – compact page for coaches only (login + all coach tools)
+css/style.css            website styling (responsive, light/dark)
+css/coach.css            coach-portal styling
 js/config.js             <-- the ONLY file you normally edit: Firebase keys + contact details
-js/app.js                the compiled site code (ready to use - do not edit)
+js/app.js                compiled website code (ready to use - do not edit)
+js/coach-app.js          compiled coach-portal code (ready to use - do not edit)
 src/*.js                 readable source of app.js (only needed if you want to change the code)
-package.json             `npm install && npm run build` rebuilds js/app.js from src/
+package.json             `npm install && npm run build` rebuilds js/app.js and js/coach-app.js from src/
 firestore.rules          database security rules (paste into Firebase)
 firebase.json            optional - lets the Firebase CLI deploy the rules
 assets/                  logos, favicon
@@ -75,6 +78,22 @@ Static text/numbers (hero text, "500+ students" stats, FAQ) are in **`index.html
 
 **Public site extras:** save coaches ♥ (remembered), share a coach link (`…/#coach=ID`),
 filters/sort, light/dark mode, mobile menu.
+
+## Coach Portal (`coach.html`)
+Share `https://<username>.github.io/<repo>/coach.html` with your coaches. Only accounts that have a
+coach profile can sign in (admins are told to use the main site). Same Firebase login as the website.
+
+| Tab | What the coach can do |
+|---|---|
+| 🏠 Home | Greeting, live counters (new bookings, upcoming classes, students, rating), 6 quick-action tiles, setup checklist, next classes, latest bookings |
+| 📥 Bookings | Every student request addressed to them; filter by status, search, **call / WhatsApp**, set status (new, contacted, confirmed, done, cancelled), add private notes |
+| 📅 Schedule | 7-day strip, add classes (title, date, time, duration, mode, seats, level, meeting link), **repeat weekly 4/8/12 weeks**, edit, duplicate to next week, delete, seat-booking bars |
+| 👥 Students | Unique students who booked them, with quick contact |
+| ⭐ Reviews | Average, star distribution and all reviews (reviews are added by the admin) |
+| 👤 Profile | Edit details, photo upload, banner colour, **live preview** of the public card, copy public profile link, password-reset email |
+
+A welcome guide opens on first login (❓ Guide button re-opens it). On phones the tabs become a bottom bar.
+After updating, re-publish `firestore.rules` (coaches may now also save a private `note` on a booking).
 
 ## Troubleshooting
 | Problem | Fix |
