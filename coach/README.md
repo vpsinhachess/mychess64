@@ -1,127 +1,96 @@
-# MyChess64 – Chess Coach Portal
+# MyChess64 – Chess Coach Platform (GitHub Pages + Supabase)
 
-A static website (HTML + CSS + JavaScript modules) for **GitHub Pages**, powered by a free
-**Firebase** backend: real coach & admin logins, admin panel, coach dashboard, demo-class
-requests and "Apply to teach" applications.
+Static website (plain HTML/CSS/JS) that runs on **GitHub Pages**, with a real backend on **Supabase**
+(Auth + Postgres with Row Level Security + Storage). Three pages:
+
+| Page | Who | What |
+|---|---|---|
+| `index.html` | Public | Website: coach cards, profile popup, free-demo requests, "Apply to teach" |
+| `coach.html` | Coaches | **Coach Dashboard** – personal login, each coach sees only their own data |
+| `admin.html` | You | **Admin Dashboard** – full administrative control |
+
+## Coach Dashboard modules
+👤 **My Profile** (photo upload to Storage, bio, fee, specialities, live preview) · 📅 **My Schedule** (available teaching
+hours + classes, weekly repeat, edit/duplicate) · 📥 **Bookings** (call/WhatsApp, status, notes, "add as student") ·
+👥 **My Students** (records + progress overview) · ✅ **Attendance** (present/late/absent per day) · 💰 **My Earnings**
+(fees received/pending, 6-month chart) · 📝 **Progress Reports** (write + share on WhatsApp) · 📈 **Performance**
+(statistics & charts) · ⭐ **My Reviews** · ⚙️ **Settings** (change password, private document uploads, privacy).
+*(Notifications and online-class integration were not selected – classes just carry a meeting link.)*
+
+## Admin Dashboard
+Overview · Demo requests (search, filter, **assign coach**, status, CSV export) · Coach applications (**approve → creates the
+coach login + profile**) · Coaches (add with login, edit, photo upload, hide, delete) · Reviews (add/delete) ·
+Coach summary (students, classes, earnings, attendance, rating per coach) · Data.
 
 ## Files
 ```
-index.html               public website
-coach.html               COACH PORTAL – compact page for coaches only (login + all coach tools)
-css/style.css            website styling (responsive, light/dark)
-css/coach.css            coach-portal styling
-js/config.js             <-- the ONLY file you normally edit: Firebase keys + contact details
-js/app.js                compiled website code (ready to use - do not edit)
-js/coach-app.js          compiled coach-portal code (ready to use - do not edit)
-src/*.js                 readable source of app.js (only needed if you want to change the code)
-package.json             `npm install && npm run build` rebuilds js/app.js and js/coach-app.js from src/
-firestore.rules          database security rules (paste into Firebase)
-firebase.json            optional - lets the Firebase CLI deploy the rules
-assets/                  logos, favicon
-.nojekyll                tells GitHub Pages to serve files as-is
+index.html  coach.html  admin.html     the three pages
+css/style.css  css/coach.css           styling (responsive, light/dark)
+js/config.js                           <-- the ONLY file you normally edit (Supabase keys, contact details)
+js/app.js  js/coach-app.js  js/admin-app.js   compiled code (ready to use – do not edit)
+src/*.js                               readable source ("npm install && npm run build" rebuilds js/*.js)
+supabase/schema.sql                    database tables + security rules + storage buckets (run once)
+assets/                                logos, icons, social-share image
 ```
-> The site uses plain scripts (no modules), so it works on GitHub Pages **and** when you
-> double-click `index.html`. If something is wrong, a red banner at the top tells you what.
+Works on a custom domain/sub-folder too (all links are relative), e.g. `https://www.mychess64.com/coach/`.
 
-## STEP 0 – Try it locally (Demo mode, no setup)
-You can simply double-click `index.html`, or (recommended) run a tiny local server:
+## STEP 0 – Try it first (Demo mode, no setup)
+Open `index.html` (or run `python3 -m http.server 8000`). Until Supabase keys are added, everything runs in **Demo mode**
+(sample data, saved only in your own browser).
+Coach: `aarav@mychess64.com` / `chess1234` (coach.html) · Admin: `admin@mychess64.com` / `admin123` (admin.html)
 
-    python3 -m http.server 8000      # open http://localhost:8000
+## STEP 1 – Create the Supabase project
+1. <https://supabase.com> → **New project** (choose a region near your users, set a database password).
+2. **SQL Editor → New query** → paste **all of `supabase/schema.sql`** → **Run**. (Safe to re-run.)
+   This creates the tables, Row Level Security, the `coach-photos` (public) and `coach-docs` (private) storage buckets and realtime.
 
-Without Firebase keys the site runs in **Demo mode**: data lives only in your own browser.
-Demo logins → Admin: `admin@mychess64.com` / `admin123` · Coach: `aarav@mychess64.com` / `chess1234`
+## STEP 2 – Auth settings
+1. **Authentication → Providers → Email**: enabled. For coach accounts that *you* create, switch **“Confirm email” OFF**
+   (otherwise each coach must click a confirmation e-mail before first login).
+2. **Authentication → URL Configuration**: *Site URL* = your site address (e.g. `https://<user>.github.io/<repo>/` or
+   `https://www.mychess64.com/coach/`). Add the same address (and `…/coach.html`, `…/admin.html`) to **Redirect URLs** –
+   needed for the “Forgot password” e-mail links.
 
-## STEP 1 – Publish on GitHub Pages
-1. Create a repo and upload **all files, keeping the folders** (include the hidden `.nojekyll`).
-2. Repo → **Settings → Pages** → *Deploy from a branch* → `main` / `(root)` → Save.
-3. After ~1 minute the site is live at `https://<username>.github.io/<repo>/`.
+## STEP 3 – Connect the site
+**Project Settings → API**: copy **Project URL** and the **anon public** key into `js/config.js`. (The anon key is *meant* to be
+public – security comes from Row Level Security. **Never** put the `service_role` key in the site.)
 
-## STEP 2 – Create the Firebase backend (makes logins & data real and shared)
-1. <https://console.firebase.google.com> → **Add project** (Analytics not needed).
-2. **Build → Authentication → Get started → Sign-in method → Email/Password → Enable → Save.**
-3. **Authentication → Settings → Authorized domains → Add domain** → `<username>.github.io`
-   (and your custom domain, if any).
-4. **Build → Firestore Database → Create database** → *Production mode* → pick the nearest region.
-5. **Project settings (⚙) → General → Your apps → Web (`</>`)** → register app → copy the
-   `firebaseConfig` values into **`js/config.js`** (`MC64_FIREBASE`) → commit & push.
-6. **Firestore → Rules tab** → delete everything → paste the contents of **`firestore.rules`** → **Publish**.
-   (CLI alternative: `firebase deploy --only firestore:rules`.)
+## STEP 4 – Create your admin account (one time)
+1. **Authentication → Users → Add user** → your email + strong password → copy the user's **UID**.
+2. **SQL Editor** → run: `insert into admins (user_id) values ('PASTE-THE-UID');`
+3. Open `admin.html` → sign in.
 
-## STEP 3 – Create your admin account (one time)
-1. **Authentication → Users → Add user** → your email + strong password → copy the **User UID**.
-2. **Firestore → Start collection** → ID `admins` → *Document ID* = the UID you copied →
-   add any field (e.g. `role` = `admin`) → Save.
-3. Open your site → **Login** → sign in → you land in the Admin panel.
-   *More admins:* repeat 1–2 for each person.
+## STEP 5 – Publish on GitHub Pages
+Upload **all files (keep folders; `node_modules` not needed)** → repo **Settings → Pages** → *Deploy from a branch* → `main` / root.
 
-## STEP 4 – Optional: contact details & WhatsApp button
-Edit **`js/config.js`** (`MC64_SITE`) (e.g. `whatsapp: '919876543210'`, phone, email, address).
-A floating WhatsApp button and footer contact lines appear automatically.
-Static text/numbers (hero text, "500+ students" stats, FAQ) are in **`index.html`**.
+## STEP 6 – Use it
+1. Admin → **Coaches → + Add coach**: name, title, email + temporary password, photo → **Save**. The coach appears on the website
+   immediately. Send them `…/coach.html`, their email and the temporary password (they change it in *Settings*).
+   (Or let coaches apply on the website and press **Approve** in *Applications*.)
+2. Coach signs in at `coach.html` → completes profile, teaching hours, classes, students, attendance, payments, reports.
+3. Players request a demo on the website → it appears in **Admin → Demo requests** (and in the chosen coach's Bookings).
+   Optional extra: every request/application is also e-mailed to you if `web3formsKey` is set in `js/config.js`.
 
-## How to use it
-**Admin panel** (Login → Admin)
-- **Overview** – live counts + latest requests.
-- **Demo requests** – every request from the website (name, call + WhatsApp links, coach, slot).
-  Search, filter by status, change status, **assign a coach**, delete, export CSV.
-- **Coach applications** – "Apply to teach" submissions. **Approve** creates the coach's login
-  + public profile and shows a *temporary password* to send them.
-- **Coaches** – add / edit / hide / delete, photo upload, fee, bio, banner colour. *Add coach*
-  creates their login (email + temporary password). Use *Send password-reset email* to reset.
-- **Reviews** – add or delete player reviews (shown on profiles and on the home page).
-- **Data** – optional sample coaches for previewing.
-
-**Coach dashboard** (coach logs in with the email/password the admin created)
-- **Overview**, **Bookings** (students who booked them – update status, call/WhatsApp),
-  **Schedule** (create classes – shown on their public profile; students can book a seat),
-  **My profile** (edit details & photo), password-reset email.
-
-**Public site extras:** save coaches ♥ (remembered), share a coach link (`…/#coach=ID`),
-filters/sort, light/dark mode, mobile menu.
-
-## Coach Portal (`coach.html`)
-Share `https://<username>.github.io/<repo>/coach.html` with your coaches. Only accounts that have a
-coach profile can sign in (admins are told to use the main site). Same Firebase login as the website.
-
-| Tab | What the coach can do |
-|---|---|
-| 🏠 Home | Greeting, live counters (new bookings, upcoming classes, students, rating), 6 quick-action tiles, setup checklist, next classes, latest bookings |
-| 📥 Bookings | Every student request addressed to them; filter by status, search, **call / WhatsApp**, set status (new, contacted, confirmed, done, cancelled), add private notes |
-| 📅 Schedule | 7-day strip, add classes (title, date, time, duration, mode, seats, level, meeting link), **repeat weekly 4/8/12 weeks**, edit, duplicate to next week, delete, seat-booking bars |
-| 👥 Students | Unique students who booked them, with quick contact |
-| ⭐ Reviews | Average, star distribution and all reviews (reviews are added by the admin) |
-| 👤 Profile | Edit details, photo upload, banner colour, **live preview** of the public card, copy public profile link, password-reset email |
-
-A welcome guide opens on first login (❓ Guide button re-opens it). On phones the tabs become a bottom bar.
-After updating, re-publish `firestore.rules` (coaches may now also save a private `note` on a booking).
+## Security model (Row Level Security)
+- Visitors can only **create** requests/applications; they cannot read them.
+- A coach can read/write **only rows where `coach_id` = their own user id** (students, attendance, payments, reports, documents,
+  classes, availability) and see only requests addressed to them. A coach cannot change their own `status` or another coach's data
+  – changing an ID in the browser does not help, the database rejects it.
+- Admins (rows in the `admins` table) can manage everything.
+- Photos: public bucket, a coach can write only into their own folder. Documents: private bucket, owner + admin only (signed links).
 
 ## Troubleshooting
 | Problem | Fix |
 |---|---|
-| Red banner "scripts did not load" | The `js/` folder (with `config.js` and `app.js`) must be uploaded next to `index.html`. |
-| Red banner "Database problem reading ..." | Firestore not created, or `firestore.rules` not published (Step 2.4 / 2.6). |
-| Admin panel shows no requests / bookings | Visitors' requests only arrive when Firebase is configured (Demo mode saves in each visitor's own browser). Check the banner, your `admins/<UID>` doc and that the rules are published. |
-| "Demo mode" shown after login | `js/config.js` still has `PASTE_…` values. |
-| Login says "no admin or coach access" (it shows your UID) | Admin: create `admins/<UID>` doc (Step 3). Coach: their `coaches/<UID>` doc must exist (created by Admin → Add coach / Approve). |
-| "Permission denied" toast | Rules not published (Step 2.6) or you are not in `/admins`. |
-| `auth/unauthorized-domain` in console | Add your domain in Authentication → Settings → Authorized domains. |
-| Coach can't log in after being deleted | Deleting a coach removes the profile only; remove the login too in Firebase → Authentication → Users. |
-| Photo upload fails to save | Keep photos modest (they are auto-resized to 480 px); Firestore docs max 1 MB. |
+| Red banner “scripts did not load” | Upload the `js/` folder next to the pages. |
+| Red banner “Database problem reading …” | Run `supabase/schema.sql` (Step 1); check URL/anon key in `js/config.js`. |
+| Still “Demo mode” | `js/config.js` still contains `PASTE_…`. |
+| “not an admin” (shows your UID + SQL) | Run the `insert into admins …` statement (Step 4). |
+| “no coach profile was found” | The account has no row in `coaches` – create the coach via Admin → Coaches. |
+| Coach can't log in after being created | Turn **Confirm email** OFF (Step 2) or ask them to confirm the e-mail. |
+| Photo/document upload fails | Re-run `schema.sql` (creates the buckets and policies); photos are auto-resized, documents ≤ 5 MB. |
+| Forgot-password link opens wrong page | Fix **Site URL / Redirect URLs** (Step 2). |
+| Deleted coach can still sign in | Deleting removes the profile and records only; remove the login in **Authentication → Users**. |
 
-## Security notes
-- Firebase config values are *meant* to be public; protection comes from `firestore.rules`.
-- Only UIDs in `/admins` are admins. Coaches can edit only their own profile/classes (not
-  their `status`) and read only requests addressed to them. Visitors can only *create*
-  requests/applications; the form has a honeypot + 15 s throttle against spam.
-- For heavy spam later, enable **Firebase App Check (reCAPTCHA v3)** in the console.
-- Coach login emails are stored in `/coachPrivate` (admin-only), never in the public profile.
-- Free Spark plan quotas (≈50k reads / 20k writes a day) are plenty for a coaching portal.
-
-## What was audited & fixed
-Full headless test of demo mode (public site, forms, admin, approve, coach creation, coach
-dashboard, scheduling, bookings) – 0 errors. Added: Admin overview + request search/filter +
-coach assignment + live badges, honeypot/throttle, URL-safe class links, saved coaches
-persistence, share links/deep links, WhatsApp/contact config, modal accessibility, new section
-headings and announcement bar, `firebase.json`, expanded README.
-
-v3: replaced ES modules with a compiled classic script (fixes blank page / dead buttons when opened from a folder), content no longer hidden if scripts fail, all browser-storage access made safe, visible error banners for script/database problems, login now explains missing admin/coach access.
+## Free-plan notes
+Supabase Free: 500 MB database, 1 GB file storage, 50 000 monthly active users; projects pause after a week of *no* activity (resume in the dashboard).

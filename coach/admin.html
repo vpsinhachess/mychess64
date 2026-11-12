@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin – MyChess64</title>
+<meta name="robots" content="noindex"><meta name="theme-color" content="#06142e">
+<link rel="icon" type="image/png" href="assets/favicon.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/coach.css">
+</head><body>
+<noscript><p style="padding:20px;text-align:center">Please enable JavaScript to use the Admin dashboard.</p></noscript>
+<div id="fatal" class="fatal" style="display:none"></div>
+<div id="login" class="lwrap"><p class="mu" style="text-align:center;padding:40px">Loading…</p></div>
+<div id="app" hidden></div>
+<div class="toast" id="ts"></div>
+<script>window.addEventListener('error',function(e){var b=document.getElementById('fatal');if(b&&!window.__mc64){b.style.display='block';b.textContent='\u26a0 Script error: '+e.message+' \u2014 see README (Troubleshooting).'}});setTimeout(function(){var b=document.getElementById('fatal');if(!window.__mc64&&b){b.style.display='block';b.innerHTML='\u26a0 The scripts did not load. Make sure the <b>js/</b> folder is uploaded next to coach.html.'}},3000);</script>
+<script src="js/config.js"></script>
+<script src="js/admin-app.js"></script>
+</body></html>

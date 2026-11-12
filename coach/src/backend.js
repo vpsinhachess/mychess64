@@ -1,86 +1,98 @@
 // One interface, two engines:
-//   • Firebase (Auth + Firestore)  – real, shared, secure   (when firebase-config.js is filled in)
-//   • Demo (localStorage)          – works out of the box, single browser only
-const cfg = window.MC64_FIREBASE || {};
+//   • Supabase (Auth + Postgres + Storage)  – real, shared, secure (when js/config.js has your keys)
+//   • Demo (localStorage)                   – works out of the box, single browser only
+import { createClient } from '@supabase/supabase-js';
 
-export const B = {};   // filled by initBackend()
-const LIVE = cfg && cfg.apiKey && !String(cfg.apiKey).startsWith('PASTE');
-
+export const B = {};
+const cfg = window.MC64_SUPABASE || {};
+const LIVE = !!(cfg.url && cfg.anonKey && !/^PASTE/.test(cfg.url) && !/^PASTE/.test(cfg.anonKey));
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
 async function sha(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('mc64:' + s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+const asDataUrl = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
 
-async function firebase() {
-  const base = 'https://www.gstatic.com/firebasejs/10.12.2/';
-  const [A, Au, F] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')]);
-  const app = A.initializeApp(cfg), auth = Au.getAuth(app), fs = F.getFirestore(app);
+function supabase() {
+  const sb = createClient(cfg.url, cfg.anonKey);
+  const ok = async p => { const { data, error } = await p; if (error) throw error; return data; };
   return {
-    mode: 'firebase',
-    sub(col, cb, q) {
-      let ref = F.collection(fs, col); if (q) ref = F.query(ref, F.where(q[0], '==', q[1]));
-      return F.onSnapshot(ref, s => cb(s.docs.map(d => ({ ...d.data(), id: d.id }))), e => { console.warn('[' + col + ']', e.code); B.onErr && B.onErr(col, e); });
+    mode: 'supabase',
+    async q(t, o = {}) {
+      let r = sb.from(t).select(o.sel || '*'); for (const k in (o.eq || {})) r = r.eq(k, o.eq[k]);
+      if (o.order) r = r.order(o.order[0], { ascending: !!o.order[1] }); return (await ok(r)) || [];
     },
-    set: (col, id, o) => F.setDoc(F.doc(fs, col, id), o),
-    remove: (col, id) => F.deleteDoc(F.doc(fs, col, id)),
-    async submit(id, o, seatCls) {            // demo request (+ public seat counter)
-      const b = F.writeBatch(fs); b.set(F.doc(fs, 'requests', id), o);
-      if (seatCls) b.set(F.doc(fs, 'seatlog', id), { cls: seatCls, ts: o.ts });
-      await b.commit();
+    async ins(t, row) { row = { id: uuid(), ...row }; if (t === 'class_booked') return row; await ok(sb.from(t).insert(row)); return row; },
+    async upd(t, id, patch) { await ok(sb.from(t).update(patch).eq('id', id)); },
+    async del(t, id) { await ok(sb.from(t).delete().eq('id', id)); },
+    async upsert(t, row, conflict) { await ok(sb.from(t).upsert(row, { onConflict: conflict })); },
+    async upload(bucket, path, blob) {
+      await ok(sb.storage.from(bucket).upload(path, blob, { upsert: true, contentType: blob.type || 'application/octet-stream' }));
+      return bucket === 'coach-photos' ? sb.storage.from(bucket).getPublicUrl(path).data.publicUrl + '?v=' + Date.now() : path;
     },
-    login: (e, p) => Au.signInWithEmailAndPassword(auth, e, p).then(r => r.user.uid),
-    logout: () => Au.signOut(auth),
-    reset: e => Au.sendPasswordResetEmail(auth, e),
-    onAuth: cb => Au.onAuthStateChanged(auth, async u => {
-      if (!u) return cb(null);
-      let role = null, err = '';
-      try {
-        if ((await F.getDoc(F.doc(fs, 'admins', u.uid))).exists()) role = 'admin';
-        else if ((await F.getDoc(F.doc(fs, 'coaches', u.uid))).exists()) role = 'coach';
-      } catch (e) { console.warn(e); err = e.code || e.message; }
-      cb({ uid: u.uid, email: u.email, role, err });
-    }),
-    // creates a login for a coach WITHOUT signing the admin out (uses a throw-away second app)
-    async createUser(email, pw) {
-      const sec = A.initializeApp(cfg, 'sec' + Date.now()), sa = Au.getAuth(sec);
-      try { const r = await Au.createUserWithEmailAndPassword(sa, email, pw); await Au.signOut(sa); return r.user.uid; }
-      finally { await A.deleteApp(sec); }
+    async fileUrl(bucket, path) { return (await ok(sb.storage.from(bucket).createSignedUrl(path, 3600))).signedUrl; },
+    async rmFile(bucket, path) { await ok(sb.storage.from(bucket).remove([path])); },
+    login: (email, password) => ok(sb.auth.signInWithPassword({ email, password })),
+    logout: () => sb.auth.signOut(),
+    reset: email => ok(sb.auth.resetPasswordForEmail(email, { redirectTo: location.href.split('#')[0] })),
+    setPassword: password => ok(sb.auth.updateUser({ password })),
+    onAuth(cb) {
+      sb.auth.onAuthStateChange((ev, session) => {
+        if (ev === 'PASSWORD_RECOVERY') B.recovery = true;
+        setTimeout(async () => {      // never await supabase calls inside the callback itself
+          if (!session) return cb(null);
+          const u = session.user; let role = null, err = '';
+          try {
+            const a = await sb.from('admins').select('user_id').eq('user_id', u.id); if (a.error) throw a.error;
+            if (a.data.length) role = 'admin'; else { const c = await sb.from('coaches').select('id').eq('id', u.id); if (c.error) throw c.error; if (c.data.length) role = 'coach'; }
+          } catch (e) { err = e.code || e.message; }
+          cb({ uid: u.id, email: u.email, role, err, recovery: !!B.recovery });
+        }, 0);
+      });
+    },
+    // creates a login WITHOUT signing the current admin out (throw-away client, no stored session)
+    async createUser(email, password) {
+      const c = createClient(cfg.url, cfg.anonKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+      const { data, error } = await c.auth.signUp({ email, password }); if (error) throw error;
+      if (!data.user || (data.user.identities && !data.user.identities.length)) throw { message: 'That email already has an account.' };
+      return data.user.id;
+    },
+    listen(tables, cb) {
+      const ch = sb.channel('mc64-' + uuid()).on('postgres_changes', { event: '*', schema: 'public' }, p => { if (tables.includes(p.table)) cb(p.table); }).subscribe();
+      return () => sb.removeChannel(ch);
     }
   };
 }
 
 function demo() {
-  const K = 'mc64_demo_v3', subs = [], listeners = [];
-  let st; try { st = JSON.parse(localStorage.getItem(K)); } catch (e) {}
-  st = st || { data: {}, acc: [] };
-  const save = () => { try { localStorage.setItem(K, JSON.stringify(st)); } catch (e) { /* storage blocked/full: keep working in memory */ } };
-  const arr = c => st.data[c] = st.data[c] || [];
-  const fire = c => subs.filter(s => s.c === c).forEach(s => s.run());
+  const K = 'mc64_sb_demo_v1', ls = []; let st; try { st = JSON.parse(localStorage.getItem(K)); } catch (e) {}
+  st = st || { t: {}, acc: [], f: {} };
+  const save = () => { try { localStorage.setItem(K, JSON.stringify(st)); } catch (e) { /* storage blocked/full: stay in memory */ } };
+  const tb = n => st.t[n] = st.t[n] || [], note = t => ls.forEach(f => f(t));
   let session = null; try { session = sessionStorage.getItem('mc64_s'); } catch (e) {}
-  const emit = () => { const a = st.acc.find(x => x.uid === session); listeners.forEach(f => f(a ? { uid: a.uid, email: a.email, role: a.role } : null)); };
+  const emit = () => { const a = st.acc.find(x => x.uid === session); cbs.forEach(f => f(a ? { uid: a.uid, email: a.email, role: a.role } : null)); }, cbs = [];
   const impl = {
     mode: 'demo',
-    sub(c, cb, q) { const s = { c, run: () => cb(arr(c).filter(x => !q || x[q[0]] === q[1]).map(x => ({ ...x }))) }; subs.push(s); setTimeout(s.run); return () => subs.splice(subs.indexOf(s), 1); },
-    async set(c, id, o) { const a = arr(c), i = a.findIndex(x => x.id === id), v = { ...o, id }; i < 0 ? a.push(v) : a[i] = v; save(); fire(c); },
-    async remove(c, id) { st.data[c] = arr(c).filter(x => x.id !== id); save(); fire(c); },
-    async submit(id, o, cls) { await impl.set('requests', id, o); if (cls) await impl.set('seatlog', id, { cls, ts: o.ts }); },
-    async login(e, p) {
-      const a = st.acc.find(x => x.email === e.toLowerCase());
-      if (!a || a.hash !== await sha(a.uid + p)) throw new Error('bad');
-      session = a.uid; try { sessionStorage.setItem('mc64_s', session); } catch (x) {} emit(); return a.uid;
+    async q(t, o = {}) {
+      let r = t === 'class_booked' ? Object.values(tb('requests').filter(x => x.class_id).reduce((m, x) => { (m[x.class_id] = m[x.class_id] || { class_id: x.class_id, n: 0 }).n++; return m; }, {})) : tb(t).slice();
+      for (const k in (o.eq || {})) r = r.filter(x => x[k] === o.eq[k]);
+      if (o.order) r.sort((a, b) => (a[o.order[0]] > b[o.order[0]] ? 1 : -1) * (o.order[1] ? 1 : -1));
+      return JSON.parse(JSON.stringify(r));
     },
-    async logout() { session = null; try { sessionStorage.removeItem('mc64_s'); } catch (x) {} emit(); },
-    async reset() { alert('Demo mode: password-reset emails need Firebase. Ask the admin to create a new account.'); },
-    onAuth(cb) { listeners.push(cb); setTimeout(emit); },
-    async createUser(email, pw, forcedUid) {
-      email = email.toLowerCase(); if (st.acc.some(x => x.email === email)) throw { code: 'auth/email-already-in-use' };
-      const u = forcedUid || 'u' + Date.now().toString(36); st.acc.push({ uid: u, email, hash: await sha(u + pw), role: forcedUid === 'admin1' ? 'admin' : 'coach' }); save(); return u;
-    }
+    async ins(t, row) { row = { id: uuid(), created_at: new Date().toISOString(), ...row }; tb(t).push(row); save(); note(t); return row; },
+    async upd(t, id, patch) { const r = tb(t).find(x => x.id === id); if (r) Object.assign(r, patch); save(); note(t); },
+    async del(t, id) { st.t[t] = tb(t).filter(x => x.id !== id); if (t === 'students') ['attendance', 'reports'].forEach(x => st.t[x] = tb(x).filter(y => y.student_id !== id)); save(); note(t); },
+    async upsert(t, row, conflict) { const ks = conflict.split(','); const r = tb(t).find(x => ks.every(k => x[k] === row[k])); r ? Object.assign(r, row) : tb(t).push({ id: uuid(), ...row }); save(); note(t); },
+    async upload(bucket, path, blob) { const d = await asDataUrl(blob); st.f[path] = d; save(); return bucket === 'coach-photos' ? d : path; },
+    async fileUrl(bucket, path) { return st.f[path] || ''; },
+    async rmFile(bucket, path) { delete st.f[path]; save(); },
+    async login(email, pw) { const a = st.acc.find(x => x.email === email.toLowerCase()); if (!a || a.hash !== await sha(a.uid + pw)) throw new Error('bad'); session = a.uid; try { sessionStorage.setItem('mc64_s', session); } catch (e) {} emit(); },
+    async logout() { session = null; try { sessionStorage.removeItem('mc64_s'); } catch (e) {} emit(); },
+    async reset() { alert('Demo mode: password-reset emails need Supabase.'); },
+    async setPassword(pw) { const a = st.acc.find(x => x.uid === session); if (a) { a.hash = await sha(a.uid + pw); save(); } },
+    onAuth(cb) { cbs.push(cb); setTimeout(emit); },
+    async createUser(email, pw, forced) { email = email.toLowerCase(); if (st.acc.some(x => x.email === email)) throw { message: 'That email already has an account.' }; const u = forced || uuid(); st.acc.push({ uid: u, email, hash: await sha(u + pw), role: forced === 'admin-demo' ? 'admin' : 'coach' }); save(); return u; },
+    listen(tables, cb) { const f = t => tables.includes(t) && cb(t); ls.push(f); return () => ls.splice(ls.indexOf(f), 1); }
   };
-  if (!st.acc.some(a => a.role === 'admin')) impl.createUser('admin@mychess64.com', 'admin123', 'admin1');
+  if (!st.acc.some(a => a.role === 'admin')) impl.createUser('admin@mychess64.com', 'admin123', 'admin-demo');
   return impl;
 }
 
-export async function initBackend() {
-  let impl;
-  if (LIVE) { try { impl = await firebase(); } catch (e) { console.error('Firebase failed, using demo mode', e); } }
-  Object.assign(B, impl || demo());
-  return B;
-}
+export async function initBackend() { Object.assign(B, LIVE ? supabase() : demo()); return B; }
