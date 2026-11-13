@@ -97,12 +97,17 @@ do $$ declare r record; begin
 
 create policy admins_self on public.admins for select to authenticated using (user_id = auth.uid());
 
-create policy coaches_read   on public.coaches for select to anon, authenticated using (true);
-create policy coaches_insert on public.coaches for insert to authenticated with check (public.is_admin());
+-- public sees only APPROVED coaches; a coach also sees their own (pending) row; admin sees all
+create policy coaches_read   on public.coaches for select to anon, authenticated using (status = 'active' or id = auth.uid() or public.is_admin());
+-- coaches may create ONLY their own profile and ONLY as 'pending' (admin approves it later)
+create policy coaches_insert on public.coaches for insert to authenticated with check (public.is_admin() or (id = auth.uid() and status = 'pending'));
 create policy coaches_update on public.coaches for update to authenticated using (id = auth.uid() or public.is_admin()) with check (id = auth.uid() or public.is_admin());
 create policy coaches_delete on public.coaches for delete to authenticated using (public.is_admin());
 
-create policy cpriv_all on public.coach_private for all to authenticated using (public.is_admin() or id = auth.uid()) with check (public.is_admin());
+create policy cpriv_select on public.coach_private for select to authenticated using (public.is_admin() or id = auth.uid());
+create policy cpriv_insert on public.coach_private for insert to authenticated with check (public.is_admin() or id = auth.uid());
+create policy cpriv_update on public.coach_private for update to authenticated using (public.is_admin() or id = auth.uid()) with check (public.is_admin() or id = auth.uid());
+create policy cpriv_delete on public.coach_private for delete to authenticated using (public.is_admin());
 
 create policy reviews_read  on public.reviews for select to anon, authenticated using (true);
 create policy reviews_write on public.reviews for all to authenticated using (public.is_admin()) with check (public.is_admin());
