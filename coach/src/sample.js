@@ -22,10 +22,11 @@ export async function sample() {
   for (const x of cl) { const r = await B.ins('classes', { coach_id: c, title: x[0], class_date: addDays(today(), x[1]), class_time: x[2], dur: x[3], mode: 'Online', cap: x[4], level: x[5], link: '' }); cid.push(r.id); }
   [[1, '17:00', '19:00'], [3, '17:00', '19:00'], [6, '09:00', '12:00']].forEach(a => B.ins('availability', { coach_id: c, weekday: a[0], start_time: a[1], end_time: a[2] }));
   // demo-only sample workspace for the first coach so the dashboard is not empty
-  const names = [['Riya Sharma', '9876500001', 'Beginner', 9], ['Arjun Mehta', '9876500002', 'Intermediate', 13], ['Neha Gupta', '9876500003', 'Advanced', 29]], sid = [];
-  for (const n of names) { const r = await B.ins('students', { coach_id: c, name: n[0], phone: n[1], level: n[2], age: n[3], notes: '', started_on: addDays(today(), -60) }); sid.push(r.id); }
+  const names = [['Riya Sharma', '9876500001', 'Beginner', 9, 2400], ['Arjun Mehta', '9876500002', 'Intermediate', 13, 3200], ['Neha Gupta', '9876500003', 'Advanced', 29, 4000]], sid = [];
+  for (const n of names) { const r = await B.ins('students', { coach_id: c, name: n[0], phone: n[1], level: n[2], age: n[3], notes: '', started_on: addDays(today(), -62), monthly_fee: n[4], active: true }); sid.push(r.id); }
+  await B.upd('coaches', c, { monthly_goal: 12000 });
   for (let d = 1; d <= 6; d++) for (let k = 0; k < 3; k++) await B.ins('attendance', { coach_id: c, student_id: sid[k], session_date: addDays(today(), -d * 3), status: (d + k) % 5 === 0 ? 'absent' : 'present', note: '' });
-  for (let m = 0; m < 4; m++) for (let k = 0; k < 3; k++) await B.ins('payments', { coach_id: c, student_id: sid[k], amount: 900 + k * 300, paid_on: addDays(today(), -m * 28 - k), method: 'UPI', status: m === 0 && k === 2 ? 'pending' : 'paid', note: '' });
+  for (let m = 0; m < 3; m++) for (let k = 0; k < 3; k++) { if (m === 0 && k === 2) continue; await B.ins('payments', { coach_id: c, student_id: sid[k], amount: [2400, 3200, 4000][k], paid_on: addDays(today(), -m * 30 - k * 2), method: k === 1 ? 'Cash' : 'UPI', status: 'paid', note: 'Monthly fee' }); }
   await B.ins('reports', { coach_id: c, student_id: sid[0], report_date: addDays(today(), -5), level: 'Beginner · ~900', topics: 'Knight forks, back-rank mates', strengths: 'Quick to spot tactics', improve: 'Slow down and check opponent threats', homework: '10 puzzles daily' });
   [['Riya Sharma', '9876500004', 'Chess for Kids', 'Kids Tactics Group', 'new', 3e5, cid[0]], ['Arjun Mehta', '9876500002', 'Tournament Prep', 'Sat 5 PM', 'contacted', 9e6, null], ['Neha Gupta', '9876500003', 'Chess for Adults', '', 'confirmed', 9e7, null]].forEach(r => B.ins('requests', { created_at: new Date(Date.now() - r[5]).toISOString(), name: r[0], phone: r[1], cat: r[2], coach_id: c, class_id: r[6], slot: r[3], status: r[4], note: null }));
 }

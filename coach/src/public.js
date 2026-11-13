@@ -14,7 +14,7 @@ export function draw() {
   const tabs = $('tabs'), grid = $('grid'); if (!tabs || !grid) return;
   [...tabs.children].forEach(b => b.classList.toggle('on', b.textContent === ST.cat));
   const lv = $('lv').value, so = $('so').value, md = $('md2').value;
-  let L = D.coaches.filter(x => x.status !== 'hidden').map(x => { const s = stat(x); return { ...x, _r: s.r, _n: s.n }; })
+  let L = D.coaches.filter(x => (x.status || 'active') === 'active').map(x => { const s = stat(x); return { ...x, _r: s.r, _n: s.n }; })
     .filter(x => (ST.cat === 'All' || (ST.cat === 'Saved ♥' ? ST.saved.has(x.id) : (x.cats || []).includes(ST.cat)))
       && (!ST.txt || ((x.name || '') + (x.city || '')).toLowerCase().includes(ST.txt))
       && (!lv || (x.cats || []).some(c => lvl[c] === lv)) && (!md || x.mode === md || x.mode === 'Both'));

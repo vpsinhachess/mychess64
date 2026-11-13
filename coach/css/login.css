@@ -1,0 +1,32 @@
+/* MyChess64 master login design (split screen) – used by coach.html and admin.html */
+.lgwrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:#f3f6fb;color:#0b2038;font-family:Poppins,"Segoe UI",system-ui,sans-serif}
+.lg-stage{flex:1;display:flex;padding:clamp(8px,2vh,24px) 12px;min-height:0}
+.lg-shell{margin:auto;width:min(980px,100%);display:grid;grid-template-columns:.85fr 1.15fr;background:#fff;border-radius:26px;box-shadow:0 12px 40px #0b20381a;overflow:hidden}
+.lg-side{background:linear-gradient(155deg,#0a5bd0,#0b2038 75%);color:#fff;padding:clamp(18px,4vh,40px) 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,2.4vh,22px);position:relative;text-align:center}
+.lg-side:before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(#ffffff10 0 25%,transparent 0 50%) 0 0/56px 56px}.lg-side>*{position:relative}
+.lg-tile{background:#fff;border-radius:20px;padding:clamp(10px,2vh,18px) 18px;box-shadow:0 12px 30px #0006}.lg-tile img{display:block;width:clamp(140px,26vh,210px)}
+.lg-tag{font-weight:600;line-height:1.4;font-size:clamp(.9rem,2.2vh,1.05rem);margin:0}
+.lg-perks{list-style:none;padding:0;margin:0;display:grid;gap:6px;font-size:.8rem;color:#cfe0ff;text-align:left}.lg-perks li:before{content:"✓ ";color:#7be0a0;font-weight:700}
+.lg-rl{display:grid;gap:7px;width:100%;max-width:230px}.lg-rl a,.lg-rm a{font-size:.82rem;font-weight:600;padding:clamp(6px,1.2vh,9px) 10px;border-radius:10px;text-decoration:none}.lg-rl a{background:#ffffff1f;color:#dbe7ff}.lg-rl a.on{background:#fff;color:#0b2038}
+.lg-main{padding:clamp(18px,3.4vh,38px) clamp(18px,4vw,44px);text-align:center;display:flex;flex-direction:column;justify-content:center}
+.lg-wide{display:none;height:40px;margin:0 auto 8px}
+.lg-main h1{font-family:Poppins,system-ui,sans-serif;font-size:clamp(1.4rem,3.4vh + .5rem,2rem);font-weight:800;letter-spacing:-.5px;margin:0;color:#0b2038}
+.lg-sub{color:#5b6b82;margin:2px 0 clamp(8px,2vh,18px);font-size:.92rem}
+.lg-rm{display:none;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px}.lg-rm a{font-size:.72rem;padding:7px 0;background:#f3f6fb;color:#5b6b82}.lg-rm a.on{background:#0b2038;color:#fff}
+.lg-seg{display:grid;background:#f3f6fb;border-radius:14px;padding:5px;gap:5px;margin-bottom:clamp(8px,1.8vh,14px)}.lg-seg.s3{grid-template-columns:repeat(3,1fr)}.lg-seg.s1{grid-template-columns:1fr}
+.lg-seg button{border:0;border-radius:10px;padding:clamp(8px,1.5vh,12px) 4px;font:700 .88rem Poppins,system-ui;background:0;color:#5b6b82;cursor:pointer}.lg-seg button.on{background:#0a6cf0;color:#fff;box-shadow:0 6px 16px #0a6cf044}
+.lg-box{border:1px solid #e3e9f3;border-radius:18px;padding:clamp(12px,2.4vh,20px);text-align:left}
+.lg-box label{display:block;font-weight:700;font-size:.85rem;margin-bottom:5px;color:#0b2038}.lg-f{margin-bottom:clamp(8px,1.7vh,14px)}
+.lg-box input[type=text],.lg-box input[type=email],.lg-box input[type=password]{width:100%;padding:clamp(9px,1.6vh,13px) 14px;border-radius:12px;border:1px solid #e3e9f3;background:#f8faff;font:.95rem Poppins,system-ui;color:#0b2038}
+.lg-box input:focus{outline:2px solid #0a6cf0;border-color:transparent}
+.lg-pw{position:relative}.lg-pw input{padding-right:64px!important}.lg-pw button{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:0;color:#0a6cf0;font:600 .85rem Poppins;cursor:pointer}
+.lg-row{display:flex;justify-content:space-between;gap:8px;font-size:.82rem;color:#5b6b82;margin-bottom:clamp(8px,1.8vh,14px);align-items:center;flex-wrap:wrap}.lg-row label{display:inline;font-weight:400;margin:0;color:#5b6b82}.lg-row input{width:auto!important;margin-right:4px}.lg-row a{color:#0a6cf0;text-decoration:none;font-weight:600}
+.lg-go,.lg-gb{width:100%;padding:clamp(11px,1.9vh,15px);border-radius:12px;font:700 1rem Poppins,system-ui;cursor:pointer}.lg-go{border:0;color:#fff;background:linear-gradient(90deg,#0f3a73,#0a6cf0)}.lg-go:hover{filter:brightness(1.1)}
+.lg-gb{border:1px solid #cfd8e6;background:#fff;color:#0b2038;display:flex;align-items:center;justify-content:center;gap:12px}.lg-gb:hover{background:#f8faff}
+.lg-info{font-size:.8rem;color:#5b6b82;margin:10px 0 0}.lg-err{color:#d12c33;font-size:.82rem;min-height:1.2em;margin-top:8px}.lg-err.ok{color:#1d7a3b}
+.lg-demo{background:#eef5ff;color:#0a58c8;border-radius:10px;padding:7px 10px;font-size:.78rem;margin:10px 0 0;text-align:center}
+.lg-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.lg-two>div{min-width:0}
+.lg-foot{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding:8px 14px;font-size:.78rem;color:#5b6b82;text-align:center;background:#fff;border-top:1px solid #e3e9f3}.lg-foot img{height:26px}.lg-foot b{color:#0b2038}
+@media(max-width:820px){.lg-shell{grid-template-columns:1fr;max-width:480px}.lg-side{display:none}.lg-wide{display:block}.lg-rm{display:grid}}
+@media(max-height:560px){.lg-info{display:none}.lg-sub{font-size:.82rem}.lg-wide{height:34px}}
+@media(max-width:480px){.lg-stage{padding:6px 8px}.lg-main{padding:14px}.lg-wide{height:32px}.lg-foot img{display:none}.lg-two{grid-template-columns:1fr}}

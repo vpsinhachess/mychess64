@@ -1,7 +1,7 @@
 // MyChess64 – Admin Dashboard (admin.html). Full administrative control (Supabase RLS: admins table).
 import { initBackend, B } from './backend.js';
 import { seedDemo } from './sample.js';
-import { loginHTML, recoveryHTML, doLogin, doForgot, doNewPw, profileForm, readProfile, previewCard, avatar, reach, ui, getPhoto } from './ui.js';
+import { loginHTML, recoveryHTML, applyKeepRule, doLogin, doForgot, doNewPw, profileForm, readProfile, previewCard, avatar, reach, ui, getPhoto } from './ui.js';
 import { $, esc, today, fd, money, digits, ago, toast, errText, D, hooks, load, ADMIN_TABLES, save, remove, stat, COL } from './state.js';
 
 const S = { user: null, tab: 'ov', rq: '', rf: 'all', edit: '', note: '' };
@@ -10,6 +10,7 @@ const TABS = [['ov', '🏠', 'Overview'], ['req', '📥', 'Demo requests'], ['ap
 const MAIN = ['ov', 'req', 'apps', 'coaches'];
 const val = i => $(i).value.trim();
 const opts = (arr, cur) => arr.map(o => `<option ${o === cur ? 'selected' : ''}>${o}</option>`).join('');
+const PEND = () => D.coaches.filter(c => c.status === 'pending').length;
 const NEW = () => D.requests.filter(r => r.status === 'new').length, NA = () => D.apps.filter(a => a.status === 'new').length;
 const cName = id => (D.coaches.find(c => c.id === id) || {}).name || '—';
 const emailOf = id => (D.coach_private.find(p => p.id === id) || {}).email || '';
@@ -18,7 +19,7 @@ const head = (t, extra = '') => `<div class="ph"><h2>${t}</h2>${extra}</div>`;
 async function run(fn, ok) { try { await fn(); if (ok) toast(ok); } catch (e) { console.error(e); toast(errText(e), 1); } }
 const tempPw = () => Math.random().toString(36).slice(2, 6) + Math.random().toString(36).slice(2, 6).toUpperCase() + '7!';
 
-function showLogin(msg) { $('app').hidden = true; const L = $('login'); L.hidden = false; L.innerHTML = loginHTML('admin', msg); }
+function showLogin(msg) { $('app').hidden = true; const L = $('login'); L.hidden = false; L.className = 'lgwrap'; L.innerHTML = loginHTML('admin', msg); }
 function showApp() {
   $('login').hidden = true; const a = $('app'); a.hidden = false;
   a.innerHTML = `<header class="top"><img class="tlogo" src="assets/header-logo.webp" alt="MyChess64"><b class="tt">Admin</b><span class="sp"></span><span class="mu hide-s">${esc(S.user.email)}</span><a class="btn o sm hide-s" href="index.html" target="_blank">Website ↗</a><button class="btn sm" onclick="app.logout()">Log out</button></header>
@@ -26,7 +27,7 @@ function showApp() {
   render(true);
 }
 function nav() {
-  const badge = k => k === 'req' ? NEW() : k === 'apps' ? NA() : 0;
+  const badge = k => k === 'req' ? NEW() : k === 'apps' ? NA() : k === 'coaches' ? PEND() : 0;
   const btn = ([k, i, l]) => `<button class="${k === S.tab ? 'on' : ''}" onclick="app.go('${k}')"><i>${i}</i><span>${l}</span>${badge(k) ? `<em>${badge(k)}</em>` : ''}</button>`;
   $('nav').innerHTML = TABS.map(btn).join('');
   $('bnav').innerHTML = TABS.filter(t => MAIN.includes(t[0])).map(btn).join('') + `<button onclick="app.more()"><i>☰</i><span>More</span></button>`;
@@ -43,7 +44,7 @@ function render(force) {
 /* ---- overview ---- */
 function ov() {
   const paid = D.payments.filter(p => p.status === 'paid').reduce((a, p) => a + +p.amount, 0);
-  return `${head('Admin Overview')}<div class="kpis"><div onclick="app.go('req')"><b>${NEW()}</b><span>New demo requests</span></div><div onclick="app.go('req')"><b>${D.requests.length}</b><span>Total requests</span></div><div onclick="app.go('apps')"><b>${NA()}</b><span>New applications</span></div><div onclick="app.go('coaches')"><b>${D.coaches.length}</b><span>Coaches</span></div><div><b>${D.students.length}</b><span>Students (all coaches)</span></div><div><b>${money(paid)}</b><span>Fees recorded by coaches</span></div><div onclick="app.go('rev')"><b>${D.reviews.length}</b><span>Reviews</span></div><div onclick="app.go('sum')"><b>${D.attendance.length}</b><span>Attendance records</span></div></div><h3 class="sec">Latest demo requests</h3><div id="list"></div>`;
+  return `${head('Admin Overview')}<div class="kpis"><div onclick="app.go('req')"><b>${NEW()}</b><span>New demo requests</span></div><div onclick="app.go('req')"><b>${D.requests.length}</b><span>Total requests</span></div><div onclick="app.go('apps')"><b>${NA()}</b><span>New applications</span></div><div onclick="app.go('coaches')"><b>${D.coaches.length}</b><span>Coaches</span></div><div onclick="app.go('coaches')"><b>${PEND()}</b><span>Pending approval</span></div><div><b>${D.students.length}</b><span>Students (all coaches)</span></div><div><b>${money(paid)}</b><span>Fees recorded by coaches</span></div><div onclick="app.go('rev')"><b>${D.reviews.length}</b><span>Reviews</span></div><div onclick="app.go('sum')"><b>${D.attendance.length}</b><span>Attendance records</span></div></div><h3 class="sec">Latest demo requests</h3><div id="list"></div>`;
 }
 const ovList = () => { $('list').innerHTML = D.requests.slice(0, 5).map(rq).join('') || empty('No demo requests yet.'); };
 
@@ -67,7 +68,7 @@ const approve = id => run(async () => {
 /* ---- coaches ---- */
 function coaches() { return `${head('Coaches', '<button class="btn sm" onclick="app.newCoach()">+ Add coach</button>')}<div id="cf"></div><div id="list"></div>`; }
 function coachList() {
-  $('list').innerHTML = D.coaches.map(c => { const pay = D.payments.filter(p => p.coach_id === c.id && p.status === 'paid').reduce((a, p) => a + +p.amount, 0); return `<div class="card bkc"><div class="rwl">${avatar(c, 'sm')}<div><b>${esc(c.name)}</b> <span class="bdg s-${c.status === 'hidden' ? 'cancelled' : 'done'}">${c.status === 'hidden' ? 'hidden' : 'live'}</span><div class="mu">${esc(c.title)} · ${esc(c.city)} · ${money(c.price)}/hr</div><div class="mu">✉ ${esc(emailOf(c.id) || 'no login') } · 👥 ${D.students.filter(s => s.coach_id === c.id).length} students · 💰 ${money(pay)}</div></div></div><div class="acts"><button class="ic" onclick="app.editCoach('${c.id}')">✏️ Edit</button><button class="ic" onclick="app.hide('${c.id}')">${c.status === 'hidden' ? 'Show' : 'Hide'}</button><button class="ic del" onclick="app.delCoach('${c.id}')">🗑 Delete</button></div></div>`; }).join('') || empty('No coaches yet — add one.');
+  $('list').innerHTML = D.coaches.map(c => { const pay = D.payments.filter(p => p.coach_id === c.id && p.status === 'paid').reduce((a, p) => a + +p.amount, 0); return `<div class="card bkc"><div class="rwl">${avatar(c, 'sm')}<div><b>${esc(c.name)}</b> <span class="bdg s-${c.status === 'hidden' ? 'cancelled' : c.status === 'pending' ? 'contacted' : 'done'}">${c.status === 'hidden' ? 'hidden' : c.status === 'pending' ? 'pending approval' : 'live'}</span><div class="mu">${esc(c.title)} · ${esc(c.city)} · ${money(c.price)}/hr</div><div class="mu">✉ ${esc(emailOf(c.id) || 'no login') } · 👥 ${D.students.filter(s => s.coach_id === c.id).length} students · 💰 ${money(pay)}</div></div></div><div class="acts">${c.status === 'pending' ? `<button class="btn sm" onclick="app.activate('${c.id}')">✓ Approve</button>` : ''}<button class="ic" onclick="app.editCoach('${c.id}')">✏️ Edit</button>${c.status === 'pending' ? '' : `<button class="ic" onclick="app.hide('${c.id}')">${c.status === 'hidden' ? 'Show' : 'Hide'}</button>`}<button class="ic del" onclick="app.delCoach('${c.id}')">🗑 Delete</button></div></div>`; }).join('') || empty('No coaches yet — add one.');
 }
 function coachForm(c) {
   S.edit = c ? c.id : ''; ui.photoOwner = () => S.edit || 'new-' + Date.now();
@@ -108,6 +109,7 @@ window.app = {
   setReq: (id, v) => run(() => save('requests', { status: v }, id), 'Status updated'), delReq: id => confirm('Delete this request?') && run(() => remove('requests', id)),
   appSt: (id, v) => run(() => save('apps', { status: v }, id)), delApp: id => confirm('Delete this application?') && run(() => remove('apps', id)),
   newCoach: () => coachForm(null), editCoach: id => coachForm(D.coaches.find(c => c.id === id)),
+  activate: id => run(() => save('coaches', { status: 'active' }, id), 'Approved ✓ — now live on the website'),
   hide: id => { const c = D.coaches.find(x => x.id === id); return run(() => save('coaches', { status: c.status === 'hidden' ? 'active' : 'hidden' }, id)); },
   delCoach: id => confirm('Delete this coach and ALL their students, classes and records? (Their login must be removed separately in Supabase → Authentication.)') && run(() => remove('coaches', id)),
   delRev: id => confirm('Delete this review?') && run(() => remove('reviews', id)),
@@ -117,12 +119,12 @@ window.app = {
 async function enter() { await load(ADMIN_TABLES); showApp(); }
 document.documentElement.classList.add('js'); window.__mc64 = true;
 (async () => {
-  await initBackend(); hooks.render = () => render(); await seedDemo();
+  await initBackend(); hooks.render = () => render(); await seedDemo(); await applyKeepRule();
   B.onAuth(u => {
     if (u && S.user && S.user.uid === u.uid && S.user.role === u.role && !u.recovery) { S.user = u; return; }  // token refresh etc.
     S.user = u;
     if (!u) { showLogin(pendingMsg); pendingMsg = ''; return; }
-    if (u.recovery) { pendingUser = u; $('app').hidden = true; $('login').hidden = false; $('login').innerHTML = recoveryHTML(); return; }
+    if (u.recovery) { pendingUser = u; $('app').hidden = true; $('login').hidden = false; $('login').className = 'lwrap'; $('login').innerHTML = recoveryHTML(); return; }
     if (u.role === 'admin') return enter();
     pendingMsg = u.role === 'coach' ? 'This is the admin area. Coaches: use the Coach Portal (coach.html).' : 'Signed in as ' + u.email + ', but this account is not an admin' + (u.err ? ' (' + u.err + ')' : '') + '. In Supabase run: insert into admins (user_id) values (\'' + u.uid + '\');';
     B.logout();

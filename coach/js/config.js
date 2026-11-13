@@ -14,10 +14,10 @@ window.MC64_SUPABASE = {
 
 // 2) Optional contact details & email alerts (leave '' to hide)
 window.MC64_SITE = {
-  whatsapp: '',   // digits only with country code, e.g. '917004186712' -> floating WhatsApp button
+  whatsapp: '',   // digits only with country code, e.g. '919876543210' -> floating WhatsApp button
   phone: '',      // e.g. '+91 70041 86712'
   email: '',      // e.g. 'mychess64.com@gmail.com'
-  address: '',    // e.g. 'Patna, Bihar, India'
+  address: '',    // e.g. 'India'
   // Optional: also e-mail every demo request / coach application to you (free key from web3forms.com)
   web3formsKey: 'd45fca8a-c796-49d4-84b0-383d5cad3d23'
 };

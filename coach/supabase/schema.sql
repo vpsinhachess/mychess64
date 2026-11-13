@@ -64,6 +64,11 @@ create table if not exists public.coach_docs (
   id uuid primary key default gen_random_uuid(), coach_id uuid not null references public.coaches(id) on delete cascade,
   title text not null, path text not null, created_at timestamptz default now());
 
+-- fee ledger + goal columns (added later; safe on existing databases)
+alter table public.students add column if not exists monthly_fee numeric(10,2) default 0;
+alter table public.students add column if not exists active boolean default true;
+alter table public.coaches add column if not exists monthly_goal numeric(10,2) default 0;
+
 -- seats already booked per class (no personal data) – readable by everyone
 create or replace view public.class_booked with (security_invoker = off) as
   select class_id, count(*)::int as n from public.requests where class_id is not null group by class_id;

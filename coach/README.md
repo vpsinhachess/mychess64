@@ -9,6 +9,29 @@ Static website (plain HTML/CSS/JS) that runs on **GitHub Pages**, with a real ba
 | `coach.html` | Coaches | **Coach Dashboard** – personal login, each coach sees only their own data |
 | `admin.html` | You | **Admin Dashboard** – full administrative control |
 
+## What's new (v3)
+- **Login** now uses the MyChess64 master split-screen design (Login / Sign Up / Google, show-hide password, “keep me signed in”).
+- **Coach Dashboard** has a friendlier home: today's classes (with Join + Attendance buttons), a **“Needs your attention”** list
+  (unanswered bookings, fees due, missed sessions, low attendance), monthly goal progress, earnings chart, month **calendar**.
+- **Real fee accounting**: set each student's **monthly fee**; the app keeps a **fee ledger** and shows dues, advances, collection rate,
+  WhatsApp fee reminders and payment receipts. Pause a student and no fees accrue.
+- **Performance** with audited formulas (see below), CSV exports of students / payments / attendance.
+- ⚠️ **Re-run `supabase/schema.sql`** once – it adds `students.monthly_fee`, `students.active` and `coaches.monthly_goal`.
+
+### How the numbers are calculated
+| Number | Formula |
+|---|---|
+| Fees billed (student) | monthly fee × number of calendar months from the start month to the current month (inclusive); paused students accrue nothing |
+| Received | payments with status **paid** only (“pending” payments are not counted) |
+| Balance / Fees due | billed − received (negative = paid in advance) |
+| Collected this month | paid payments dated in the current month (▲/▼ % vs last month) |
+| Expected monthly fees | sum of monthly fees of **active** students; *Collection rate* = collected ÷ expected |
+| Attendance rate | (present + late) ÷ all marked sessions; *streak* = latest consecutive non-absent sessions |
+| Revenue / teaching hour | fees received in the last 30 days ÷ hours of classes already held in those 30 days |
+| Student retention | active students who attended at least once in the last 30 days ÷ active students |
+| Booking conversion | bookings marked confirmed or done ÷ all bookings |
+| Avg students / session | attended records ÷ number of distinct session days |
+
 ## Coach Dashboard modules
 👤 **My Profile** (photo upload to Storage, bio, fee, specialities, live preview) · 📅 **My Schedule** (available teaching
 hours + classes, weekly repeat, edit/duplicate) · 📥 **Bookings** (call/WhatsApp, status, notes, "add as student") ·

@@ -33,6 +33,12 @@ function supabase() {
     logout: () => sb.auth.signOut(),
     reset: email => ok(sb.auth.resetPasswordForEmail(email, { redirectTo: location.href.split('#')[0] })),
     setPassword: password => ok(sb.auth.updateUser({ password })),
+    async signUp(email, password, name) {
+      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: location.href.split('#')[0] } }); if (error) throw error;
+      if (data.user && data.user.identities && !data.user.identities.length) throw { message: 'That email already has an account — please sign in.' };
+      return { confirm: !data.session };
+    },
+    google: () => ok(sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href.split('#')[0] } })),
     onAuth(cb) {
       sb.auth.onAuthStateChange((ev, session) => {
         if (ev === 'PASSWORD_RECOVERY') B.recovery = true;
@@ -43,7 +49,8 @@ function supabase() {
             const a = await sb.from('admins').select('user_id').eq('user_id', u.id); if (a.error) throw a.error;
             if (a.data.length) role = 'admin'; else { const c = await sb.from('coaches').select('id').eq('id', u.id); if (c.error) throw c.error; if (c.data.length) role = 'coach'; }
           } catch (e) { err = e.code || e.message; }
-          cb({ uid: u.id, email: u.email, role, err, recovery: !!B.recovery });
+          const m = u.user_metadata || {};
+          cb({ uid: u.id, email: u.email, role, err, recovery: !!B.recovery, meta: { name: m.full_name || m.name || '', avatar: m.avatar_url || m.picture || '' } });
         }, 0);
       });
     },
@@ -67,7 +74,7 @@ function demo() {
   const save = () => { try { localStorage.setItem(K, JSON.stringify(st)); } catch (e) { /* storage blocked/full: stay in memory */ } };
   const tb = n => st.t[n] = st.t[n] || [], note = t => ls.forEach(f => f(t));
   let session = null; try { session = sessionStorage.getItem('mc64_s'); } catch (e) {}
-  const emit = () => { const a = st.acc.find(x => x.uid === session); cbs.forEach(f => f(a ? { uid: a.uid, email: a.email, role: a.role } : null)); }, cbs = [];
+  const emit = () => { const a = st.acc.find(x => x.uid === session); cbs.forEach(f => f(a ? { uid: a.uid, email: a.email, role: a.role === 'admin' ? 'admin' : (tb('coaches').some(c => c.id === a.uid) ? 'coach' : null), meta: { name: a.name || '', avatar: '' } } : null)); }, cbs = [];
   const impl = {
     mode: 'demo',
     async q(t, o = {}) {
@@ -86,6 +93,8 @@ function demo() {
     async login(email, pw) { const a = st.acc.find(x => x.email === email.toLowerCase()); if (!a || a.hash !== await sha(a.uid + pw)) throw new Error('bad'); session = a.uid; try { sessionStorage.setItem('mc64_s', session); } catch (e) {} emit(); },
     async logout() { session = null; try { sessionStorage.removeItem('mc64_s'); } catch (e) {} emit(); },
     async reset() { alert('Demo mode: password-reset emails need Supabase.'); },
+    async signUp(email, pw, name) { const id = await impl.createUser(email, pw); const a = st.acc.find(x => x.uid === id); a.name = name; save(); session = id; try { sessionStorage.setItem('mc64_s', id); } catch (e) {} emit(); return { confirm: false }; },
+    async google() { throw new Error('Google sign-in works once Supabase is connected (README step: Google login).'); },
     async setPassword(pw) { const a = st.acc.find(x => x.uid === session); if (a) { a.hash = await sha(a.uid + pw); save(); } },
     onAuth(cb) { cbs.push(cb); setTimeout(emit); },
     async createUser(email, pw, forced) { email = email.toLowerCase(); if (st.acc.some(x => x.email === email)) throw { message: 'That email already has an account.' }; const u = forced || uuid(); st.acc.push({ uid: u, email, hash: await sha(u + pw), role: forced === 'admin-demo' ? 'admin' : 'coach' }); save(); return u; },
