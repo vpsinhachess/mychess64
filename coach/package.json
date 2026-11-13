@@ -1,0 +1,13 @@
+{
+  "name": "mychess64",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --format=iife --target=es2019 --minify --outfile=js/app.js && esbuild src/coach.js --bundle --format=iife --target=es2019 --minify --outfile=js/coach-app.js && esbuild src/admin.js --bundle --format=iife --target=es2019 --minify --outfile=js/admin-app.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
