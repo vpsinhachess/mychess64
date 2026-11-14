@@ -1,0 +1,94 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MyChess64 Academy | Dashboard</title><link rel="icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0a1626;--n2:#10233d;--blue:#1d6fe0;--or:#f9a826;--bg:#f2f5fa;--ink:#14213a;--mu:#64718a;--ok:#16a34a;--bad:#dc2626}
+*{box-sizing:border-box}body{margin:0;font:14px Poppins,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}a{color:var(--blue)}
+.auth{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,var(--navy),var(--n2));padding:16px}
+.box{background:#fff;border-radius:20px;padding:28px;width:min(420px,100%)}.box img{height:46px}
+input,select{width:100%;padding:11px 12px;border:1px solid #d5dbe6;border-radius:10px;margin:5px 0}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer}
+.btn.or{background:var(--or);color:var(--navy)}.btn.g{background:#e8eefb;color:var(--blue)}.btn.sm{padding:5px 10px;font-size:12px}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{background:var(--navy);color:#cfd9ea;padding:16px;position:sticky;top:0;height:100vh}
+aside img{height:38px;margin-bottom:18px}aside button{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:10px 12px;border-radius:10px;cursor:pointer}
+aside button.on,aside button:hover{background:var(--blue);color:#fff}
+main{padding:22px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:22px;margin:0}.pill{background:#fff3dc;color:#9a5b00;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.k{background:#fff;border-radius:14px;padding:14px;border-top:4px solid var(--blue)}.k b{display:block;font-size:24px}.k span{color:var(--mu);font-size:12px}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;overflow-x:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;border-bottom:1px solid #edf0f5}th{color:var(--mu);font-size:12px}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+@media(max-width:760px){.app{grid-template-columns:1fr}aside{position:static;height:auto;display:flex;flex-wrap:wrap;gap:4px}aside img{width:100%;height:auto;max-height:38px;object-fit:contain;object-position:left}aside button{width:auto}}
+</style></head><body><div id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* ===== 1. CONFIG: paste Supabase values to go live. Leave blank = Demo mode (browser only) ===== */
+const CFG={url:"",key:""};
+const $=s=>document.querySelector(s),root=$("#root"),LIVE=!!(CFG.url&&CFG.key),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10),today=()=>new Date().toISOString().slice(0,10);
+/* ===== 2. DATA LAYER (same API for Supabase and demo) ===== */
+let sb,ME,DB;
+if(LIVE)sb=supabase.createClient(CFG.url,CFG.key);
+const demo={load(){return JSON.parse(localStorage.getItem("mc64")||"null")||demo.seed()},save(d){localStorage.setItem("mc64",JSON.stringify(d))},
+seed(){const d={profiles:[{id:"a1",name:"Admin",role:"admin",approved:true},{id:"c1",name:"Coach Demo",role:"coach",approved:true},{id:"c2",name:"Coach B",role:"coach",approved:true},{id:"c3",name:"New Coach",role:"coach",approved:false}],
+batches:[{id:"b1",coach_id:"c1",name:"Beginners Sat",level:"Beginner",schedule:"Sat 5pm"},{id:"b2",coach_id:"c2",name:"Advanced Sun",level:"Advanced",schedule:"Sun 10am"}],
+students:[{id:"s1",coach_id:"c1",batch_id:"b1",name:"Aarav",rating:900,student_email:"student@demo",parent_email:"parent@demo",fee_due:1500},{id:"s2",coach_id:"c1",batch_id:"b1",name:"Diya",rating:1100,fee_due:0},{id:"s3",coach_id:"c2",batch_id:"b2",name:"Rohan (Coach B only)",rating:1500,fee_due:800}],
+attendance:[{id:"t1",coach_id:"c1",student_id:"s1",day:today(),present:true}],homework:[{id:"h1",coach_id:"c1",batch_id:"b1",student_id:"s1",title:"Solve 10 mate-in-2",details:"Lichess puzzles",due:today(),done:false}],fees:[]};demo.save(d);return d}};
+const T=["batches","students","attendance","homework","fees"];
+async function loadAll(){
+ if(!LIVE){const d=demo.load(),r=ME.role,em=ME.email;DB={};T.forEach(t=>DB[t]=d[t].filter(x=>r=="admin"||(r=="coach"&&x.coach_id==ME.id)||false));
+  const mine=d.students.filter(s=>r=="student"?s.student_email==em:s.parent_email==em),ids=mine.map(s=>s.id);
+  if(r=="student"||r=="parent"){DB.students=mine;T.slice(2).forEach(t=>DB[t]=d[t].filter(x=>ids.includes(x.student_id)));DB.batches=[]}
+  DB.profiles=d.profiles;return}
+ DB={};for(const t of [...T,"profiles"]){const{data}=await sb.from(t).select("*");DB[t]=data||[]}}
+async function add(t,row){row.id=uid();if(["batches","students","attendance","homework","fees"].includes(t))row.coach_id=ME.id;
+ if(!LIVE){const d=demo.load();d[t].push(row);demo.save(d)}else{delete row.id;const{error}=await sb.from(t).insert(row);if(error)alert(error.message)}await go()}
+async function upd(t,id,p){if(!LIVE){const d=demo.load();Object.assign(d[t].find(x=>x.id==id),p);demo.save(d)}else{const{error}=await sb.from(t).update(p).eq("id",id);if(error)alert(error.message)}await go()}
+async function del(t,id){if(!confirm("Delete this record?"))return;if(!LIVE){const d=demo.load();d[t]=d[t].filter(x=>x.id!=id);demo.save(d)}else await sb.from(t).delete().eq("id",id);await go()}
+/* ===== 3. AUTH ===== */
+function authView(msg=""){root.innerHTML=`<div class="auth"><div class="box"><img src="Header_Logo.png" alt="MyChess64 Academy"><h2>Welcome to the Academy</h2><p style="color:var(--mu)">${LIVE?"Log in or create your account.":"<b>Demo mode</b> (data stays in this browser). Pick a role to explore."}</p><p class="bad">${msg}</p>
+${LIVE?`<input id="nm" placeholder="Full name (sign up only)"><input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password (min 6)"><select id="rl"><option value="student">I am a Student</option><option value="parent">I am a Parent</option><option value="coach">I am a Coach (needs approval)</option></select>
+<div class="row"><button class="btn" onclick="login()">Log in</button><button class="btn or" onclick="signup()">Sign up</button></div>`:
+["admin|a1|Admin","coach|c1|Coach (Coach Demo)","coach|c2|Coach B (see isolation)","student|x|Student","parent|y|Parent"].map(x=>{const[r,i,l]=x.split("|");return`<button class="btn ${r=="admin"?"":"g"}" style="width:100%;margin:4px 0" onclick="demoLogin('${r}','${i}')">Enter as ${l}</button>`}).join("")}</div></div>`}
+function demoLogin(role,id){const p=demo.load().profiles.find(x=>x.id==id);ME=p?{...p}:{id,name:role=="student"?"Aarav":"Aarav's Parent",role,approved:true};ME.email=role=="student"?"student@demo":"parent@demo";go()}
+async function login(){const{error}=await sb.auth.signInWithPassword({email:$("#em").value,password:$("#pw").value});error?authView(error.message):boot()}
+async function signup(){const{error}=await sb.auth.signUp({email:$("#em").value,password:$("#pw").value,options:{data:{name:$("#nm").value,role:$("#rl").value}}});error?authView(error.message):authView("Account created. Check email if confirmation is on, then log in.")}
+async function logout(){if(LIVE)await sb.auth.signOut();ME=null;authView()}
+async function boot(){if(!LIVE)return authView();const{data:{session}}=await sb.auth.getSession();if(!session)return authView();
+ const{data:p}=await sb.from("profiles").select("*").eq("id",session.user.id).single();ME={...p,email:session.user.email};go()}
+/* ===== 4. DASHBOARDS ===== */
+let TAB="Dashboard";
+const MENU={admin:["Dashboard","Coaches"],coach:["Dashboard","Students & Batches","Attendance","Homework","Fees"],student:["Dashboard","Homework"],parent:["Dashboard","Homework","Fees"]};
+const pct=()=>DB.attendance.length?Math.round(100*DB.attendance.filter(a=>a.present).length/DB.attendance.length):0;
+const sName=id=>(DB.students.find(s=>s.id==id)||{}).name||"-",bName=id=>(DB.batches.find(b=>b.id==id)||{}).name||"-";
+const kp=(a)=>`<div class="kpis">${a.map(([n,l,c])=>`<div class="k" style="border-color:${c||"var(--blue)"}"><b>${n}</b><span>${l}</span></div>`).join("")}</div>`;
+const tbl=(h,rows)=>`<table><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")||`<tr><td colspan=9 style="color:var(--mu)">Nothing here yet.</td></tr>`}</table>`;
+const xb=(t,id)=>`<button class="btn g sm" onclick="del('${t}','${id}')">Delete</button>`;
+const opt=(a,f)=>a.map(x=>`<option value="${x.id}">${esc(f(x))}</option>`).join("");
+const V={
+Dashboard(){const r=ME.role,pend=DB.homework.filter(h=>!h.done).length,due=DB.students.reduce((a,s)=>a+(+s.fee_due||0),0);
+ if(r=="admin"){const c=DB.profiles.filter(p=>p.role=="coach");return kp([[c.length,"Coaches"],[c.filter(x=>!x.approved).length,"Awaiting approval","var(--or)"],[DB.students.length,"Total students"],[DB.batches.length,"Batches"]])+`<div class="card">Approve new coaches in <b>Coaches</b>. Each coach only ever sees their own students and batches.</div>`}
+ return kp([[DB.students.length,r=="coach"?"Total students":"Children"],...(r=="coach"?[[DB.batches.length,"Active batches"]]:[]),[pend,"Pending homework","var(--or)"],[pct()+"%","Attendance","var(--ok)"],["₹"+due,"Fees due","var(--bad)"]])+
+ `<div class="card"><h3>Recent homework</h3>${tbl(["Student","Task","Due","Status"],DB.homework.slice(-5).map(h=>[sName(h.student_id),esc(h.title),h.due||"-",h.done?'<span class=ok>Done</span>':'<span class=bad>Pending</span>']))}</div>`},
+Coaches(){return`<div class="card">${tbl(["Name","Status",""],DB.profiles.filter(p=>p.role=="coach").map(p=>[esc(p.name),p.approved?'<span class=ok>Approved</span>':'<span class=bad>Pending</span>',`<button class="btn sm" onclick="upd('profiles','${p.id}',{approved:${!p.approved}})">${p.approved?"Suspend":"Approve"}</button>`]))}</div>`},
+"Students & Batches"(){return`<div class="card"><h3>Add batch</h3><div class="row"><input id="bn" placeholder="Batch name"><input id="bl" placeholder="Level"><input id="bs" placeholder="Schedule"><button class="btn or" onclick="add('batches',{name:bn.value,level:bl.value,schedule:bs.value})">Add</button></div>${tbl(["Batch","Level","Schedule",""],DB.batches.map(b=>[esc(b.name),esc(b.level),esc(b.schedule),xb("batches",b.id)]))}</div>
+<div class="card"><h3>Add student</h3><div class="row"><input id="sn" placeholder="Name"><input id="sr" type="number" placeholder="Rating"><select id="sb"><option value="">No batch</option>${opt(DB.batches,b=>b.name)}</select><input id="se" placeholder="Student login email"><input id="sp" placeholder="Parent login email"><button class="btn or" onclick="add('students',{name:sn.value,rating:+sr.value||null,batch_id:sb.value||null,student_email:se.value||null,parent_email:sp.value||null,fee_due:0})">Add</button></div>
+${tbl(["Student","Rating","Batch","Fee due",""],DB.students.map(s=>[esc(s.name),s.rating||"-",bName(s.batch_id),"₹"+(s.fee_due||0),xb("students",s.id)]))}</div>`},
+Attendance(){return`<div class="card"><h3>Mark attendance</h3><div class="row"><select id="as">${opt(DB.students,s=>s.name)}</select><input id="ad" type="date" value="${today()}"><button class="btn" onclick="add('attendance',{student_id:as.value,day:ad.value,present:true})">Present</button><button class="btn g" onclick="add('attendance',{student_id:as.value,day:ad.value,present:false})">Absent</button></div>
+${tbl(["Date","Student","Status",""],[...DB.attendance].reverse().slice(0,30).map(a=>[a.day,sName(a.student_id),a.present?'<span class=ok>Present</span>':'<span class=bad>Absent</span>',xb("attendance",a.id)]))}</div>`},
+Homework(){const c=ME.role=="coach";return`${c?`<div class="card"><h3>Assign homework</h3><div class="row"><select id="hs"><option value="">Whole batch...</option>${opt(DB.students,s=>s.name)}</select><select id="hb"><option value="">(or pick batch)</option>${opt(DB.batches,b=>b.name)}</select><input id="ht" placeholder="Title"><input id="hd" type="date"><input id="hx" placeholder="Details / link"><button class="btn or" onclick="add('homework',{student_id:hs.value||null,batch_id:hb.value||null,title:ht.value,due:hd.value||null,details:hx.value})">Assign</button></div></div>`:""}
+<div class="card">${tbl(["For","Task","Details","Due","Status",""],DB.homework.map(h=>[h.student_id?sName(h.student_id):bName(h.batch_id),esc(h.title),esc(h.details),h.due||"-",h.done?'<span class=ok>Done</span>':'<span class=bad>Pending</span>',ME.role=="student"&&!h.done?`<button class="btn sm" onclick="upd('homework','${h.id}',{done:true})">Mark done</button>`:c?xb("homework",h.id):""]))}</div>`},
+Fees(){const c=ME.role=="coach";return`${c?`<div class="card"><h3>Record payment</h3><div class="row"><select id="fs">${opt(DB.students,s=>s.name)}</select><input id="fa" type="number" placeholder="Amount ₹"><input id="fn" placeholder="Note"><button class="btn or" onclick="pay()">Save</button></div></div>`:""}
+<div class="card">${tbl(["Date","Student","Amount","Note"],DB.fees.map(f=>[f.paid_on||"-",sName(f.student_id),"₹"+f.amount,esc(f.note)]))}</div>`}};
+async function pay(){const s=DB.students.find(x=>x.id==fs.value),a=+fa.value;if(!s||!a)return;await upd("students",s.id,{fee_due:Math.max(0,(+s.fee_due||0)-a)});await add("fees",{student_id:s.id,amount:a,note:fn.value,paid_on:today()})}
+async function go(){if(!ME)return authView();
+ if(ME.role=="coach"&&!ME.approved)return root.innerHTML=`<div class="auth"><div class="box"><h2>Almost there</h2><p>Your coach account is waiting for admin approval.</p><button class="btn" onclick="logout()">Log out</button></div></div>`;
+ await loadAll();const m=MENU[ME.role];if(!m.includes(TAB))TAB="Dashboard";
+ root.innerHTML=`<div class="app"><aside><img src="Header_Logo.png" style="filter:brightness(0) invert(1)" alt="MyChess64"><div class="pill" style="margin-bottom:10px;display:inline-block">${ME.role}</div>${m.map(x=>`<button class="${x==TAB?"on":""}" onclick="TAB='${x.replace("&","&")}';go()">${x}</button>`).join("")}<button onclick="logout()" style="margin-top:14px">Log out</button></aside>
+ <main><div class="top"><h1>${TAB}</h1><span>${esc(ME.name)}${ME.role=="coach"?' · <span class="pill">Private workspace</span>':""}</span></div>${V[TAB]()}</main></div>`}
+boot();
+</script></body></html>
