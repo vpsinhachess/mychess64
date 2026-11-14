@@ -85,3 +85,13 @@ body{font-family:Poppins,Inter,system-ui,sans-serif}.btn,.side button,.bottom bu
 .calg button{aspect-ratio:1/.85;border:1px solid var(--line);background:var(--card);border-radius:10px;cursor:pointer;color:var(--ink);font:inherit;position:relative;display:grid;place-items:center;padding:0}.calg button span{font-size:13px}.calg button.today{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}.calg button.has{background:var(--acc2)}.calg button em{position:absolute;bottom:2px;right:4px;font-size:10px;font-style:normal;font-weight:700;color:var(--acc)}.calg i{display:block}
 .side button.on{background:linear-gradient(135deg,#0b6bde,#19a0ff);color:#fff}.side .who{background:linear-gradient(135deg,var(--acc2),var(--card))}
 .top{border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#0b6bde,#19c3ff,#f9a825) 1}
+
+/* ---- rich text editor (About me) ---- */
+.lbl{font-size:12.5px;font-weight:600;color:var(--mut);margin-top:2px}
+.rte-wrap{border:1.5px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}.rte-wrap:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(11,107,222,.15)}
+.rte-bar{display:flex;flex-wrap:wrap;gap:3px;padding:6px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0}
+.rte-bar button{border:0;background:none;color:var(--ink);min-width:34px;height:32px;border-radius:8px;font:600 13px Poppins,Inter,sans-serif;cursor:pointer;padding:0 8px}.rte-bar button:hover{background:var(--acc2)}.rte-bar button.on{background:var(--acc);color:#fff}.rte-bar .sep{width:1px;background:var(--line);margin:4px 3px}
+.rte{min-height:150px;max-height:340px;overflow:auto;padding:12px 14px;outline:0;line-height:1.65;color:var(--ink);overflow-wrap:anywhere}.rte:empty:before{content:attr(data-ph);color:var(--mut)}
+.rte p{margin:0 0 .6em}.rte ul,.rte ol{margin:0 0 .7em;padding-left:1.4em}.rte h3{margin:.6em 0 .3em;font-size:1.1em}.rte blockquote{margin:.5em 0;padding:.3em .9em;border-left:4px solid var(--acc);background:var(--acc2);border-radius:0 10px 10px 0}.rte a{color:var(--acc);text-decoration:underline}
+.rte-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:5px 12px;font-size:11.5px;color:var(--mut);border-top:1px solid var(--line);background:var(--card)}.rte-foot .over{color:#dc2626;font-weight:700}
+.clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}

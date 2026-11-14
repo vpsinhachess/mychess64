@@ -18,6 +18,12 @@ Static website (plain HTML/CSS/JS) that runs on **GitHub Pages**, with a real ba
 - **Performance** with audited formulas (see below), CSV exports of students / payments / attendance.
 - ⚠️ **Re-run `supabase/schema.sql`** once – it adds `students.monthly_fee`, `students.active` and `coaches.monthly_goal`.
 
+- **Rich “About me” editor** (Profile, onboarding and Admin → Coaches): bold, italic, underline, heading, bullet & numbered lists, quote,
+  line break, link, clear formatting, undo/redo, live character counter (max 1500). Pasted text is cleaned; only a safe set of tags is
+  stored (scripts/styles/event handlers are always removed, links must be http/https). Old plain-text bios keep working.
+- **Uniform coach cards** on the website: every card has the same size — the bio is shown as a 3-line excerpt, long names/titles are
+  trimmed with “…”, tag rows are fixed height. The full formatted bio appears in the coach's profile popup.
+
 ### How the numbers are calculated
 | Number | Formula |
 |---|---|
