@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review your arbiter | MyChess64 Arbiters</title><link rel="stylesheet" href="mc64.css"></head><body>
+<div id="app"></div>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="mc64.js"></script>
+<script>
+var app=document.getElementById("app"),t=new URLSearchParams(location.search).get("t"),stars=0;
+function box(h){app.innerHTML='<div class="auth"><div class="lg"><img src="'+MC.LOGO+'" alt="MyChess64"></div><div class="card">'+h+'</div></div>'}
+if(!MC.ok)MC.setup();else if(!t)box('<h2>Review link missing</h2><p class="muted">Please use the link sent to you by MyChess64.</p>');
+else MC.sb.rpc("arb_review_info",{t:t}).then(function(r){var d=r.data&&r.data[0];if(r.error||!d)return box('<h2>Link not valid</h2><p class="muted">This review link is invalid or has expired.</p>');
+ if(!d.can_review)return box('<h2>Thank you</h2><p class="muted">A review for <b>'+MC.esc(d.event_name)+'</b> has already been submitted, or the event is not completed yet.</p>');
+ box('<h2>Rate your arbiter</h2><p class="muted">How was <b>'+MC.esc(d.arbiter_name)+'</b> at <b>'+MC.esc(d.event_name)+'</b>?</p><div id="st" style="font-size:36px;cursor:pointer;color:#f5a623;letter-spacing:6px;margin:10px 0">'+[1,2,3,4,5].map(function(i){return'<span data-i="'+i+'">\u2606</span>'}).join("")+'</div><form id="rf" class="fg"><div class="f full"><label>Your name (optional)</label><input name="who"></div><div class="f full"><label>Comments</label><textarea name="note" rows="4" maxlength="1500" placeholder="Professionalism, rules knowledge, communication, pairing accuracy"></textarea></div><div class="full"><button class="btn" style="width:100%">Submit review</button></div></form><p class="muted sm">Reviews are moderated before they appear on the arbiter\u2019s profile.</p>');
+ [].forEach.call(document.querySelectorAll("#st span"),function(s){s.onclick=function(){stars=+s.dataset.i;[].forEach.call(document.querySelectorAll("#st span"),function(x){x.textContent=+x.dataset.i<=stars?"\u2605":"\u2606"})}});
+ document.getElementById("rf").onsubmit=function(e){e.preventDefault();if(!stars){MC.toast("Please choose a rating",1);return}var f=e.target;MC.sb.rpc("arb_submit_review",{t:t,stars:stars,note:f.note.value,who:f.who.value}).then(function(r){if(r.error)MC.toast(r.error.message,1);else box('<h2>Thank you</h2><p class="muted">Your review has been submitted for moderation.</p>')})}});
+</script></body></html>
