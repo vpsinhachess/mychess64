@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="MyChess64 Community: discuss openings, endgames, puzzles, games, clubs and tournaments.">
+  <meta name="theme-color" content="#4a3520">
+  <title>MyChess64 Community</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-in">
+      <div class="brand"><span class="logo" aria-hidden="true">♞</span> MyChess64</div>
+      <nav id="tabs" aria-label="Sections"></nav>
+      <button id="bell" class="bell" type="button" hidden aria-label="Notifications">🔔</button>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="pieces" aria-hidden="true">♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜</div>
+    <h1>The MyChess64 Community</h1>
+    <p>Openings, endgames, puzzles, your games, clubs and tournaments. Think it through together.</p>
+  </header>
+
+  <main id="app"><p class="empty">Loading the community…</p></main>
+  <footer class="foot">♟ MyChess64 Community · Built for players of every level</footer>
+  <div id="note" role="status" aria-live="polite"></div>
+
+  <!-- Libraries (pinned versions, loaded from public CDNs) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.2/chess.min.js"></script>
+
+  <!-- App -->
+  <script src="js/config.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
