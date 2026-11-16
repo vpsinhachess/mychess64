@@ -1,0 +1,34 @@
+name: Update tournament data
+
+on:
+  schedule:
+    - cron: "30 2 * * 1"      # every Monday 02:30 UTC (08:00 IST) — at least once every 7 days
+  workflow_dispatch:           # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-events
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm install --prefix scripts --no-audit --no-fund
+      - name: Fetch AICF + FIDE events
+        run: node scripts/update-events.mjs
+      - name: Commit changes (also runs after a failure so the error status is saved)
+        if: always()
+        run: |
+          git config user.name "mychess64-bot"
+          git config user.email "mychess64-bot@users.noreply.github.com"
+          git add data/events.json
+          git diff --staged --quiet || (git commit -m "chore: refresh tournaments $(date -u +%F)" && git push)
