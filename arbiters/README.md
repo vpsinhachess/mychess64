@@ -39,3 +39,11 @@ Dashboard, My Profile, Certificates (private storage with expiry tracking), Avai
 Tournament Records (full event details, import completed appointments, CSV export), Fees & Earnings (rate card, income tracking,
 monthly chart, CSV and PDF statement), Resume & Share (resume PDF, profile card PDF, WhatsApp and social sharing), Reviews, Account Settings.
 PDFs are generated in the browser (jsPDF from cdnjs), so an internet connection is needed to create them.
+
+## Deploy on GitHub Pages
+1. Create a repository, upload all files from this zip to the repository root (keep `.nojekyll`).
+2. Settings > Pages > Deploy from branch > `main` / root.
+3. Your site will be at `https://USERNAME.github.io/REPO/`. Set `SITE_URL` in `config.js` to that address (no trailing slash).
+4. Supabase > Authentication > URL Configuration: add the same address to Site URL and Redirect URLs.
+5. Open `/index.html` (directory), `/arbiter-dashboard.html` and `/admin-dashboard.html`.
+The anon key in `config.js` is public by design; access is protected by the row-level security rules in `schema.sql`. Never commit the service_role key.
