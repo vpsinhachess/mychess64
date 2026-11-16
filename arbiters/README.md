@@ -5,7 +5,7 @@
 |---|---|
 | index.html | Public directory (reads approved arbiters, records enquiries) |
 | arbiter-dashboard.html | Arbiter registration, login and dashboard |
-| admin-dashboard.html | Admin dashboard (applications, verification, monitoring, reviews, reports) |
+| admin.html | Admin dashboard (admin-dashboard.html redirects here) (applications, verification, monitoring, reviews, reports) |
 | review.html | Organizer review page (opened from a link) |
 | arbiter-pdf.js | PDF generation (profile card, resume, earnings statement) |
 | config.js | Your Supabase URL and anon key |
@@ -21,7 +21,7 @@ The existing admin (from your `admins` table) was copied into `arb_admins`.
 1. Upload every file in this folder to one place on your host.
 2. Edit `config.js` and set `SITE_URL` to your domain.
 3. Supabase > Authentication > URL Configuration: add that domain to Site URL and Redirect URLs.
-4. Open `admin-dashboard.html` and sign in with your admin account (an account must exist first: use "Register here" on arbiter-dashboard.html, or sign in with an account already in the project that is listed in `arb_admins`).
+4. Open `admin.html` and sign in with your admin account (an account must exist first: use "Register here" on arbiter-dashboard.html, or sign in with an account already in the project that is listed in `arb_admins`).
 5. To add another admin: `insert into public.arb_admins(user_id) select id from auth.users where email='NAME@example.com';`
 6. Optional: Authentication > Providers > Email: enable "leaked password protection".
 
@@ -45,5 +45,5 @@ PDFs are generated in the browser (jsPDF from cdnjs), so an internet connection 
 2. Settings > Pages > Deploy from branch > `main` / root.
 3. Your site will be at `https://USERNAME.github.io/REPO/`. Set `SITE_URL` in `config.js` to that address (no trailing slash).
 4. Supabase > Authentication > URL Configuration: add the same address to Site URL and Redirect URLs.
-5. Open `/index.html` (directory), `/arbiter-dashboard.html` and `/admin-dashboard.html`.
+5. Open `/index.html` (directory), `/arbiter-dashboard.html` and `/admin.html`.
 The anon key in `config.js` is public by design; access is protected by the row-level security rules in `schema.sql`. Never commit the service_role key.
