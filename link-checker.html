@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Broken Link Checker</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--tx:#1c2430;--mu:#5d6b7c;--ln:#dde3ea;--ac:#1a62c9;--bad:#d64545;--ok:#2e9d5b}
+@media(prefers-color-scheme:dark){:root{--bg:#12171d;--card:#1b222b;--tx:#e6ebf1;--mu:#98a5b5;--ln:#2b3541;--ac:#5b9cf0}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+main{max-width:1000px;margin:0 auto;padding:16px}h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:26px 0 8px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.grid b{font-size:26px;display:block}
+button,input{font-size:15px;padding:9px 12px;border-radius:8px;border:1px solid var(--ln);background:var(--card);color:var(--tx)}
+button{background:var(--ac);color:#fff;border:0;cursor:pointer;margin-right:6px}button.alt{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+button:disabled{opacity:.5}.mu{color:var(--mu);font-size:13px}.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:13px}td,th{border-bottom:1px solid var(--ln);padding:6px 8px;text-align:left;vertical-align:top;word-break:break-all}
+th{background:var(--bg)}.bad{color:var(--bad)}.ok{color:var(--ok)}
+@media print{.card.ctl,.noprint{display:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Broken Link Checker</h1>
+<p class="mu">Checks <b id="site"></b> &mdash; every page, link and image on your own site.</p>
+
+<div class="card ctl">
+  <label>Max pages <input id="max" type="number" value="200" min="1" max="2000" style="width:90px"></label>
+  <label style="margin-left:12px"><input id="ext" type="checkbox"> also test external links (can only detect dead sites)</label>
+  <p><button id="go">Start analysis</button> <span id="st" class="mu"></span></p>
+</div>
+
+<div id="out"></div>
+</main>
+
+<script>
+(function(){
+  var origin = location.origin, $ = function(id){return document.getElementById(id)};
+  $('site').textContent = origin;
+  var e = function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+  var pages, linkSrc, results, lastBroken = [], lastPages = [];
+  var SKIP = /\.(jpe?g|png|gif|webp|svg|pdf|zip|css|js|ico|mp4|mp3|xml|json|txt|woff2?|ttf)(\?|$)/i;
+
+  async function pool(items, n, fn){
+    var i = 0;
+    await Promise.all(Array.from({length:n}, async function(){
+      while (i < items.length){ await fn(items[i++]); }
+    }));
+  }
+
+  function addLink(abs, src){ (linkSrc[abs] = linkSrc[abs] || new Set()).add(src); }
+
+  async function visit(u){
+    var r = {url:u, status:0, time:0, size:0, title:'', desc:'', h1:0, noalt:0, words:0, html:false, links:[]};
+    var t = performance.now();
+    try {
+      var res = await fetch(u, {cache:'no-store'});
+      r.status = res.status;
+      var txt = await res.text();
+      r.time = Math.round(performance.now() - t); r.size = txt.length;
+      if (res.ok && (res.headers.get('content-type') || '').indexOf('html') > -1){
+        r.html = true;
+        var doc = new DOMParser().parseFromString(txt, 'text/html');
+        r.title = (doc.title || '').trim();
+        var m = doc.querySelector('meta[name="description"]'); r.desc = m ? (m.content || '').trim() : '';
+        r.h1 = doc.querySelectorAll('h1').length;
+        r.noalt = Array.prototype.filter.call(doc.querySelectorAll('img'), function(i){return !i.hasAttribute('alt')}).length;
+        r.words = (doc.body ? doc.body.textContent : '').trim().split(/\s+/).length;
+        var sel = [['a[href]','href'],['img[src]','src'],['link[rel=stylesheet][href]','href'],['script[src]','src']];
+        sel.forEach(function(p){
+          doc.querySelectorAll(p[0]).forEach(function(el){
+            var h = (el.getAttribute(p[1]) || '').trim();
+            if (!h || /^(mailto:|tel:|javascript:|#|data:|sms:)/i.test(h)) return;
+            try { var x = new URL(h, u); x.hash = ''; addLink(x.href, u); if (p[0] === 'a[href]') r.links.push(x.href); } catch(err){}
+          });
+        });
+      }
+    } catch(err){ r.err = 'No response'; r.time = Math.round(performance.now() - t); }
+    pages[u] = r; return r;
+  }
+
+  async function chk(u){
+    try {
+      var r = await fetch(u, {method:'HEAD', cache:'no-store'});
+      if (r.status >= 400) r = await fetch(u, {cache:'no-store'});
+      return {status:r.status};
+    } catch(err){ return {status:0, err:'No response'}; }
+  }
+
+  async function chkExt(u){
+    try { await fetch(u, {mode:'no-cors'}); return {status:200, opaque:true}; }
+    catch(err){ return {status:0, err:'Unreachable'}; }
+  }
+
+  function dl(name, text, type){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], {type:type})); a.download = name; a.click();
+  }
+
+  $('go').onclick = async function(){
+    var btn = $('go'); btn.disabled = true; $('out').innerHTML = '';
+    pages = {}; linkSrc = {}; results = {};
+    var max = Math.min(+$('max').value || 200, 2000), start = origin + '/';
+    var seen = new Set([start]), queue = [start], count = 0;
+    while (queue.length && count < max){
+      var batch = queue.splice(0, Math.min(queue.length, max - count));
+      await pool(batch, 6, async function(u){
+        var r = await visit(u); count++;
+        $('st').textContent = 'Crawling... ' + count + ' pages';
+        r.links.forEach(function(l){
+          if (l.indexOf(origin + '/') === 0 && !seen.has(l) && !SKIP.test(l)){ seen.add(l); queue.push(l); }
+        });
+      });
+    }
+    var targets = Object.keys(linkSrc).filter(function(u){return !pages[u]});
+    var internal = targets.filter(function(u){return u.indexOf(origin + '/') === 0});
+    var external = targets.filter(function(u){return u.indexOf(origin + '/') !== 0 && /^https?:/.test(u)});
+    var done = 0;
+    await pool(internal, 8, async function(u){ results[u] = await chk(u); $('st').textContent = 'Checking links... ' + (++done) + '/' + internal.length; });
+    if ($('ext').checked) await pool(external, 8, async function(u){ results[u] = await chkExt(u); });
+    render(external.length);
+    $('st').textContent = 'Done'; btn.disabled = false;
+  };
+
+  function render(extCount){
+    var broken = [];
+    function add(u, code, type, err){
+      var srcs = linkSrc[u] ? Array.from(linkSrc[u]) : ['(start page)'];
+      srcs.forEach(function(s){ broken.push({url:u, code:code, type:type, err:err || '', src:s}); });
+    }
+    Object.keys(pages).forEach(function(u){ var r = pages[u]; if (!r.status || r.status >= 400) add(u, r.status || 'ERR', 'page', r.err); });
+    Object.keys(results).forEach(function(u){ var r = results[u]; if (!r.status || r.status >= 400) add(u, r.status || 'ERR', u.indexOf(origin + '/') === 0 ? 'internal' : 'external', r.err); });
+    lastBroken = broken;
+    var list = Object.keys(pages).map(function(u){return pages[u]});
+    var okp = list.filter(function(p){return p.status === 200});
+    var avg = okp.length ? Math.round(okp.reduce(function(a, p){return a + p.time}, 0) / okp.length) : 0;
+    var uniq = new Set(broken.map(function(b){return b.url})).size;
+
+    var h = '<div class="grid"><div class="card"><b>' + list.length + '</b>Pages crawled</div>'
+      + '<div class="card"><b>' + Object.keys(linkSrc).length + '</b>Links &amp; files found</div>'
+      + '<div class="card"><b class="' + (uniq ? 'bad' : 'ok') + '">' + uniq + '</b>Broken links</div>'
+      + '<div class="card"><b>' + avg + ' ms</b>Avg page load</div></div>'
+      + '<p class="noprint"><button id="b1">Download sitemap.xml</button><button class="alt" id="b2">Download broken links CSV</button><button class="alt" id="b3">Print / Save as PDF</button></p>';
+
+    h += '<h2>Broken / invalid links (' + uniq + ')</h2>';
+    if (broken.length){
+      h += '<div class="wrap"><table><tr><th>Broken URL<th>Status<th>Type<th>Found on page</tr>';
+      broken.forEach(function(b){ h += '<tr><td>' + e(b.url) + '<td class="bad">' + b.code + ' ' + e(b.err) + '<td>' + b.type + '<td>' + e(b.src) + '</tr>'; });
+      h += '</table></div>';
+    } else h += '<p class="ok">No broken internal links or images found.</p>';
+    if (!$('ext').checked) h += '<p class="mu">' + extCount + ' external links were not tested (tick the box above to test them).</p>';
+
+    h += '<h2>Slowest pages</h2><div class="wrap"><table><tr><th>Page<th>Load<th>Size</tr>';
+    okp.slice().sort(function(a, b){return b.time - a.time}).slice(0, 10).forEach(function(p){
+      h += '<tr><td>' + e(p.url) + '<td>' + p.time + ' ms<td>' + Math.round(p.size / 1024) + ' KB</tr>'; });
+    h += '</table></div><p class="mu">Load time is measured in your browser and includes download time.</p>';
+
+    h += '<h2>SEO report per page</h2><div class="wrap"><table><tr><th>Page<th>Title<th>Issues</tr>';
+    okp.filter(function(p){return p.html}).forEach(function(p){
+      var i = [];
+      if (!p.title) i.push('Missing title'); else if (p.title.length < 30 || p.title.length > 60) i.push('Title length ' + p.title.length + ' (ideal 30-60)');
+      if (!p.desc) i.push('Missing meta description'); else if (p.desc.length < 70 || p.desc.length > 160) i.push('Description length ' + p.desc.length + ' (ideal 70-160)');
+      if (p.h1 === 0) i.push('No H1'); else if (p.h1 > 1) i.push(p.h1 + ' H1 tags');
+      if (p.noalt) i.push(p.noalt + ' images without alt');
+      if (p.words < 300) i.push('Thin content (' + p.words + ' words)');
+      p.issues = i;
+      h += '<tr><td>' + e(p.url) + '<td>' + e(p.title || '-') + '<td class="' + (i.length ? 'bad' : 'ok') + '">' + (i.length ? e(i.join('; ')) : 'OK') + '</tr>';
+    });
+    h += '</table></div>';
+    $('out').innerHTML = h;
+
+    $('b1').onclick = function(){
+      var urls = okp.filter(function(p){return p.html}).map(function(p){return '<url><loc>' + e(p.url) + '</loc></url>'}).join('\n');
+      dl('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '\n</urlset>', 'application/xml');
+    };
+    $('b2').onclick = function(){
+      var q = function(s){return '"' + String(s).replace(/"/g, '""') + '"'};
+      dl('broken_links.csv', 'broken_url,status,type,found_on\n' + lastBroken.map(function(b){return [b.url, b.code, b.type, b.src].map(q).join(',')}).join('\n'), 'text/csv');
+    };
+    $('b3').onclick = function(){ window.print(); };
+  }
+})();
+</script>
+</body>
+</html>
