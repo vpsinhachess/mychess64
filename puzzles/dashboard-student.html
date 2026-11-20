@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My puzzle dashboard · MyChess64</title>
+<meta name="description" content="Your MyChess64 puzzle dashboard: rating, progress, topics and full puzzle history.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/account.css">
+</head>
+<body class="acct">
+<nav>
+  <a class="brand" href="index.html" aria-label="MyChess64 home"><img src="assets/logo.png" alt="MyChess64"></a>
+  <a href="endgame-puzzles.html">Endgame</a><a href="middlegame-puzzles.html">Middlegame</a><a href="opening-puzzles.html">Opening</a>
+  <span class="sp"></span>
+  <a href="login.html" id="navLogin">Sign in</a>
+  <button type="button" class="out" id="signout" hidden>Sign out</button>
+</nav>
+
+<main class="dash">
+  <div id="notice" class="notice" hidden></div>
+
+  <section class="hero" aria-labelledby="who">
+    <div>
+      <span class="eyebrow">MY DASHBOARD</span>
+      <h1 id="who">Hello, player</h1>
+      <p class="mu" id="ttl">&nbsp;</p>
+    </div>
+    <div class="mcr" aria-label="Overall MyChess64 rating">
+      <small>MYCHESS64 RATING</small>
+      <b id="mcr">1000</b>
+      <span id="pk">Peak 1000</span>
+    </div>
+  </section>
+
+  <section class="stats" aria-label="Totals">
+    <div class="stat"><small>Puzzles solved</small><b id="st-solved">0</b></div>
+    <div class="stat"><small>Attempts</small><b id="st-att">0</b></div>
+    <div class="stat"><small>Accuracy</small><b id="st-acc">0%</b></div>
+    <div class="stat"><small>Time on puzzles</small><b id="st-time">0s</b></div>
+    <div class="stat"><small>Moves played</small><b id="st-moves">0</b></div>
+    <div class="stat"><small>XP</small><b id="st-xp">0</b></div>
+    <div class="stat"><small>Current streak</small><b id="st-streak">0 days</b></div>
+    <div class="stat"><small>Best day</small><b id="st-best">0</b></div>
+  </section>
+
+  <section class="phases" id="phases" aria-label="Rating by puzzle set"></section>
+
+  <section class="card" id="report" aria-labelledby="h-chart">
+    <div class="row"><h2 id="h-chart">Rating progress</h2><span class="mu">Overall rating after each attempt</span></div>
+    <div class="chart" id="chart"></div>
+  </section>
+
+  <section class="two">
+    <div class="card">
+      <div class="row"><h2>Last 14 days</h2><span class="mu">Puzzles per day</span></div>
+      <div class="bars" id="days"></div>
+    </div>
+    <div class="card">
+      <h2>Strengths &amp; topics</h2>
+      <div id="topics"></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-hist">
+    <div class="row">
+      <h2 id="h-hist">Puzzle history</h2>
+      <div class="ctrl">
+        <select id="fp" aria-label="Filter by puzzle set">
+          <option value="all">All puzzle sets</option>
+          <option value="e">Endgame</option>
+          <option value="m">Middlegame</option>
+          <option value="o">Opening</option>
+        </select>
+        <button type="button" id="csv">Export CSV</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>When</th><th>Set</th><th>Topic</th><th>Puzzle</th><th>Result</th><th>Moves</th><th>Time</th><th>MCR</th></tr></thead>
+        <tbody id="hist"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="histEmpty" hidden>No puzzles yet. <a href="endgame-puzzles.html">Start with an endgame puzzle</a>.</p>
+  </section>
+</main>
+
+<script src="supabase/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/common.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="rating/rating.js"></script>
+<script src="js/mc64-sync.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

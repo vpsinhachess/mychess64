@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Player login · MyChess64</title>
+<meta name="description" content="Sign in to MyChess64 to save your puzzle progress, rating and history.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/account.css">
+</head>
+<body class="acct">
+<nav>
+  <a class="brand" href="index.html" aria-label="MyChess64 home"><img src="assets/logo.png" alt="MyChess64"></a>
+  <span class="sp"></span>
+  <a href="endgame-puzzles.html">Endgame</a><a href="middlegame-puzzles.html">Middlegame</a><a href="opening-puzzles.html">Opening</a>
+</nav>
+
+<main class="authwrap">
+  <section class="authcard">
+    <h1>Player login</h1>
+    <p class="lead">Save your puzzles, rating and history, and pick them up on any device.</p>
+
+    <div id="setup" class="notice" hidden>Sign-in is not set up yet. Add your Supabase URL and anon key in <b>supabase/config.js</b>. Until then, puzzles still work and progress is saved on this device.</div>
+
+    <div class="tabs" role="tablist">
+      <button type="button" data-tab="in" class="on" role="tab">Sign in</button>
+      <button type="button" data-tab="up" role="tab">Create account</button>
+      <button type="button" data-tab="fp" role="tab">Forgot password</button>
+    </div>
+
+    <form id="f-in" class="pane" autocomplete="on">
+      <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+      <label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required></label>
+      <button type="submit" class="btnp">Sign in</button>
+    </form>
+
+    <form id="f-up" class="pane" hidden autocomplete="on">
+      <label class="field"><span>Player name</span><input type="text" name="username" maxlength="30" autocomplete="nickname" placeholder="e.g. Rahul_K" required></label>
+      <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+      <label class="field"><span>Password (8+ characters)</span><input type="password" name="password" minlength="8" autocomplete="new-password" required></label>
+      <button type="submit" class="btnp">Create account</button>
+    </form>
+
+    <form id="f-fp" class="pane" hidden>
+      <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+      <button type="submit" class="btnp">Send reset link</button>
+    </form>
+
+    <form id="f-rs" class="pane" hidden>
+      <p class="lead" style="margin:0">Choose a new password for your account.</p>
+      <label class="field"><span>New password (8+ characters)</span><input type="password" name="password" minlength="8" autocomplete="new-password" required></label>
+      <button type="submit" class="btnp">Save new password</button>
+    </form>
+
+    <p id="msg" class="msg" role="status" aria-live="polite"></p>
+    <p class="foot">Want to try first? <a href="endgame-puzzles.html">Play as a guest</a> &middot; progress stays on this device.</p>
+  </section>
+</main>
+
+<script src="supabase/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/common.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="rating/rating.js"></script>
+<script src="js/mc64-sync.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>
