@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Site Audit Dashboard</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--text:#1c2430;--muted:#5d6b7c;--accent:#1a62c9;--line:#dde3ea}
+@media (prefers-color-scheme:dark){:root{--bg:#12171d;--card:#1b222b;--text:#e6ebf1;--muted:#98a5b5;--accent:#5b9cf0;--line:#2b3541}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--text)}
+header{padding:18px 16px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:22px}header p{margin:4px 0 0;color:var(--muted)}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+h2{margin:0 0 8px;font-size:18px}
+label{display:block;font-size:14px;color:var(--muted);margin:8px 0 4px}
+input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px}
+.btn{display:inline-block;margin:10px 8px 0 0;padding:10px 16px;border-radius:8px;border:0;background:var(--accent);color:#fff;font-size:15px;text-decoration:none;cursor:pointer}
+.btn.alt{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+ol{padding-left:20px;margin:6px 0}
+iframe{width:100%;height:75vh;border:1px solid var(--line);border-radius:8px;background:#fff}
+#msg{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Site Audit Dashboard</h1>
+  <p>Broken links, sitemap, page speed and SEO report for your website</p>
+</header>
+<main>
+  <section class="card">
+    <h2>1. Run a new audit</h2>
+    <p style="color:var(--muted);margin:0">The crawl runs on GitHub (free) and takes a few minutes.</p>
+    <label for="repo">Your GitHub repository (owner/name)</label>
+    <input id="repo" placeholder="yourname/mychess64" autocomplete="off">
+    <a class="btn" id="run" href="#" target="_blank" rel="noopener">Open &ldquo;Run workflow&rdquo; page</a>
+    <a class="btn alt" id="runs" href="#" target="_blank" rel="noopener">See progress / past runs</a>
+    <ol>
+      <li>Click <b>Run workflow</b> on the GitHub page that opens.</li>
+      <li>Keep <b>publish</b> ticked, then confirm.</li>
+      <li>Wait until the run shows a green tick, then come back and refresh this page.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>2. Latest report</h2>
+    <p id="msg">Checking for a report&hellip;</p>
+    <div id="links" hidden>
+      <a class="btn alt" href="report.html" target="_blank">Open full report</a>
+      <a class="btn alt" href="sitemap.xml" download>Download sitemap.xml</a>
+      <a class="btn alt" href="broken_links.csv" download>Broken links CSV</a>
+      <a class="btn alt" href="issues.csv" download>All issues CSV</a>
+    </div>
+    <iframe id="frame" title="Audit report" hidden></iframe>
+  </section>
+</main>
+<script>
+(function(){
+  var repo=document.getElementById('repo');
+  try{repo.value=localStorage.getItem('auditRepo')||''}catch(e){}
+  function upd(){
+    var r=repo.value.trim();
+    try{localStorage.setItem('auditRepo',r)}catch(e){}
+    var base='https://github.com/'+(r||'OWNER/REPO')+'/actions/workflows/site-audit.yml';
+    document.getElementById('run').href=base;
+    document.getElementById('runs').href='https://github.com/'+(r||'OWNER/REPO')+'/actions';
+  }
+  repo.addEventListener('input',upd);upd();
+
+  fetch('report.html',{method:'HEAD'}).then(function(res){
+    if(!res.ok)throw 0;
+    document.getElementById('msg').hidden=true;
+    document.getElementById('links').hidden=false;
+    var f=document.getElementById('frame');f.src='report.html';f.hidden=false;
+  }).catch(function(){
+    document.getElementById('msg').textContent='No report yet. Run an audit above, then refresh this page.';
+  });
+})();
+</script>
+</body>
+</html>
