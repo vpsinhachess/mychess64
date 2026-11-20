@@ -100,6 +100,29 @@ the dashboard straight away; the profile stays **pending** (not on the website) 
       (e.g. `https://www.mychess64.com/coach/coach.html`, or a wildcard like `https://www.mychess64.com/coach/**`).
 5. Test: `coach.html` → *Create account* → or *Continue with Google* → complete the profile → then approve it in `admin.html`.
 
+## STEP 2c – Forgot / reset password (must be set up once)
+Coaches and admins can reset their own password: **Login → “Forgot password?” → enter email → “Send reset link”** → open the e-mail →
+choose a new password. (Admins can also press **🔑 Reset password** next to a coach in *Admin → Coaches* to e-mail them a link.)
+For the e-mail to arrive, configure these in Supabase:
+
+1. **Custom SMTP (important).** Supabase's built-in mail service is only for testing – it is heavily rate-limited and may deliver only to
+   your own team's addresses, so coaches would never receive the link. Go to **Authentication → Emails → SMTP Settings → Enable custom SMTP**
+   and enter any provider's details, e.g. **Brevo** (free 300 mails/day), **Resend**, **SendGrid**, **Mailgun** or **Gmail** (use an *App password*).
+   Set a *Sender email/name* (e.g. `noreply@yourdomain.com` / “MyChess64”).
+2. **Authentication → URL Configuration**
+   - **Site URL** = your site (e.g. `https://www.mychess64.com/coach/`).
+   - **Redirect URLs** must include `…/coach.html` **and** `…/admin.html` (or a wildcard such as `https://www.mychess64.com/coach/**`).
+   *(Without this the link opens the wrong page; the website now forwards stray reset links to `coach.html`, but add the URLs anyway.)*
+3. **Authentication → Emails → Templates → Reset Password**: keep the default (it uses the secure link `{{ .ConfirmationURL }}`); you may edit the wording.
+4. Test it: `coach.html` → Forgot password → your email → open the link → set a new password → you are signed in.
+
+*Emergency option:* **Supabase → Authentication → Users → ⋯ next to a user → Send password recovery** (or *Reset password*) – works even if the app is down.
+
+What the user sees: a clean “Forgot password?” screen, a “Check your email” confirmation with a **Resend** button (60-second cooldown),
+a **Set a new password** screen with show/hide and a strength meter, and a clear message if the link has expired or was already used.
+For security the site never reveals whether an email has an account. Reset links expire after 1 hour (Supabase setting).
+In **Demo mode** no email is sent – the reset link is shown on screen so you can test the whole flow.
+
 ## STEP 3 – Connect the site
 **Project Settings → API**: copy **Project URL** and the **anon public** key into `js/config.js`. (The anon key is *meant* to be
 public – security comes from Row Level Security. **Never** put the `service_role` key in the site.)
@@ -142,7 +165,10 @@ Upload **all files (keep folders; `node_modules` not needed)** → repo **Settin
 | New coach is not on the website | Their profile is *pending* – approve it in Admin → Coaches. |
 | Coach can't log in after being created | Turn **Confirm email** OFF (Step 2) or ask them to confirm the e-mail. |
 | Photo/document upload fails | Re-run `schema.sql` (creates the buckets and policies); photos are auto-resized, documents ≤ 5 MB. |
-| Forgot-password link opens wrong page | Fix **Site URL / Redirect URLs** (Step 2). |
+| Reset email never arrives | Set up **custom SMTP** (Step 2c) and check the spam folder; Supabase's default mailer is limited. |
+| “Too many requests” when resetting | Wait a few minutes (Supabase e-mail rate limit) – custom SMTP raises the limit. |
+| Reset link says expired / already used | Request a new link (links work once, for 1 hour). |
+| Forgot-password link opens wrong page | Fix **Site URL / Redirect URLs** (Step 2 / 2c). |
 | Deleted coach can still sign in | Deleting removes the profile and records only; remove the login in **Authentication → Users**. |
 
 ## Free-plan notes

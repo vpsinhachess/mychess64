@@ -1,7 +1,8 @@
 // MyChess64 – Coach Dashboard (coach.html). Each coach only ever sees their own data (Supabase RLS).
 import { initBackend, B } from './backend.js';
 import { seedDemo } from './sample.js';
-import { loginHTML, recoveryHTML, setAuthMode, doLogin, doSignup, doGoogle, doForgot, doNewPw, applyKeepRule, profileForm, readProfile, previewCard, avatar, reach, ui } from './ui.js';
+import { plainText } from './rich.js';
+import { bioTooLong, loginHTML, recoveryHTML, setAuthMode, startForgot, doReset, doResend, urlProblem, doLogin, doSignup, doGoogle, doNewPw, applyKeepRule, profileForm, readProfile, previewCard, avatar, reach, ui } from './ui.js';
 import * as K from './calc.js';
 import { $, esc, pad, ymd, today, addDays, fd, tf, t5, money, digits, url, ago, toast, errText, ls, D, hooks, load, COACH_TABLES, save, remove, stat, booked, upcoming, sName, WD } from './state.js';
 
@@ -25,8 +26,9 @@ function showLogin(msg) { $('app').hidden = true; const L = $('login'); L.hidden
 function showOnboard(u) {
   $('app').hidden = true; const L = $('login'); L.hidden = false; L.className = 'lwrap'; ui.photoOwner = () => u.uid;
   L.innerHTML = `<div class="lcard wide"><img class="llogo" src="assets/header-logo.webp" alt="MyChess64"><h1>Welcome${u.meta && u.meta.name ? ', ' + esc(u.meta.name.split(' ')[0]) : ''} 👋</h1><p class="mu">Create your coach profile. An admin reviews it before it appears on the website — you can start using your dashboard right away.</p>${profileForm({ name: (u.meta || {}).name || '', photo_url: (u.meta || {}).avatar || '' })}<div id="pvbox" hidden></div><div class="acts"><button class="btn" onclick="app.createProfile()">Create my coach profile</button><button class="btn o" onclick="app.logout()">Log out</button></div><p class="mu">Signed in as ${esc(u.email)}</p></div>`;
+  ui.pv();
 }
-function showRecovery() { $('app').hidden = true; const L = $('login'); L.hidden = false; L.className = 'lwrap'; L.innerHTML = recoveryHTML(); }
+function showRecovery() { $('app').hidden = true; const L = $('login'); L.hidden = false; L.className = 'lgwrap'; L.innerHTML = recoveryHTML('coach'); }
 function showApp() {
   $('login').hidden = true; const a = $('app'); a.hidden = false;
   a.innerHTML = `<header class="top"><img class="tlogo" src="assets/header-logo.webp" alt="MyChess64"><span class="sp"></span><button class="btn o sm" onclick="app.guide()">❓ Guide</button><a class="btn o sm hide-s" href="index.html" target="_blank">Website ↗</a><button class="btn sm" onclick="app.logout()">Log out</button></header>
@@ -60,7 +62,7 @@ function home(c) {
   const k = K.monthKey(T), cur = K.collected(pays, k), prev = K.collected(pays, K.shiftMonth(k, -1)), exp = K.expectedMonthly(studs), due = K.totalDue(studs, pays, T), goal = +c.monthly_goal || 0;
   const nb = D.requests.filter(r => r.status === 'new').length, today_ = D.classes.filter(x => x.coach_id === c.id && x.class_date === T).sort((a, b) => a.class_time.localeCompare(b.class_time));
   const attn = K.attention(studs, att, pays, D.requests, T), s = stat(c), up = upcoming(c.id).filter(x => x.class_date > T);
-  const tdo = [['Add a profile photo', !!c.photo_url, 'pf'], ['Write a bio (40+ characters)', (c.bio || '').length >= 40, 'pf'], ['Set your teaching hours', D.availability.some(a => a.coach_id === c.id), 'sch'], ['Schedule your first class', D.classes.some(x => x.coach_id === c.id), 'sch'], ['Add your first student', studs.length > 0, 'st'], ['Set student monthly fees', studs.some(x => +x.monthly_fee > 0), 'st']];
+  const tdo = [['Add a profile photo', !!c.photo_url, 'pf'], ['Write a bio (40+ characters)', plainText(c.bio).length >= 40, 'pf'], ['Set your teaching hours', D.availability.some(a => a.coach_id === c.id), 'sch'], ['Schedule your first class', D.classes.some(x => x.coach_id === c.id), 'sch'], ['Add your first student', studs.length > 0, 'st'], ['Set student monthly fees', studs.some(x => +x.monthly_fee > 0), 'st']];
   const done = tdo.filter(t => t[1]).length;
   const T10 = { pf: ['👤', 'My Profile', 'Photo, rating, experience', 'b1'], sch: ['📅', 'My Schedule', 'Teaching hours & classes', 'b2'], bk: ['📥', 'Bookings', 'Upcoming and past bookings', 'b3'], st: ['👥', 'My Students', 'Details, fees & progress', 'b4'], att: ['✅', 'Attendance', 'Mark and track attendance', 'b5'], earn: ['💰', 'My Earnings', 'Fees, dues & payments', 'b6'], rep: ['📝', 'Progress Reports', 'Share with parents', 'b7'], perf: ['📈', 'Performance', 'Teaching statistics', 'b8'], rv: ['⭐', 'My Reviews', 'Student feedback', 'b9'], set: ['⚙️', 'Settings', 'Password, documents, export', 'b10'] };
   const pct = goal > 0 ? Math.min(100, Math.round(cur / goal * 100)) : 0;
@@ -79,7 +81,7 @@ function home(c) {
 function pf(c) {
   return `${head('My Profile', '<button class="btn o sm" onclick="app.share()">🔗 Copy public link</button>')}<div class="pfgrid"><div class="card">${profileForm(c)}<div class="acts"><button class="btn" onclick="app.savePf()">Save profile</button></div></div><div><div class="mu" style="margin-bottom:6px">Live preview – how students see you</div><div id="pvbox">${previewCard()}</div></div></div>`;
 }
-const savePf = () => { const p = readProfile(); if (!p.name || !p.title) return toast('Name and title are required', 1); return run(() => save('coaches', p, uid()), 'Profile saved ✓ — live on the website'); };
+const savePf = () => { const p = readProfile(); if (!p.name || !p.title) return toast('Name and title are required', 1); if (bioTooLong(p)) return toast('About me is too long (max 1500 characters)', 1); return run(() => save('coaches', p, uid()), 'Profile saved ✓ — live on the website'); };
 
 /* ---------------- schedule + availability ---------------- */
 /* ---------------- month calendar ---------------- */
@@ -252,8 +254,8 @@ window.app = {
   exportCsv, calNav: d => { const n = new Date(S.cy ?? new Date().getFullYear(), (S.cm ?? new Date().getMonth()) + d, 1); S.cy = n.getFullYear(); S.cm = n.getMonth(); render(true); },
   attToday: () => { S.att = today(); go('att'); }, fix: (tab, sid) => { if (tab === 'att') S.att = today(); if (sid && tab === 'earn') S.pre = sid; S.tab = tab; S.sid = ''; render(true); window.scrollTo && scrollTo(0, 0); },
   setGoal: () => run(() => save('coaches', { monthly_goal: +val('g_a') || 0 }, uid()), 'Goal saved ✓'),
-  login: doLogin, signup: doSignup, google: doGoogle, mode: m => { setAuthMode(m); showLogin(''); }, forgot: doForgot,
-  createProfile: () => { const p = readProfile(); if (!p.name || !p.title) return toast('Name and title are required', 1); return run(async () => { await B.ins('coaches', { id: uid(), ...p, status: 'pending' }); await B.ins('coach_private', { id: uid(), email: S.user.email }); S.user.role = 'coach'; await enter(); }, 'Profile created ✓ — awaiting admin approval'); }, logout: () => B.logout(), go, guide, share, more, savePf, saveCls, toStudent, saveStu, mark, allPresent, addPay, addRep,
+  login: doLogin, signup: doSignup, google: doGoogle, mode: m => { setAuthMode(m); showLogin(''); }, forgot: () => { startForgot(); showLogin(''); }, sendReset: () => doReset(() => showLogin('')), resend: () => doResend(() => showLogin('')),
+  createProfile: () => { const p = readProfile(); if (!p.name || !p.title) return toast('Name and title are required', 1); if (bioTooLong(p)) return toast('About me is too long (max 1500 characters)', 1); return run(async () => { await B.ins('coaches', { id: uid(), ...p, status: 'pending' }); await B.ins('coach_private', { id: uid(), email: S.user.email }); S.user.role = 'coach'; await enter(); }, 'Profile created ✓ — awaiting admin approval'); }, logout: () => B.logout(), go, guide, share, more, savePf, saveCls, toStudent, saveStu, mark, allPresent, addPay, addRep,
   newStu: () => { $('sf').innerHTML = stuForm(); }, editStu: id => { $('sf').innerHTML = stuForm(stuById(id)); $('sf').scrollIntoView(); }, closeForm: () => { $('sf').innerHTML = ''; },
   openStu: id => { S.sid = id; render(true); window.scrollTo && scrollTo(0, 0); }, back: () => { S.sid = ''; render(true); },
   delStu: id => confirm('Delete this student and their attendance & reports?') && run(async () => { S.sid = ''; await remove('students', id); await load(['attendance', 'reports', 'payments']); render(true); }, 'Student deleted'),
@@ -269,7 +271,7 @@ window.app = {
   paid: id => run(() => save('payments', { status: 'paid', paid_on: today() }, id), 'Marked as paid ✓'), delPay: id => confirm('Delete this payment record?') && run(() => remove('payments', id)),
   delRep: id => confirm('Delete this report?') && run(() => remove('reports', id)),
   changePw: async () => { if (await doNewPw()) { $('np1').value = ''; $('np2').value = ''; } }, reset: () => run(() => B.reset(S.user.email), 'Reset link sent to ' + S.user.email),
-  newPw: async () => { if (await doNewPw()) { B.recovery = false; history.replaceState(null, '', location.pathname); if (pendingUser) enter(pendingUser); } },
+  newPw: async () => { if (!(await doNewPw())) return; B.recovery = false; try { history.replaceState(null, '', location.pathname); } catch (e) {} const u = pendingUser; pendingUser = null; if (u && u.role === 'coach') { toast('Password updated ✓'); S.user = { ...u, recovery: false }; enter(); } else { pendingMsg = '✓ Password updated. ' + (u && u.role === 'admin' ? 'Please sign in at the Admin dashboard (admin.html).' : 'Please sign in.'); await B.logout(); } },
   upDoc: () => { const f = $('d_f').files[0], t = val('d_t'); if (!t || !f) return toast('Add a title and choose a file', 1); if (f.size > 5e6) return toast('File is larger than 5 MB', 1); return run(async () => { const path = uid() + '/' + Date.now() + '-' + f.name.replace(/[^\w.\-]+/g, '_'); await B.upload('coach-docs', path, f); await save('coach_docs', { coach_id: uid(), title: t, path }); $('d_t').value = ''; $('d_f').value = ''; }, 'Document uploaded ✓'); },
   openDoc: id => run(async () => { const d = D.coach_docs.find(x => x.id === id); const u = await B.fileUrl('coach-docs', d.path); if (u) window.open(u, '_blank'); }),
   delDoc: id => confirm('Delete this document?') && run(async () => { const d = D.coach_docs.find(x => x.id === id); await B.rmFile('coach-docs', d.path).catch(() => {}); await remove('coach_docs', id); })
@@ -279,7 +281,7 @@ window.app = {
 async function enter() { await load(COACH_TABLES); showApp(); }
 document.documentElement.classList.add('js'); window.__mc64 = true;
 (async () => {
-  await initBackend(); hooks.render = () => render(); await seedDemo(); await applyKeepRule();
+  await initBackend(); hooks.render = () => render(); await seedDemo(); await applyKeepRule(); pendingMsg = urlProblem();
   B.onAuth(async u => {
     if (u && S.user && S.user.uid === u.uid && S.user.role === u.role && !u.recovery) { S.user = u; return; }  // token refresh etc.
     S.user = u;

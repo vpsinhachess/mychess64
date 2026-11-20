@@ -1,5 +1,6 @@
 // Public website: coach cards, profile popup, demo-request + apply forms
 import { B } from './backend.js';
+import { renderBio, plainText } from './rich.js';
 import { $, esc, ini, fd, tf, t5, toast, ls, D, stat, seats, upcoming, lvl, WD, errText } from './state.js';
 
 const site = window.MC64_SITE || {};
@@ -21,7 +22,7 @@ export function draw() {
   if (so === 'r') L.sort((a, b) => b._r - a._r); if (so === 'pl') L.sort((a, b) => a.price - b.price);
   if (so === 'ph') L.sort((a, b) => b.price - a.price); if (so === 'e') L.sort((a, b) => b.exp - a.exp);
   $('cnt').textContent = L.length + ' coach' + (L.length === 1 ? '' : 'es') + ' found · ' + ST.saved.size + ' saved';
-  grid.innerHTML = L.length ? L.map(x => `<article class="cd"><div class="ph" style="background:linear-gradient(135deg,${x.c1},${x.c2})">${x.photo_url ? `<img src="${esc(x.photo_url)}" alt="${esc(x.name)}" loading="lazy">` : `<div class="ini">${ini(x.name)}</div>`}<span class="rb">★ ${x._n ? x._r.toFixed(1) + ' (' + x._n + ')' : 'New'}</span><button class="hr ${ST.saved.has(x.id) ? 'on' : ''}" onclick="save('${x.id}')" aria-label="Save coach">♥</button><div class="nm"><h3>${esc(x.name)} <i class="vf">✓</i></h3><span>${esc(x.title)} · ${esc(x.city)}</span></div></div><div class="cbd"><p>${esc(x.bio)}</p><div class="tags">${(x.cats || []).map(c => `<i>${esc(c)}</i>`).join('')}<i>${esc(x.mode)}</i></div><div class="mt"><span>🎓 ${x.exp} yrs</span><span>👥 ${x.students_count} students</span></div><div class="foot"><div><b>₹${x.price}</b><small>/hr</small></div><div class="bt"><button class="btn o sm" onclick="openM('${x.id}')">Profile</button><button class="btn sm" onclick="demo('${x.id}')">Free demo</button></div></div></div></article>`).join('')
+  grid.innerHTML = L.length ? L.map(x => `<article class="cd"><div class="ph" style="background:linear-gradient(135deg,${x.c1},${x.c2})">${x.photo_url ? `<img src="${esc(x.photo_url)}" alt="${esc(x.name)}" loading="lazy">` : `<div class="ini">${ini(x.name)}</div>`}<span class="rb">★ ${x._n ? x._r.toFixed(1) + ' (' + x._n + ')' : 'New'}</span><button class="hr ${ST.saved.has(x.id) ? 'on' : ''}" onclick="save('${x.id}')" aria-label="Save coach">♥</button><div class="nm"><h3>${esc(x.name)} <i class="vf">✓</i></h3><span>${esc(x.title)} · ${esc(x.city)}</span></div></div><div class="cbd"><p class="bio-ex">${esc(plainText(x.bio))}</p><div class="tags">${(x.cats || []).map(c => `<i>${esc(c)}</i>`).join('')}<i>${esc(x.mode)}</i></div><div class="mt"><span>🎓 ${x.exp} yrs</span><span>👥 ${x.students_count} students</span></div><div class="foot"><div><b>₹${x.price}</b><small>/hr</small></div><div class="bt"><button class="btn o sm" onclick="openM('${x.id}')">Profile</button><button class="btn sm" onclick="demo('${x.id}')">Free demo</button></div></div></div></article>`).join('')
     : '<p class="mu">No coaches to show yet. Try Reset, or request a match below.</p>';
   const rs = [...D.reviews].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))).slice(0, 3);
   $('reviews').style.display = rs.length ? '' : 'none';
@@ -43,7 +44,7 @@ export function openM(id, keep) {
   $('pm').innerHTML = `<button class="x" onclick="closeM()" aria-label="Close">×</button><div class="pbn" style="background:linear-gradient(135deg,${x.c1},${x.c2})"><span class="wm">${P[(x.name || '').length % 6]}</span></div>
 <div class="phd"><div class="pav">${x.photo_url ? `<img src="${esc(x.photo_url)}" alt="${esc(x.name)}">` : `<div class="ini" style="font-size:54px;background:linear-gradient(135deg,${x.c1},${x.c2})">${ini(x.name)}</div>`}</div>
 <div class="pin"><h2>${esc(x.name)} <i class="vf">✓</i></h2><div class="tags" style="margin-top:8px"><span class="tt">${esc(x.title)}</span><i>📍 ${esc(x.city)}</i><i>${esc(x.mode)} classes</i><i style="color:#b7791f">★ ${s.n ? s.r.toFixed(1) + ' · ' + s.n + ' reviews' : 'New coach'}</i></div></div></div>
-<div class="pbd"><div class="main"><div><h4>About</h4><p>${esc(x.bio)}</p><p class="mu" style="margin-top:6px">Languages: ${esc(x.langs || 'English')}</p></div>
+<div class="pbd"><div class="main"><div><h4>About</h4><div class="bio">${renderBio(x.bio)}</div><p class="mu" style="margin-top:6px">Languages: ${esc(x.langs || 'English')}</p></div>
 <div class="ss"><div><b>${x.exp}+</b><span>Years coaching</span></div><div><b>${x.students_count}+</b><span>Students taught</span></div><div><b>${s.n}</b><span>Reviews</span></div></div>
 <div><h4>Specialities</h4><div class="tags">${(x.cats || []).map(c => `<i>${esc(c)}</i>`).join('')}<i>Game analysis</i><i>Endgames</i><i>Progress reports</i></div></div>
 ${av.length ? `<div><h4>Available teaching hours</h4><div class="tags">${av.map(a => `<i>${WD[a.weekday]} ${tf(a.start_time)}–${tf(a.end_time)}</i>`).join('')}</div></div>` : ''}

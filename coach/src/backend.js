@@ -74,7 +74,9 @@ function demo() {
   const save = () => { try { localStorage.setItem(K, JSON.stringify(st)); } catch (e) { /* storage blocked/full: stay in memory */ } };
   const tb = n => st.t[n] = st.t[n] || [], note = t => ls.forEach(f => f(t));
   let session = null; try { session = sessionStorage.getItem('mc64_s'); } catch (e) {}
-  const emit = () => { const a = st.acc.find(x => x.uid === session); cbs.forEach(f => f(a ? { uid: a.uid, email: a.email, role: a.role === 'admin' ? 'admin' : (tb('coaches').some(c => c.id === a.uid) ? 'coach' : null), meta: { name: a.name || '', avatar: '' } } : null)); }, cbs = [];
+  const mt = /demo_token=([\w-]+)/.exec(location.hash || '');
+  if (mt) { if (st.reset && st.reset.token === mt[1] && st.reset.exp > Date.now()) { session = st.reset.uid; try { sessionStorage.setItem('mc64_s', session); } catch (e) {} B.recovery = true; } else { B.recovery = false; B.urlError = { code: 'otp_expired', desc: 'Email link is invalid or has expired' }; } }
+  const emit = () => { const a = st.acc.find(x => x.uid === session); cbs.forEach(f => f(a ? { uid: a.uid, email: a.email, recovery: !!B.recovery, role: a.role === 'admin' ? 'admin' : (tb('coaches').some(c => c.id === a.uid) ? 'coach' : null), meta: { name: a.name || '', avatar: '' } } : null)); }, cbs = [];
   const impl = {
     mode: 'demo',
     async q(t, o = {}) {
@@ -92,10 +94,14 @@ function demo() {
     async rmFile(bucket, path) { delete st.f[path]; save(); },
     async login(email, pw) { const a = st.acc.find(x => x.email === email.toLowerCase()); if (!a || a.hash !== await sha(a.uid + pw)) throw new Error('bad'); session = a.uid; try { sessionStorage.setItem('mc64_s', session); } catch (e) {} emit(); },
     async logout() { session = null; try { sessionStorage.removeItem('mc64_s'); } catch (e) {} emit(); },
-    async reset() { alert('Demo mode: password-reset emails need Supabase.'); },
+    async reset(email) {   // demo: no e-mail is sent – the reset link is shown on screen instead
+      const a = st.acc.find(x => x.email === String(email).toLowerCase()); if (!a) return {};
+      const token = uuid().replace(/-/g, ''); st.reset = { token, uid: a.uid, exp: Date.now() + 36e5 }; save();
+      return { demoLink: location.href.split('#')[0] + '#type=recovery&demo_token=' + token };
+    },
     async signUp(email, pw, name) { const id = await impl.createUser(email, pw); const a = st.acc.find(x => x.uid === id); a.name = name; save(); session = id; try { sessionStorage.setItem('mc64_s', id); } catch (e) {} emit(); return { confirm: false }; },
     async google() { throw new Error('Google sign-in works once Supabase is connected (README step: Google login).'); },
-    async setPassword(pw) { const a = st.acc.find(x => x.uid === session); if (a) { a.hash = await sha(a.uid + pw); save(); } },
+    async setPassword(pw) { const a = st.acc.find(x => x.uid === session); if (a) { a.hash = await sha(a.uid + pw); delete st.reset; save(); } },
     onAuth(cb) { cbs.push(cb); setTimeout(emit); },
     async createUser(email, pw, forced) { email = email.toLowerCase(); if (st.acc.some(x => x.email === email)) throw { message: 'That email already has an account.' }; const u = forced || uuid(); st.acc.push({ uid: u, email, hash: await sha(u + pw), role: forced === 'admin-demo' ? 'admin' : 'coach' }); save(); return u; },
     listen(tables, cb) { const f = t => tables.includes(t) && cb(t); ls.push(f); return () => ls.splice(ls.indexOf(f), 1); }
@@ -104,4 +110,11 @@ function demo() {
   return impl;
 }
 
-export async function initBackend() { Object.assign(B, LIVE ? supabase() : demo()); return B; }
+// Read the e-mail-link result from the URL BEFORE the auth library consumes it (reset link = type=recovery; failures = error_code)
+function readUrl() {
+  const q = new URLSearchParams((location.hash || '').replace(/^#/, '')), qq = new URLSearchParams(location.search || '');
+  if (/type=recovery/.test(location.hash || '')) B.recovery = true;
+  const code = q.get('error_code') || q.get('error') || qq.get('error_code');
+  if (code) B.urlError = { code, desc: (q.get('error_description') || qq.get('error_description') || '').replace(/\+/g, ' ') };
+}
+export async function initBackend() { readUrl(); Object.assign(B, LIVE ? supabase() : demo()); return B; }

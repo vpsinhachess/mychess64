@@ -1,7 +1,7 @@
 // MyChess64 – Admin Dashboard (admin.html). Full administrative control (Supabase RLS: admins table).
 import { initBackend, B } from './backend.js';
 import { seedDemo } from './sample.js';
-import { loginHTML, recoveryHTML, applyKeepRule, doLogin, doForgot, doNewPw, profileForm, readProfile, previewCard, avatar, reach, ui, getPhoto } from './ui.js';
+import { bioTooLong, loginHTML, recoveryHTML, setAuthMode, startForgot, doReset, doResend, urlProblem, applyKeepRule, doLogin, doNewPw, profileForm, readProfile, previewCard, avatar, reach, ui, getPhoto } from './ui.js';
 import { $, esc, today, fd, money, digits, ago, toast, errText, D, hooks, load, ADMIN_TABLES, save, remove, stat, COL } from './state.js';
 
 const S = { user: null, tab: 'ov', rq: '', rf: 'all', edit: '', note: '' };
@@ -68,15 +68,15 @@ const approve = id => run(async () => {
 /* ---- coaches ---- */
 function coaches() { return `${head('Coaches', '<button class="btn sm" onclick="app.newCoach()">+ Add coach</button>')}<div id="cf"></div><div id="list"></div>`; }
 function coachList() {
-  $('list').innerHTML = D.coaches.map(c => { const pay = D.payments.filter(p => p.coach_id === c.id && p.status === 'paid').reduce((a, p) => a + +p.amount, 0); return `<div class="card bkc"><div class="rwl">${avatar(c, 'sm')}<div><b>${esc(c.name)}</b> <span class="bdg s-${c.status === 'hidden' ? 'cancelled' : c.status === 'pending' ? 'contacted' : 'done'}">${c.status === 'hidden' ? 'hidden' : c.status === 'pending' ? 'pending approval' : 'live'}</span><div class="mu">${esc(c.title)} · ${esc(c.city)} · ${money(c.price)}/hr</div><div class="mu">✉ ${esc(emailOf(c.id) || 'no login') } · 👥 ${D.students.filter(s => s.coach_id === c.id).length} students · 💰 ${money(pay)}</div></div></div><div class="acts">${c.status === 'pending' ? `<button class="btn sm" onclick="app.activate('${c.id}')">✓ Approve</button>` : ''}<button class="ic" onclick="app.editCoach('${c.id}')">✏️ Edit</button>${c.status === 'pending' ? '' : `<button class="ic" onclick="app.hide('${c.id}')">${c.status === 'hidden' ? 'Show' : 'Hide'}</button>`}<button class="ic del" onclick="app.delCoach('${c.id}')">🗑 Delete</button></div></div>`; }).join('') || empty('No coaches yet — add one.');
+  $('list').innerHTML = D.coaches.map(c => { const pay = D.payments.filter(p => p.coach_id === c.id && p.status === 'paid').reduce((a, p) => a + +p.amount, 0); return `<div class="card bkc"><div class="rwl">${avatar(c, 'sm')}<div><b>${esc(c.name)}</b> <span class="bdg s-${c.status === 'hidden' ? 'cancelled' : c.status === 'pending' ? 'contacted' : 'done'}">${c.status === 'hidden' ? 'hidden' : c.status === 'pending' ? 'pending approval' : 'live'}</span><div class="mu">${esc(c.title)} · ${esc(c.city)} · ${money(c.price)}/hr</div><div class="mu">✉ ${esc(emailOf(c.id) || 'no login') } · 👥 ${D.students.filter(s => s.coach_id === c.id).length} students · 💰 ${money(pay)}</div></div></div><div class="acts">${c.status === 'pending' ? `<button class="btn sm" onclick="app.activate('${c.id}')">✓ Approve</button>` : ''}<button class="ic" onclick="app.editCoach('${c.id}')">✏️ Edit</button><button class="ic" onclick="app.resetCoach('${c.id}')" title="Email this coach a password-reset link">🔑 Reset password</button>${c.status === 'pending' ? '' : `<button class="ic" onclick="app.hide('${c.id}')">${c.status === 'hidden' ? 'Show' : 'Hide'}</button>`}<button class="ic del" onclick="app.delCoach('${c.id}')">🗑 Delete</button></div></div>`; }).join('') || empty('No coaches yet — add one.');
 }
 function coachForm(c) {
   S.edit = c ? c.id : ''; ui.photoOwner = () => S.edit || 'new-' + Date.now();
   $('cf').innerHTML = `<div class="card"><div class="ch"><b>${c ? 'Edit coach' : 'Add coach (creates their login)'}</b><button class="lnk" onclick="document.getElementById('cf').innerHTML=''">Close</button></div><div class="pfgrid"><div>${profileForm(c, { admin: true, isNew: !c })}<div class="acts"><button class="btn" onclick="app.saveCoach()">Save</button></div></div><div id="pvbox">${previewCard()}</div></div></div>`;
-  $('cf').scrollIntoView();
+  ui.pv(); $('cf').scrollIntoView();
 }
 const saveCoach = () => run(async () => {
-  const p = readProfile(); if (!p.name || !p.title) return toast('Name and title are required', 1);
+  const p = readProfile(); if (!p.name || !p.title) return toast('Name and title are required', 1); if (bioTooLong(p)) return toast('About me is too long (max 1500 characters)', 1);
   if (S.edit) { await save('coaches', p, S.edit); toast('Coach saved ✓'); }
   else {
     const em = val('f_em').toLowerCase(), pw = val('f_pw'); if (!em || pw.length < 8) return toast('Login email and an 8+ character password are required', 1);
@@ -103,7 +103,8 @@ function csv() {
 
 window.ui = ui;
 window.app = {
-  login: doLogin, forgot: doForgot, logout: () => B.logout(), go, more, csv, approve, saveCoach, addRev,
+  login: doLogin, mode: m => { setAuthMode(m); showLogin(''); }, forgot: () => { startForgot(); showLogin(''); }, sendReset: () => doReset(() => showLogin('')), resend: () => doResend(() => showLogin('')),
+  resetCoach: id => run(async () => { const e = emailOf(id); if (!e) throw new Error('This coach has no login email on record.'); const r = await B.reset(e); if (r && r.demoLink) prompt('Demo mode – no email is sent. Open this reset link:', r.demoLink); else toast('Password-reset email sent to ' + e); }), logout: () => B.logout(), go, more, csv, approve, saveCoach, addRev,
   rq: v => { S.rq = v; reqList(); }, rf: v => { S.rf = v; reqList(); },
   assign: (id, cid) => run(() => save('requests', { coach_id: cid || null }, id), cid ? 'Assigned — the coach can now see it' : 'Assignment removed'),
   setReq: (id, v) => run(() => save('requests', { status: v }, id), 'Status updated'), delReq: id => confirm('Delete this request?') && run(() => remove('requests', id)),
@@ -113,18 +114,18 @@ window.app = {
   hide: id => { const c = D.coaches.find(x => x.id === id); return run(() => save('coaches', { status: c.status === 'hidden' ? 'active' : 'hidden' }, id)); },
   delCoach: id => confirm('Delete this coach and ALL their students, classes and records? (Their login must be removed separately in Supabase → Authentication.)') && run(() => remove('coaches', id)),
   delRev: id => confirm('Delete this review?') && run(() => remove('reviews', id)),
-  newPw: async () => { if (await doNewPw()) { B.recovery = false; history.replaceState(null, '', location.pathname); if (pendingUser) enter(); } }
+  newPw: async () => { if (!(await doNewPw())) return; B.recovery = false; try { history.replaceState(null, '', location.pathname); } catch (e) {} const u = pendingUser; pendingUser = null; if (u && u.role === 'admin') { toast('Password updated ✓'); S.user = { ...u, recovery: false }; enter(); } else { pendingMsg = '✓ Password updated. ' + (u && u.role === 'coach' ? 'Coaches: please sign in at the Coach Portal (coach.html).' : 'Please sign in.'); await B.logout(); } }
 };
 
 async function enter() { await load(ADMIN_TABLES); showApp(); }
 document.documentElement.classList.add('js'); window.__mc64 = true;
 (async () => {
-  await initBackend(); hooks.render = () => render(); await seedDemo(); await applyKeepRule();
+  await initBackend(); hooks.render = () => render(); await seedDemo(); await applyKeepRule(); pendingMsg = urlProblem();
   B.onAuth(u => {
     if (u && S.user && S.user.uid === u.uid && S.user.role === u.role && !u.recovery) { S.user = u; return; }  // token refresh etc.
     S.user = u;
     if (!u) { showLogin(pendingMsg); pendingMsg = ''; return; }
-    if (u.recovery) { pendingUser = u; $('app').hidden = true; $('login').hidden = false; $('login').className = 'lwrap'; $('login').innerHTML = recoveryHTML(); return; }
+    if (u.recovery) { pendingUser = u; $('app').hidden = true; $('login').hidden = false; $('login').className = 'lgwrap'; $('login').innerHTML = recoveryHTML('admin'); return; }
     if (u.role === 'admin') return enter();
     pendingMsg = u.role === 'coach' ? 'This is the admin area. Coaches: use the Coach Portal (coach.html).' : 'Signed in as ' + u.email + ', but this account is not an admin' + (u.err ? ' (' + u.err + ')' : '') + '. In Supabase run: insert into admins (user_id) values (\'' + u.uid + '\');';
     B.logout();
