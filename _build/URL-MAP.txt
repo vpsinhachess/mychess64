@@ -1,0 +1,21 @@
+FOLDER RENAMES (so folder names match the public URLs used in menus, footers and canonicals)
+  diagram-generator    -> chess-diagram-generator
+  gif-video-maker      -> chess-gif-video-maker
+  position-share       -> chess-position-share
+  rating-converter     -> chess-rating-converter
+  rating-tracker       -> chess-rating-tracker
+  scoresheet-generator -> chess-scoresheet-generator
+All other folders keep their names. Every tool lives at /tools/<folder>/ and the library at /tools/.
+
+LINK FIXES
+  performance-rating-calulator.html (typo)  -> /tools/performance-rating-calculator/
+  every  *.html  link and JS-built link    -> /tools/<slug>/
+  pgn-editor.html, pgn-merger.html          -> removed (pages not in the ZIP)
+  chess-analysis-board.html                 -> button hidden until ANALYSIS_URL is set (image-to-fen, chess-position-share)
+
+NOT VERIFIABLE FROM THIS ZIP (outside /tools/)
+  https://www.mychess64.com/            https://www.mychess64.com/academy/
+  https://www.mychess64.com/community/  https://www.mychess64.com/play/digital-chess-clock/
+
+Re-check any time:   python3 _build/build_tools.py check tools
+After editing TOOLS: python3 _build/build_tools.py refresh tools
