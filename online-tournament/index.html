@@ -102,7 +102,7 @@ main.mid{max-width:1060px}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="/firebase-config.js"></script>
+<script src="/online-tournament/firebase-config.js"></script>
 <script id="core">
 const FL='abcdefgh',START='rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR',GL={K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟'};
 const tcl=(m,i)=>(m==.5?'½':m==.25?'¼':m==.75?'¾':m)+'+'+i;
@@ -230,7 +230,7 @@ function saveCache(){if(!tid||!T)return;clearTimeout(saveCache.t);saveCache.t=se
 const addRec=(id,n)=>ls.set('rec',[{id,name:n},...(ls.get('rec')||[]).filter(x=>x.id!=id)].slice(0,5));
 async function init(){
  const C=window.FIREBASE_CONFIG;
- if(!window.firebase||!C||/YOUR_/.test(C.apiKey||'YOUR_')){app.innerHTML='<div class="cd"><h2>Setup needed</h2>Upload <b>/firebase-config.js</b> to the website root with your Firebase web-app settings.</div>';return}
+ if(!window.firebase||!C||/YOUR_/.test(C.apiKey||'YOUR_')){app.innerHTML='<div class="cd"><h2>Setup needed</h2>Upload <b>/online-tournament/firebase-config.js</b> to the website root with your Firebase web-app settings.</div>';return}
  firebase.initializeApp(C);db=firebase.firestore();try{db.settings({experimentalAutoDetectLongPolling:true})}catch(e){}try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
  const au=firebase.auth();let first=true;
  au.onAuthStateChanged(async u=>{
