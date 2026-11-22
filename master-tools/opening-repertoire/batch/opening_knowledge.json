@@ -1,0 +1,510 @@
+{
+ "FIVE": {
+  "Ruy Lopez (Closed)": [
+   "Castle kingside by move 5; Re1 and h3 support the center.",
+   "...b5 and ...d6 to kick the bishop, then ...Na5/...c5; the Marshall (...d5) is the sharp try."
+  ],
+  "Italian Game (Giuoco Pianissimo)": [
+   "Castle kingside by move 6, then build d3-c3 behind it.",
+   "...d5 to free the game, or ...Na5 to trade your bishop."
+  ],
+  "Scotch Game": [
+   "Castle kingside quickly; the open center punishes delays.",
+   "Active pieces (...Bc5, ...Qh4) and ...Nf6 hitting e4."
+  ],
+  "Vienna Game": [
+   "Castle before opening lines: f4 weakens your king.",
+   "...d5 to hit e4 and the center for quick equality."
+  ],
+  "Queen's Gambit": [
+   "Castle kingside after Nf3/e3; focus on the queenside minority attack.",
+   "...c5 or ...e5 to free the position and escape the c4-d4 squeeze."
+  ],
+  "Catalan": [
+   "Castle early; Bg2 shields the king.",
+   "...dxc4 and ...b5 to keep the pawn, or ...c5 to trade your center."
+  ],
+  "London System": [
+   "Castle kingside after Bd3; e3/f2 form a safe shell.",
+   "...c5 + ...Qb6 hitting b2, ...Bf5 to trade bishops, or ...e5."
+  ],
+  "English Opening": [
+   "Castle kingside behind g3/Bg2.",
+   "...e5 and ...d5 to take the center, or a symmetrical ...c5."
+  ],
+  "Reti / King's Indian Attack": [
+   "Castle early, then attack the kingside with e4/e5.",
+   "...c5 and ...Nc6 hitting d4/e4, or a quick ...e5."
+  ],
+  "Alapin Sicilian (2.c3)": [
+   "Castle kingside after Be2; Black's play is on the other wing.",
+   "The ...d5 break to free the game and trade pieces."
+  ],
+  "Sicilian Najdorf": [
+   "Castle kingside after ...Be7; if White castles long, race on the queenside.",
+   "Be3, Qd2, O-O-O and a g4-g5 or f4-f5 storm before your counterplay arrives."
+  ],
+  "Sicilian Dragon": [
+   "Castle early; the g7 bishop and pawns are the shield, so avoid ...h6.",
+   "The Yugoslav Attack (Be3, f3, Qd2, O-O-O, h4-h5) to open the h-file."
+  ],
+  "French Defense": [
+   "Castle after ...Be7; be ready for ...f5 or ...Qb6 against Bd3/Qg4.",
+   "Space with e5, a kingside attack, and keeping d4 protected."
+  ],
+  "Caro-Kann": [
+   "Castle after ...Be7/...Nf6; counterplay starts on the queenside.",
+   "Space (e5 Advance) or h4-h5 + Bd3 kingside pressure; in the Panov, use the IQP."
+  ],
+  "Petroff Defense": [
+   "Castle by move 7 and keep it simple.",
+   "Nc3 and Bd3 pressure for a small endgame edge; avoid a Qd2/Bh6 attack."
+  ],
+  "Ruy Lopez: Berlin Defense": [
+   "The king walks to e8 or g8 after queens trade; ...Ke8 and ...h5 setups.",
+   "A pawn-structure endgame with the bishop pair; Black wants to keep it solid."
+  ],
+  "Scandinavian Defense": [
+   "Castle kingside after ...Bf5 and ...e6.",
+   "Tempo on the queen (Nc3, Bd2) and a lead in development."
+  ],
+  "Pirc Defense": [
+   "Castle early behind the fianchetto; avoid ...h6.",
+   "A big center (e4-d4-f4) and Bc4/Be3/Qd2/h4 attack; counter with ...c5 or ...e5."
+  ],
+  "Queen's Gambit Declined": [
+   "Castle early; free your light bishop with ...b6 or ...c5.",
+   "The minority attack or a c4-d4 squeeze; break with ...c5 or ...e5."
+  ],
+  "Slav / Semi-Slav": [
+   "Castle after ...e6 and ...Be7; keep ...Bf5 outside the chain.",
+   "e4 to grab the center, a4 to hold c4; Black wants ...e5 or ...c5."
+  ],
+  "Nimzo-Indian": [
+   "Castle after ...d5 or ...Bxc3; watch Bd3/Qc2 aiming at h7.",
+   "The bishop pair and a big center (e4, d4); Black hits e4 and keeps the c-file."
+  ],
+  "King's Indian Defense": [
+   "Castle early, then ...f5 and ...g5; White often castles long.",
+   "Queenside expansion (c5), space, Bg5/h3 breaks and trading the g7 bishop."
+  ],
+  "Grunfeld Defense": [
+   "Castle after ...Bg7; avoid early ...h6 or ...g5.",
+   "A big center (c3-d4-e4) and kingside pressure; hold d4."
+  ],
+  "Dutch Defense (Leningrad / Stonewall)": [
+   "Castle early; watch the h4-e1 diagonal and e6.",
+   "Bg5, Nc3-b5, h4 and e4; take advantage of the e1-h4 diagonal."
+  ],
+  "Modern Benoni": [
+   "Castle kingside; watch e4-e5, play ...Re8 and ...Nbd7.",
+   "The e4-e5 break, Bb5+, and restraining your queenside pawns."
+  ]
+ },
+ "FC": {
+  "sic": {
+   "t": "Sicilian family",
+   "s": "Asymmetry: White has the e-pawn and d-file play; Black has the half-open c-file and a d6/e6/g6 setup (Najdorf, Scheveningen, Dragon). Alapin and Rossolimo lines trade space for solidity.",
+   "k": "Both kings usually castle; with opposite-side castling, race with pawn storms (g4-g5 against ...b5-b4).",
+   "p": "White: bishops e3/e2/d3, knights d4/c3, queen d2. Black: Bg7/Be7, Rc8, knight c6/d7, queen c7/a5.",
+   "pl": "White attacks the kingside or exploits d5/e4 space; Black counterattacks on the queenside and the c-file and aims for ...d5.",
+   "o": "White wants a kingside attack before Black's counterplay; Black wants ...d5 or ...b5-b4 to open the position favorably.",
+   "w": "Nf3=develop and control d4;d4=open the center;Nxd4=central knight;Nc3=develop;Be3=English Attack setup;Qd2=connect, castle long;O-O-O=castle long, attack;f3=support e4 and g4;g4=kingside pawn storm;Be2=solid development;O-O=castle;c3=Alapin center",
+   "b": "Nc6=develop, hit d4;d6=support e5;Nf6=hit e4;a6=stop Nb5, prepare ...b5;e5=gain space;e6=solid Scheveningen;g6=Dragon fianchetto;Bg7=long diagonal;Be7=develop;O-O=castle;b5=queenside expansion;Rc8=c-file pressure;d5=central break;Qc7=flexible queen",
+   "exp": "Najdorf and Dragon structures were played by Fischer and Kasparov, among many others.",
+   "why": "The most popular reply to 1.e4: Black unbalances the game at once and plays for a win instead of mirroring White.",
+   "ideas": [
+    "Black trades the c-pawn for White's d-pawn: a queenside pawn majority and a half-open c-file.",
+    "White's lead in development and e4 space means Black must respect king attacks (Be3, Qd2, f3, g4).",
+    "Black's freeing breaks are ...d5 and ...b5; White's are e5, f4-f5 and Nd5.",
+    "Against Alapin and Closed lines, the fight is over the d4-d5 break and the center.",
+    "Sharp theory in Najdorf/Dragon; Scheveningen, Taimanov and Kan are more flexible.",
+    "Always count the race: pawn storm against your king versus counterplay on the c-file."
+   ],
+   "mist": [
+    "Playing ...d5 early, before developing, so White's lead in development tells.",
+    "Ignoring White's kingside storm (g4-g5) while pushing ...b5 without support.",
+    "Memorizing sharp lines without the structure, then losing to a sideline."
+   ],
+   "trap": [
+    "Bxf6 then Nd5 or e5 punishing a loose knight in 6.Bg5 lines (watch pins on d7/f6).",
+    "Nxe6 or Nd5 sacrifices when Black's king is uncastled and e6/d6 are loose."
+   ],
+   "coach": "Learn the structure before the moves. In the Najdorf, understand why ...a6 and ...e5/...e6 are played and what ...b5 and ...d5 achieve. Choose one Black system and one anti-Sicilian answer as White (Alapin is easiest to learn).",
+   "end": "Middlegames are double-edged; endgames favor the safer king and better pawn structure. Black's queenside majority is a long-term asset.",
+   "mem": "e4 vs c5: trade the c-pawn for the d-pawn, then Black strikes with ...d5 or ...b5 while White attacks the king."
+  },
+  "french": {
+   "t": "French family",
+   "s": "Pawn chain e6/d5 against e5/d4 (Advance) or an open center (Exchange). Black's c8 bishop is the bad bishop; the d4/c3 base is the target for ...c5 and ...Qb6.",
+   "k": "White usually castles kingside and attacks there; Black can castle either side but watch h7 and the f-file.",
+   "p": "Black: knights c6/e7, Qb6/c7, trade the light bishop. White: Bd3, Nf3, Qd2, kingside space.",
+   "pl": "Black hits d4 (...c5, ...Nc6, ...Qb6) and undermines e5 (...f6); White advances on the kingside or keeps the chain solid.",
+   "o": "White wants space and a kingside attack; Black wants the ...c5 break and an active light bishop.",
+   "w": "e5=gain space;Nc3=develop;Bd3=aim at the kingside;Nf3=develop;c3=support d4;Be2=solid;O-O=castle;Qd2=castle long ideas;f4=support e5;Bg5=pin Nf6",
+   "b": "d5=challenge e4;c5=attack the d4 base;Nc6=pressure d4;Qb6=hit d4 and b2;f6=undermine e5;Nf6=develop;Be7=develop;Bd7=develop the bad bishop;O-O=castle;b6=free the light bishop;Bb4=Winawer pin",
+   "exp": "Botvinnik and Korchnoi were famous French Defense players.",
+   "why": "A solid, counter-punching defense: Black accepts a cramped position for a strong pawn chain and clear plans.",
+   "ideas": [
+    "Attack the base of White's chain: ...c5, ...Nc6, ...Qb6 against d4.",
+    "Undermine e5 with ...f6 when White overextends.",
+    "Free the 'bad' light bishop with ...b6/...Ba6 or trade it.",
+    "White's plans are space, a kingside attack, or the Exchange for a quiet game.",
+    "The Winawer (3...Bb4) trades structure for activity and sharp play."
+   ],
+   "mist": [
+    "Leaving the light bishop buried behind e6/d5 with no plan to free it.",
+    "Castling into a Bxh7+ or Qg4 attack without ...f5 or ...Qc7 defenses.",
+    "Letting White keep e5 and d4 both fully supported."
+   ],
+   "trap": [
+    "Bxh7+ (Greek gift) after ...Nf6 and ...O-O with White's Ng5 and Qh5 ready.",
+    "Qg4 attacking g7 in the Winawer, when Black grabs pawns."
+   ],
+   "coach": "Pick your structure (Classical, Advance, Tarrasch, Winawer) and learn its two or three key plans well. The French rewards patience: do not rush ...c5 before your pieces are ready, and always know how your light bishop gets out.",
+   "end": "Endgames are often slightly better for White in the Exchange, but Black's solid structure and counterplay make the French hard to beat.",
+   "mem": "e6, d5, then c5 and f6: hit the base of the chain and free the light bishop."
+  },
+  "caro": {
+   "t": "Caro-Kann family",
+   "s": "Solid c6/d5 with a free light bishop (Classical) or a French-like chain (Advance). Black has no weaknesses and the endgame is comfortable.",
+   "k": "Black castles kingside after ...Be7 and ...Nf6; White's h-pawn push is the main king-attack idea.",
+   "p": "Black: Bf5/g6 outside the chain, Nd7/Nf6, Qc7. White: Nf3, Bd3, Bf4.",
+   "pl": "Black plays ...c5 or ...e5 to free the position; White uses space, or an IQP attack in the Panov.",
+   "o": "White wants a space edge and kingside pressure; Black wants safe development, then a pawn break.",
+   "w": "Nc3=develop;e5=gain space;Nf3=develop;Bd3=aim at the kingside;h4=attack the bishop;Bf4=develop actively;c3=support d4;O-O=castle;Qe2=flexible",
+   "b": "d5=challenge e4;dxe4=release tension;Bf5=develop outside the chain;Bg6=keep the bishop;e6=solid;Nf6=develop;Nd7=support;Qc7=flexible queen;Bd6=trade bishops;c5=break d4;Be7=develop;O-O=castle;h6=bishop retreat",
+   "exp": "Capablanca, Petrosian and Karpov are among the great Caro-Kann players.",
+   "why": "Rock-solid but not passive: Black keeps a healthy structure and a free light bishop and heads for a comfortable endgame.",
+   "ideas": [
+    "Support d5 with c6, then develop the light bishop before ...e6.",
+    "Classical: ...Bf5, ...Nd7, ...Ngf6 and a safe, healthy structure.",
+    "Advance: attack the chain with ...c5 and ...Nc6 rather than waiting.",
+    "Panov: play for piece activity against the IQP.",
+    "Exchange: easy equality; use the half-open c-file."
+   ],
+   "mist": [
+    "Playing ...e6 before the light bishop is out.",
+    "Pushing ...h6 and ...Bh7 without a plan against White's h4-h5 push.",
+    "Being too passive against the Advance Variation and getting squeezed."
+   ],
+   "trap": [
+    "Nd6+ or Nxf7 tricks if the e-pawn is advanced and the king is stuck.",
+    "A Qa4 or Qb3 pin when Black's ...Bf5 hangs the b7 pawn."
+   ],
+   "coach": "The Caro-Kann is ideal if you like solid structures. Know your plan against each main reply: Advance (...c5, ...Bf5), Exchange (...Nc6, ...Bg4) and Classical (...Bf5 and ...e6). Aim for a safe middlegame and use the endgame edge.",
+   "end": "Endgames are Black's strength; White gets space but few targets.",
+   "mem": "c6, d5, free the bishop, then ...e6 and ...c5."
+  },
+  "semi": {
+   "t": "Semi-open / hypermodern defenses",
+   "s": "Black avoids symmetrical development: a fianchetto (Pirc/Modern), a quick ...d5 (Scandinavian) or tempo play (Alekhine). White often gets a big center.",
+   "k": "Black castles short behind the fianchetto; White often attacks with f4/Be3/Qd2/h4.",
+   "p": "Black: Bg7, Nf6/Nd7, ...c5/...e5 breaks. White: Nc3, Nf3, Be3, Bc4.",
+   "pl": "Black waits, then undermines the center with ...c5 or ...e5; White consolidates the center and develops quickly.",
+   "o": "White wants a big center and a fast attack; Black wants to hit the center in time.",
+   "w": "Nc3=develop;Nf3=develop;d4=take the center;Bd2=develop;Bc4=active bishop;Be3=develop;Qd2=connect;f4=Austrian attack;O-O-O=castle long;h3=prevent ...Bg4;Bd3=develop",
+   "b": "Nf6=hit e4;g6=fianchetto;Bg7=long diagonal;d6=support;c6=support b5 and d5;Qa5=pin Nc3;Qd6=safe queen;O-O=castle;Bf5=develop;c5=counter the center;e5=challenge the center;Nc6=develop",
+   "exp": "",
+   "why": "Hypermodern and semi-open defenses avoid book fights: Black lets White build, then counterattacks the center.",
+   "ideas": [
+    "Black fianchettoes (Pirc/Modern) or hits e4 at once (Scandinavian, Alekhine).",
+    "White gets space and often a big center, but it can become a target.",
+    "Black's key breaks are ...c5, ...e5 and ...f5 at the right moment.",
+    "Develop quickly and avoid early queen moves unless they win time.",
+    "White should avoid overextension and keep pieces coordinated."
+   ],
+   "mist": [
+    "Letting White roll forward with e5 and f4 without a counter-break.",
+    "Moving the queen repeatedly in the Scandinavian and falling behind in development.",
+    "Fianchettoing without castling early and leaving the king exposed."
+   ],
+   "trap": [
+    "Bxf7+ or Bxh7+ if Black's king sits behind a fianchetto without defenders.",
+    "e5 forks or pins after Black ignores the center."
+   ],
+   "coach": "Know the move-order tricks: in the Pirc, White's Austrian Attack (f4) is the main danger; in the Scandinavian, learn the queen retreat squares (a5, d6, d8). Always counterattack the center within the first 8-10 moves.",
+   "end": "Black aims to undermine White's center and reach an equal middlegame with flexible pawn structure.",
+   "mem": "Let White build, then hit the center with ...c5 or ...e5."
+  },
+  "ruy": {
+   "t": "Ruy Lopez family",
+   "s": "Closed Spanish centre (e4/d3 or d4 against e5/d6) or an open centre after exd4. The b5 bishop pressures the knight that guards e5.",
+   "k": "Both sides castle kingside early; the bishop and Re1 keep the center under control.",
+   "p": "White: Bb3, Re1, knights d2-f1-g3. Black: Bb7, Re8, Na5/Nd7.",
+   "pl": "White prepares c3-d4 and kingside maneuvers; Black expands with ...b5, ...Na5, ...c5 and ...d5.",
+   "o": "White wants d4 at the right moment; Black wants ...d5 or queenside expansion and trades to ease the squeeze.",
+   "w": "Bb5=pin the knight;Ba4=keep the pin;O-O=castle;Re1=support e4;c3=prepare d4;d4=central break;h3=prevent ...Bg4;Bb3=keep the bishop;Nbd2=reroute;Nf1=reroute;Ng3=kingside pressure;a4=hit b5;Bxc6=exchange variation",
+   "b": "Nc6=defend e5;a6=question the bishop;Nf6=hit e4;Be7=develop;b5=gain space;d6=support e5;O-O=castle;Bb7=long diagonal;Re8=pressure e4;Na5=trade the bishop;c5=queenside play;d5=Marshall counter;Bc5=active bishop",
+   "exp": "The Ruy Lopez has been a main weapon of Lasker, Capablanca, Fischer and Carlsen.",
+   "why": "The classical main line of 1.e4 e5: slow pressure on e5 with endless middlegame plans and a small, lasting edge for White.",
+   "ideas": [
+    "Bb5 pins the knight that defends e5; the real aim is long-term pressure on the center.",
+    "White builds c3 and d4 in the Closed Ruy, with Re1, Bb3 and h3 as standard moves.",
+    "Black expands with ...b5, ...Na5 and ...c5 or ...d5 breaks.",
+    "Exchange Variation: damaged queenside pawns for a healthier kingside majority.",
+    "Berlin Defense: a solid endgame-oriented defense; Marshall: a gambit for activity."
+   ],
+   "mist": [
+    "Giving up the bishop on c6 without a plan for the resulting pawn structure.",
+    "Playing d4 before the center is supported (c3, Re1) and losing the e4 pawn.",
+    "Allowing ...d5 breaks without preparation in the Closed Ruy."
+   ],
+   "trap": [
+    "The Marshall Gambit (...d5) is a deep, forcing line; know it or sidestep with 8.a4 (Anti-Marshall).",
+    "Bxc6 followed by Nxe5 winning a pawn when e5 loses its protector."
+   ],
+   "coach": "Learn the closed structure: c3, d4, Nbd2-f1-g3 and the plans for both sides. Choose either the Main Line (Bb3, c3, h3) or the Exchange for a simpler game. If you dislike theory, play the Exchange.",
+   "end": "Closed Ruy: slow maneuvering. Exchange and Berlin lines lead to endings where pawn structure and bishop pair decide.",
+   "mem": "Bb5 pins; castle; Re1, c3, d4: build the center slowly and keep the e4 pawn safe."
+  },
+  "italian": {
+   "t": "Italian / Two Knights family",
+   "s": "A flexible centre (c3/d3/e4) with the bishop on c4 eyeing f7. Often a slow, closed-ish structure where d4 is the central break.",
+   "k": "Castle kingside early; the bishop on c4 and the knight on f3 support play against f7.",
+   "p": "White: Bc4/b3, Nbd2-f1-g3, Re1, Qe2. Black: Bc5/Be7, Nc6, ...d6/...d5.",
+   "pl": "White builds with c3-d3, then d4 or a kingside regroup; Black frees the game with ...d5 or ...Na5.",
+   "o": "White wants d4 at the right time; Black wants ...d5 for equality or to trade the bishop.",
+   "w": "Nf3=develop;Bc4=aim at f7;c3=prepare d4;d3=solid center;O-O=castle;Re1=support e4;a4=stop ...b5;h3=stop ...Bg4;Nbd2=reroute;Nf1=reroute;Ng3=kingside pressure;d4=central break;b4=Evans gambit space;Bb3=keep the bishop",
+   "b": "Nc6=develop;Nf6=hit e4;Bc5=develop actively;Be7=solid;d6=support e5;O-O=castle;a6=prevent Bb5/Ba4 ideas;Ba7=keep the bishop;h6=stop Bg5;d5=central break;Na5=trade the bishop;Nxe4=take the e4 pawn",
+   "exp": "",
+   "why": "A flexible, classical center-building opening aiming at f7, with little forced theory in the quiet Giuoco Pianissimo.",
+   "ideas": [
+    "The bishop on c4 eyes f7; the center is built with c3, d3 and then d4.",
+    "Giuoco Pianissimo: slow maneuvering with a4, h3, Re1 and Nbd2-f1-g3.",
+    "Evans Gambit and Moller Attack give sharper play.",
+    "Black frees the game with ...d5 or ...Na5, or fights for e4 after Nf6.",
+    "Two Knights: avoid the Fried Liver theory with d3 (4.d3)."
+   ],
+   "mist": [
+    "Playing d4 too early without c3 support and losing the e4 pawn.",
+    "Retreating the bishop to b3 and then neglecting the center.",
+    "Falling for ...Nxe4 or ...d5 tactics when e4 is not defended."
+   ],
+   "trap": [
+    "Fried Liver Attack (Nxf7) in the Two Knights after 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7.",
+    "The ...Nxe4 trick when d3 has not been played and the Re1 pin disappears."
+   ],
+   "coach": "Aim for c3 and d3, castle, then reroute the knight to g3 or e3 and play d4 when the timing is right. Understand that this is a maneuvering opening: plan before you move.",
+   "end": "Often quiet and balanced; wins come from small advantages in pawn structure and piece activity.",
+   "mem": "Bc4, Nf3, c3, d3, O-O, Re1: then reroute the knight and strike with d4."
+  },
+  "open": {
+   "t": "Open games (1.e4 e5)",
+   "s": "Open centre: lines open early, so development and king safety dominate. Structures range from open centres to gambit positions.",
+   "k": "Castle early; do not leave the king in the center when lines open.",
+   "p": "Develop knights then bishops; fight for the center and the f7/f2 squares.",
+   "pl": "Complete development, castle, then open the center or attack the weak point.",
+   "o": "The side with the initiative wants to open lines; the defender wants to neutralize with ...d5 or ...Nf6.",
+   "w": "Nf3=develop;Nc3=develop;d4=central break;Bc4=aim at f7;Bd3=develop;O-O=castle;Be3=develop;f4=attack the center;Qe2=flexible;c3=prepare d4",
+   "b": "Nc6=develop;Nf6=counter e4;d5=free the position;Be7=develop;Bc5=active bishop;O-O=castle;exd4=open the center;d6=support e5;Bg4=pin the knight",
+   "exp": "",
+   "why": "Classical open-game theory: rapid development, central tension and king safety decide the game.",
+   "ideas": [
+    "Develop knights before bishops and castle early.",
+    "Fight for the center with d4 or ...d5 at the right moment.",
+    "Use gambit ideas (Scotch, King's Gambit, Vienna) only when you know the follow-up tactics.",
+    "Avoid pawn grabs that cost tempi; watch f7/f2 weaknesses.",
+    "Trade pieces when ahead; keep tension when your pieces are more active."
+   ],
+   "mist": [
+    "Early queen sorties that lose time.",
+    "Leaving the king in the center when lines are open.",
+    "Grabbing a pawn and falling behind in development."
+   ],
+   "trap": [
+    "Fried Liver, Legal's Mate and similar f7/f2 tactics.",
+    "Scholar's-style Qh5/Bc4 attacks on f7 if Black ignores them."
+   ],
+   "coach": "Count your developed pieces versus your opponent's every move. If you are ahead, open the position; if behind, keep it closed or trade.",
+   "end": "Open games reward activity; simplified endings depend on pawn structure and piece activity.",
+   "mem": "Knights, bishops, castle, then open the center when ahead in development."
+  },
+  "qg": {
+   "t": "Queen's Gambit / Slav family",
+   "s": "c4/d4 against d5: Carlsbad (c6/e6), Slav chain (c6/d5), QGA (White regains c4), IQP or hanging pawns after exchanges. The minority attack (b4-b5) is White's key plan.",
+   "k": "Both sides castle kingside; the king is rarely attacked early.",
+   "p": "White: Bg5/Bf4, Nc3/Nf3, Bd3, Rc1. Black: Nbd7, Bb7 or Bf5, Be7, Rc8.",
+   "pl": "White: minority attack, e4 break or Bd3-Qc2 kingside play. Black: ...c5/...e5 breaks and trading light bishops.",
+   "o": "White wants e4 or a queenside attack; Black wants a pawn break (...c5/...e5) and active bishops.",
+   "w": "c4=attack d5;Nc3=develop;Nf3=develop;Bg5=pin Nf6;e3=support d4;Bd3=develop;O-O=castle;Qc2=flexible queen;Rc1=c-file pressure;cxd5=exchange, minority attack;b4=minority attack;e4=central break;Bxc4=regain the pawn;a3=prepare b4",
+   "b": "d5=hold the center;e6=solid;Nf6=develop;Be7=develop;O-O=castle;c6=Slav setup;dxc4=take the pawn;c5=free the position;Nbd7=develop;b6=Bb7 setup;Bb7=long diagonal;h6=ask the bishop;Ne4=trade pieces;Bf5=develop outside the chain",
+   "exp": "Capablanca and Karpov played the Queen's Gambit Declined with great success.",
+   "why": "The classical 1.d4 opening: White fights for e4 and the center; Black chooses solid structures (QGD, Slav) or active ones (QGA).",
+   "ideas": [
+    "Challenge d5 with c4: if Black takes (QGA), White regains the pawn and gets center.",
+    "QGD: Black holds d5 with ...e6; the light bishop is the problem piece.",
+    "Slav: ...c6 keeps the light bishop free for ...Bf5.",
+    "Exchange Carlsbad: White plays the minority attack b4-b5; Black counters with ...Ne4 and ...f5.",
+    "Black's freeing moves are ...c5 and ...e5; White's are e4 and Qc2/Bd3 kingside play."
+   ],
+   "mist": [
+    "Taking on c4 without a plan to hold the pawn (...b5) or return it.",
+    "Playing Bg5 too early or Nf3 too early without considering ...Ne4 or ...c5.",
+    "Ignoring the minority attack and allowing a permanently weak c6 pawn."
+   ],
+   "trap": [
+    "Elephant Trap: 1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Nbd7 5.cxd5 exd5 6.Nxd5? Nxd5! 7.Bxd8 Bb4+ and Black wins.",
+    "Back-rank tactics when queens trade and the rooks are unconnected."
+   ],
+   "coach": "Know the three structures: Carlsbad (minority attack), IQP (attack vs blockade) and hanging pawns. Study the plans for each, then choose the QGD, Slav or QGA based on your style.",
+   "end": "QGD endings are usually balanced; Black's solid structure makes winning chances hard for White.",
+   "mem": "c4 vs d5: White takes the center, Black holds with e6 or c6 and breaks with ...c5."
+  },
+  "indianQ": {
+   "t": "Nimzo / Queen's Indian / Catalan family",
+   "s": "Black controls e4 with pieces (pin on c3 or Bb7) while White takes the c4/d4 centre or the bishop pair. Catalan: White uses g3/Bg2 pressure on d5 and the long diagonal.",
+   "k": "Kings castle short; Black often keeps a healthy pawn structure by giving up the bishop pair.",
+   "p": "Black: Bb4/Bb7 and the long diagonal. White: Nc3, Bd3, Qc2, e4 break; Catalan: Bg2, Qc2, Nbd2.",
+   "pl": "White occupies the centre with e4 or plays a3/Bxc3 structures; Black strikes with ...d5/...c5 and piece pressure.",
+   "o": "White wants the bishop pair and a big centre; Black wants to restrain e4 and hit the centre.",
+   "w": "d4=take the center;c4=space;Nc3=develop;Nf3=develop;g3=fianchetto;Bg2=long diagonal;O-O=castle;e3=solid;Bd3=develop;Qc2=flexible queen;a3=ask the Nimzo bishop;Bg5=pin;e4=central break",
+   "b": "Nf6=develop;e6=solid;Bb4=pin Nc3;b6=Queen's Indian;Bb7=long diagonal;O-O=castle;d5=central break;c5=counter in the center;Be7=develop;Bxc3=take the knight;Nc6=develop;d6=solid",
+   "exp": "Nimzowitsch (Nimzo-Indian), Karpov and Kramnik (Catalan) are strongly linked to these systems.",
+   "why": "Flexible, high-level systems: Black controls e4 with pieces; White fights with the bishop pair, the center or a fianchetto.",
+   "ideas": [
+    "Nimzo: pin Nc3 and fight for e4; trade the bishop for knight to damage structure.",
+    "Queen's Indian: Bb7 and ...Be7 control e4 without weaknesses.",
+    "Catalan: use the long diagonal and queenside pressure.",
+    "Bogo-Indian: solid, flexible and low-risk for Black.",
+    "Plans revolve around e4, the c-file, and whether White gets the bishop pair."
+   ],
+   "mist": [
+    "Giving up the bishop pair without compensation (Nimzo).",
+    "Playing ...d5 too early before the pieces are developed.",
+    "Letting White play e4 with a big center unopposed."
+   ],
+   "trap": [
+    "Bxc3 followed by Ng5 or e4 winning the pinned knight if Black is careless.",
+    "Qa4+ forks after ...b5 in Catalan lines."
+   ],
+   "coach": "Learn the key structure: doubled c-pawns versus bishop pair (Nimzo), the long diagonal fight (Catalan) and the e4 break. Play solid, flexible moves and avoid early commitments.",
+   "end": "Balanced endgames with small edges decided by structure and bishops.",
+   "mem": "Control e4 with pieces, then break with ...d5 or ...c5."
+  },
+  "kid": {
+   "t": "King's Indian / Grünfeld / Benoni family",
+   "s": "Hypermodern: Black fianchettoes and lets White build c4/d4/e4. KID: locked centre (d5/e5) with ...f5 against c5. Grünfeld: Black attacks the centre with pieces and ...c5. Benoni: asymmetrical with queenside majority.",
+   "k": "Black castles kingside and attacks it with pawns (...f5, ...g5) or keeps it solid; White often castles long to counter.",
+   "p": "Black: Bg7 (the monster), knights e8/d7/c6, rooks f8/e8. White: Be3/Bg5, Nf3, Qd2, space.",
+   "pl": "KID: ...e5 and ...f5 kingside play against White's c5/queenside space. Grünfeld: attack d4 with ...c5/...Nc6/...Bg4.",
+   "o": "White wants space and a queenside break; Black wants a kingside pawn storm or a central counterblow.",
+   "w": "d4=center;c4=space;Nc3=develop;e4=big center;Nf3=develop;Be2=solid;O-O=castle;Be3=develop;f3=Samisch;Qd2=castle long;d5=gain space;Bg5=pin;h3=support;cxd5=Grunfeld exchange;Rb1=b4 plan",
+   "b": "Nf6=develop;g6=fianchetto;Bg7=long diagonal;d6=solid center;O-O=castle;e5=strike the center;c5=Benoni or Grunfeld break;Nc6=pressure d4;d5=Grunfeld counter;Nbd7=develop;Re8=pressure e4;Ne8=prepare ...f5;f5=kingside attack;Nxd5=Grunfeld capture",
+   "exp": "Fischer and Kasparov used the King's Indian Defense as a main weapon.",
+   "why": "Let White build a big center and attack it: dynamic, double-edged and rich in attacking chances for Black.",
+   "ideas": [
+    "Black fianchettoes, castles, then strikes with ...e5 or ...c5.",
+    "Classical KID: after d5 the center locks; White plays on the queenside (c5), Black on the kingside (...f5-f4, ...g5).",
+    "Grünfeld: Black attacks the center with ...d5, ...Nxd5 and ...c5.",
+    "Benoni: asymmetrical; Black plays ...b5, ...Re8 and ...Nbd7.",
+    "The g7 bishop becomes a monster when the center closes."
+   ],
+   "mist": [
+    "Pushing ...f5 before development is complete.",
+    "Allowing White's c5 break without counterplay.",
+    "Playing ...exd4 too early and giving White an easy central grip."
+   ],
+   "trap": [
+    "Bg5 and Bxf6 followed by Nd5 when Black's knight leaves f6.",
+    "Early e5 pushes by White hitting the unprotected d6 pawn."
+   ],
+   "coach": "Learn the KID by structure: in the Classical, count the pawn storm race; in the Sämisch, the structure is different (...c5). Make sure you know your plan versus Bg5, h3 and f3 setups.",
+   "end": "Middlegames are sharp; endgames are less common, but a solid pawn structure and open g7 bishop help Black.",
+   "mem": "Fianchetto, castle, ...e5, ...f5: attack White's king while White attacks yours."
+  },
+  "dutch": {
+   "t": "Dutch family",
+   "s": "Black fights for e4 with ...f5: Stonewall (f5/e6/d5), Leningrad (g6/Bg7/d6) or Classical (d6/Be7).",
+   "k": "Castle short, but the e1-h4 diagonal and the e6 square need care.",
+   "p": "Black: Ne4 outpost, Bd6, Qe8-h5. White: Bg5/Bf4, Nc3, e3/e4.",
+   "pl": "Black attacks the kingside with ...Ne4 and ...f4; White uses the weak e6 square and queenside play.",
+   "o": "White wants to exploit the weakened king and e6; Black wants a kingside attack and control of e4.",
+   "w": "d4=center;c4=space;Nf3=develop;g3=fianchetto;Bg2=long diagonal;O-O=castle;Nc3=develop;Bg5=pin;e4=break;h4=attack;Qc2=flexible",
+   "b": "f5=control e4;Nf6=develop;e6=Stonewall base;g6=Leningrad;Bg7=long diagonal;d5=Stonewall center;d6=Leningrad center;O-O=castle;Qe8=prepare ...Qh5;Ne4=outpost;Bd6=Stonewall bishop;c6=support d5",
+   "exp": "",
+   "why": "A fighting defense that claims e4 immediately and aims for kingside attacks, with a wide choice of structures.",
+   "ideas": [
+    "Control e4 with ...f5 and develop the knight to f6.",
+    "Stonewall: pawns on f5/e6/d5 with an outpost on e4.",
+    "Leningrad: ...g6, ...Bg7 and a kingside pawn break with ...e5.",
+    "Classical: ...d6, ...Be7 and flexible play.",
+    "Watch the e1-h4 diagonal and the weak e6 square."
+   ],
+   "mist": [
+    "Ignoring Bg5 and h4 attacks on the king.",
+    "Playing ...d5 too early in the Leningrad and losing the e4 outpost.",
+    "Allowing Nc3-b5 hits on c7."
+   ],
+   "trap": [
+    "Bg5 and Nc3-b5-c7 forks when Black plays slowly.",
+    "Staunton Gambit (e4) tactics if Black grabs pawns without care."
+   ],
+   "coach": "Choose your setup (Stonewall or Leningrad) and learn its plans. Be ready for White's Bg5, g3/Bg2 fianchetto and e4 break.",
+   "end": "Complex middlegames; Black's king safety is the main issue.",
+   "mem": "f5 controls e4: then Nf6, e6 or g6 and a kingside attack."
+  },
+  "flank": {
+   "t": "Flank openings (English, Reti, Bird, KIA)",
+   "s": "Control d5/e5 with pieces and keep the centre flexible (Reversed Sicilian, Reti, King's Indian Attack). Transpositions are common.",
+   "k": "Castle short; g3/Bg2 is a safe shelter.",
+   "p": "Bg2 and Bb2 on the long diagonals, knights c3/f3, breaks with d4/e4.",
+   "pl": "Choose a centre after seeing Black's setup; expand with b4 or d4; attack with e4/Ne5.",
+   "o": "White wants a favourable centre; Black wants to claim the centre with ...e5/...d5 or symmetrical counterplay.",
+   "w": "c4=control d5;Nf3=develop;g3=fianchetto;Bg2=long diagonal;O-O=castle;Nc3=develop;d4=central break;b3=queen's bishop fianchetto;Bb2=long diagonal;e4=take the center;d3=solid;a3=prepare b4;b4=queenside expansion;Rb1=support b4",
+   "b": "e5=take the center;Nf6=develop;d5=hit c4;c5=symmetry and central pressure;g6=fianchetto;Bg7=long diagonal;Nc6=develop;e6=solid;Be7=develop;O-O=castle;d6=solid;Bb7=long diagonal",
+   "exp": "",
+   "why": "Flexible flank openings control the center with pieces and avoid early theoretical battles.",
+   "ideas": [
+    "Control d5 and e5 with pawns on c4 and pieces on f3 and c3.",
+    "Fianchetto the king's bishop (g3, Bg2) for long-diagonal pressure.",
+    "Choose a center after seeing Black's setup: d4 or e4.",
+    "Transpose to Queen's Gambit, Catalan or Sicilian-style structures.",
+    "English: reversed Sicilian ideas with extra tempo."
+   ],
+   "mist": [
+    "Being too passive and letting Black take the center for free.",
+    "Playing d3 and e4 without a plan for the queenside pawns.",
+    "Neglecting development while chasing a fianchetto."
+   ],
+   "trap": [
+    "Early Qb3 or Qa4 pins that win the c4 or d5 pawn if Black is careless.",
+    "Tactics on the long diagonal against b7/g7."
+   ],
+   "coach": "Flank openings are about flexibility, not speed. Make sure you know the main transpositions and what structures you want, then choose moves accordingly.",
+   "end": "Balanced, flexible endgames with minor advantages for the better-placed bishops.",
+   "mem": "Fianchetto, control d5 and e5, then pick the center."
+  },
+  "qp": {
+   "t": "d4 systems (London, Colle, Torre, Trompowsky)",
+   "s": "A compact pyramid (c3/d4/e3), fast development and flexible plans.",
+   "k": "Castle short; the king shelters behind e3/f2.",
+   "p": "Bf4/Bg5, Bd3, Nbd2-f3-e5, Qc2/Qb3.",
+   "pl": "Complete the setup, castle, then Ne5/Qf3 or e4; against ...c5/...Qb6 trade or defend b2.",
+   "o": "White wants a safe fast setup and a kingside plan; Black wants ...c5/...Bf5 and an equal fight for the centre.",
+   "w": "d4=center;Bf4=London bishop;e3=solid center;c3=pyramid;Nf3=develop;Nbd2=develop;Bd3=aim at h7;O-O=castle;Ne5=outpost;Qb3=hit b7;Qf3=pressure;h3=keep the bishop;Bg5=pin",
+   "b": "d5=take the center;Nf6=develop;e6=solid;c5=challenge d4;Nc6=pressure d4;Bf5=develop outside the chain;Bd6=trade bishops;O-O=castle;Qb6=hit b2;Nh5=attack the bishop;Be7=develop;c6=solid",
+   "exp": "",
+   "why": "Low-theory 1.d4 systems: a solid setup that you can reach against many Black replies.",
+   "ideas": [
+    "Build a pyramid with c3, d4, e3, develop bishops outside the chain.",
+    "London: Bf4, e3, Nbd2, Bd3, Ne5.",
+    "Colle/Torre: Nbd2 with a quick e4 break.",
+    "Trompowsky: Bg5 at move 2, with a flexible, offbeat character.",
+    "Plans involve Ne5, f4 or e4 break, and kingside attacks."
+   ],
+   "mist": [
+    "Playing the same setup without checking tactical issues (…Qb6, …Nh5, …Bf5).",
+    "Ignoring the c5/d4 tension and allowing ...Qb6 attacks on b2.",
+    "Trading pieces with no plan for your light-squared bishop."
+   ],
+   "trap": [
+    "...Qb6 hitting b2 after the bishop leaves the c1-h6 diagonal.",
+    "...Nh5 forks the bishop and f4/g3 squares when Bf4 is loose."
+   ],
+   "coach": "Solid is not automatic: learn the plan against ...c5/...Qb6, ...Bf5 and the King's Indian setups. Know when to switch to an e4 or c4 break.",
+   "end": "Equal-ish middlegames; success depends on planning, not memory.",
+   "mem": "c3, d4, e3, Bf4 or Bg5, then Ne5 and a kingside plan."
+  }
+ }
+}
