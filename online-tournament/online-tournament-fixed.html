@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><title>MyChess64 — Tournaments</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#0b1f3a"><meta name="description" content="MyChess64 — online chess tournaments. Learn. Play. Improve. Anytime, Anywhere.">
-<link rel="icon" href="assets/favicon.png"><link rel="apple-touch-icon" href="assets/icon-192.png"><link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="/assets/favicon.png"><link rel="apple-touch-icon" href="/assets/icon-192.png"><link rel="manifest" href="/manifest.webmanifest">
 <style>
 :root{box-sizing:border-box;--bg:#f2f4f7;--pn:#fff;--pn2:#eef1f5;--ln:#d9dee6;--fg:#1c2430;--mut:#6b7686;--ac:#0a66c2;--ac2:#f9a825;--ok:#4c8a1c;--bad:#d33;--lt:#f0d9b5;--dk:#b58863;--clk:#e5e9ef;--clkf:#1c2430;--hdr:#0b1f3a}
 @media(prefers-color-scheme:dark){:root{--bg:#0f1722;--pn:#17212f;--pn2:#1f2c3f;--ln:#2a384c;--fg:#e6ebf2;--mut:#93a1b5;--ac:#3b8cf0;--clk:#263447;--clkf:#e6ebf2}}
@@ -95,14 +95,14 @@ main.mid{max-width:1060px}
 .c-sum{background:var(--pn);border:1px solid var(--ln);border-radius:18px;overflow:hidden}.c-sum .top{background:linear-gradient(135deg,#0b1f3a,#0a4f9e);color:#fff;padding:16px 18px}.c-sum .top b{display:block;font-size:18px;word-break:break-word}.c-sum .top span{color:#cfe0f5;font-size:13px}
 .c-sum .bd2{padding:6px 18px 18px}.c-sum .li b{font-size:14px}.c-sum .tip{font-size:12px;color:var(--mut);text-align:center;margin-top:10px}
 </style></head><body>
-<header class="hd"><button class="ib" id="bk" onclick="goBack()" style="display:none" aria-label="Back">‹</button><img src="assets/favicon.png" alt=""><b>MyChess64</b><span class="sp"></span><button class="ib" onclick="menu=true;render()" aria-label="Settings">⚙</button></header>
+<header class="hd"><button class="ib" id="bk" onclick="goBack()" style="display:none" aria-label="Back">‹</button><img src="/assets/favicon.png" alt=""><b>MyChess64</b><span class="sp"></span><button class="ib" onclick="menu=true;render()" aria-label="Settings">⚙</button></header>
 <div id="idw"></div><div id="cdwn"></div><main id="app"></main>
-<footer class="ft" id="ft"><img src="assets/Footer_Logo.png" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere. · v2.2</p></footer>
+<footer class="ft" id="ft"><img src="/assets/favicon.png" alt="MyChess64"><p>Learn. Play. Improve. Anytime, Anywhere. · v2.2</p></footer>
 <div id="sheet" onclick="menu=false;render()"></div><div id="tz"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+<script src="/firebase-config.js"></script>
 <script id="core">
 const FL='abcdefgh',START='rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR',GL={K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟'};
 const tcl=(m,i)=>(m==.5?'½':m==.25?'¼':m==.75?'¾':m)+'+'+i;
@@ -230,7 +230,7 @@ function saveCache(){if(!tid||!T)return;clearTimeout(saveCache.t);saveCache.t=se
 const addRec=(id,n)=>ls.set('rec',[{id,name:n},...(ls.get('rec')||[]).filter(x=>x.id!=id)].slice(0,5));
 async function init(){
  const C=window.FIREBASE_CONFIG;
- if(!window.firebase||!C||/YOUR_/.test(C.apiKey||'YOUR_')){app.innerHTML='<div class="cd"><h2>Setup needed</h2>Open <b>firebase-config.js</b> and paste your Firebase web-app settings.</div>';return}
+ if(!window.firebase||!C||/YOUR_/.test(C.apiKey||'YOUR_')){app.innerHTML='<div class="cd"><h2>Setup needed</h2>Upload <b>/firebase-config.js</b> to the website root with your Firebase web-app settings.</div>';return}
  firebase.initializeApp(C);db=firebase.firestore();try{db.settings({experimentalAutoDetectLongPolling:true})}catch(e){}try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
  const au=firebase.auth();let first=true;
  au.onAuthStateChanged(async u=>{
