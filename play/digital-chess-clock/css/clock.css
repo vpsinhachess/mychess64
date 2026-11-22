@@ -1,0 +1,94 @@
+/* Player panels, digits and the centre control deck */
+
+.panel{
+  position:relative;min-width:0;min-height:0;
+  container-type:size;
+  border-radius:var(--radius);
+  background:var(--panel);color:var(--panel-text);
+  overflow:hidden;
+  touch-action:manipulation;
+  transition:background-color .18s ease,color .18s ease;
+}
+.panel-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(10px,4cqh,28px);
+  padding:0 4cqw;
+}
+.panel .top{
+  position:absolute;
+  left:clamp(14px,3cqmin,26px);right:clamp(14px,3cqmin,26px);top:clamp(10px,2.4cqmin,20px);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font:600 clamp(13px,2.6cqmin,18px)/1 var(--font);letter-spacing:.02em;
+}
+.who{display:flex;align-items:center;gap:8px}
+.name,.status{opacity:.75}
+.sym{
+  width:clamp(30px,6.4cqmin,50px);height:clamp(30px,6.4cqmin,50px);
+  display:block;flex:none;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));
+}
+/* Black king is black-on-charcoal: give it a light halo so it stays readable */
+.panel.idle .sym{filter:drop-shadow(0 0 1.5px rgba(255,255,255,.55))}
+
+/* Digits: every character sits in a fixed-width cell so the clock never jitters */
+.time{
+  font-family:var(--font);font-weight:800;
+  font-variant-numeric:lining-nums tabular-nums;
+  font-size:min(calc(78cqw / var(--w,2.4)),36cqh);
+  line-height:1;white-space:nowrap;text-align:center;letter-spacing:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.time i{font-style:normal;display:inline-block;text-align:center}
+.time i.n{width:.64em}
+.time i.c{width:.34em;transform:translateY(-.04em)}
+.time i.d{width:.3em}
+
+.moves{font:600 clamp(16px,3.3cqmin,28px)/1 var(--font);letter-spacing:.01em}
+.moves b{font-weight:700}
+
+/* States */
+.panel.turn{background:var(--yellow);color:var(--ink);cursor:pointer}
+.panel.turn.warning{background:var(--orange)}
+.panel.turn.critical{background:var(--red);color:#fff;animation:pulse 1s ease-in-out infinite}
+.panel.idle.warning{color:var(--orange)}
+.panel.idle.critical{color:#f87171}
+.panel.flag{background:var(--flag);color:#fff;animation:none}
+.panel.turn.paused .time{animation:blink 1.1s steps(2,jump-none) infinite}
+.panel.turn:active{filter:brightness(.96)}
+@keyframes pulse{50%{filter:brightness(.88)}}
+@keyframes blink{50%{opacity:.35}}
+
+/* Control deck */
+#deck{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.fmt{
+  text-align:center;color:#d6d6d6;min-height:1.1em;
+  font:700 20px/1.1 var(--font);letter-spacing:0;font-variant-numeric:lining-nums tabular-nums;
+}
+.fmt.long{font-size:14px}
+.fmt small{display:block;margin-top:3px;font:600 11px/1 var(--font);letter-spacing:.04em;color:#8a8a8a}
+.ctl{
+  width:64px;height:58px;border-radius:15px;
+  background:var(--btn);color:#f2f2f2;
+  display:grid;place-items:center;
+  box-shadow:0 4px 0 var(--btn-edge);
+  transition:transform .06s,box-shadow .06s,background-color .15s,color .15s;
+}
+.ctl svg{width:26px;height:26px;fill:currentColor;stroke:none;pointer-events:none}
+.ctl svg.s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ctl:hover{background:#303030}
+.ctl:active{transform:translateY(3px);box-shadow:0 1px 0 var(--btn-edge)}
+.ctl.primary.go{color:var(--yellow)}
+
+@media (orientation:portrait){
+  #deck{flex-direction:row;gap:10px;padding:2px 0}
+  .fmt{min-width:58px}
+  .ctl{width:min(64px,16vw);height:56px}
+}
+@media (orientation:landscape) and (max-height:520px){
+  :root{--deck-w:68px;--gap:8px}
+  #deck{gap:8px}
+  .ctl{width:52px;height:44px;border-radius:12px}
+  .ctl svg{width:22px;height:22px}
+  .fmt{font-size:16px}
+}

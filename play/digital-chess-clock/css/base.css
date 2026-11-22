@@ -1,0 +1,56 @@
+/* Design tokens, reset and page layout */
+:root{
+  --bg:#161616;
+  --panel:#232323;
+  --panel-text:#9b9b9b;
+  --yellow:#fbbf24;
+  --orange:#fb923c;
+  --red:#ef4444;
+  --flag:#b91c1c;
+  --ink:#1b1109;
+  --btn:#262626;
+  --btn-edge:#0a0a0a;
+  --deck-w:84px;
+  --gap:12px;
+  --radius:22px;
+  --font:"Outfit",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);overscroll-behavior:none}
+body{font-family:var(--font);color:#eee}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0}
+input{-webkit-user-select:text;user-select:text}
+img{-webkit-user-drag:none}
+:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}
+
+/* Landscape / desktop:  White | controls | Black */
+#app{
+  position:fixed;inset:0;height:100dvh;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) var(--deck-w) minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr);
+  grid-template-areas:"white deck black";
+  gap:var(--gap);
+  padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+  background:var(--bg);
+}
+#whiteClock{grid-area:white}
+#blackClock{grid-area:black}
+#deck{grid-area:deck}
+
+/* Portrait / mobile:  Black on top, controls in the middle, White at the bottom */
+@media (orientation:portrait){
+  #app{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) auto minmax(0,1fr);
+    grid-template-areas:"black" "deck" "white";
+    gap:10px;
+  }
+  /* Face-to-face play: Black is turned 180° for the opponent across the table */
+  #app.flip #blackClock .panel-inner{transform:rotate(180deg)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
