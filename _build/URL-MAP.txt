@@ -1,21 +1,21 @@
-FOLDER RENAMES (so folder names match the public URLs used in menus, footers and canonicals)
-  diagram-generator    -> chess-diagram-generator
-  gif-video-maker      -> chess-gif-video-maker
-  position-share       -> chess-position-share
-  rating-converter     -> chess-rating-converter
-  rating-tracker       -> chess-rating-tracker
-  scoresheet-generator -> chess-scoresheet-generator
-All other folders keep their names. Every tool lives at /tools/<folder>/ and the library at /tools/.
+URL PATTERN   https://www.mychess64.com/<section>/<tool>/      (section = tools | master-tools)
+              No page ever links to a bare  something.html  or to a sibling relative path any more.
 
-LINK FIXES
-  performance-rating-calulator.html (typo)  -> /tools/performance-rating-calculator/
-  every  *.html  link and JS-built link    -> /tools/<slug>/
-  pgn-editor.html, pgn-merger.html          -> removed (pages not in the ZIP)
-  chess-analysis-board.html                 -> button hidden until ANALYSIS_URL is set (image-to-fen, chess-position-share)
+master-tools/  (9 tools + library page)
+  /master-tools/analysis-board/        /master-tools/training-board/       /master-tools/opening-repertoire/
+  /master-tools/custom-position/       /master-tools/chess-lens/           /master-tools/pgn-editor/
+  /master-tools/pgn-merger/            /master-tools/student-tracker/      /master-tools/player-report-card/
+  /master-tools/                       (new library page)
 
-NOT VERIFIABLE FROM THIS ZIP (outside /tools/)
-  https://www.mychess64.com/            https://www.mychess64.com/academy/
-  https://www.mychess64.com/community/  https://www.mychess64.com/play/digital-chess-clock/
+RENAMED
+  opening-repertiore  ->  opening-repertoire     (typo; PDFs, Python and JSON stay inside the folder)
 
-Re-check any time:   python3 _build/build_tools.py check tools
-After editing TOOLS: python3 _build/build_tools.py refresh tools
+LINKS FIXED
+  pgn-merger/prize-fund-splitter.html      ->  /tools/prize-fund-splitter/
+  pgn-editor/*.html, pgn-merger/*.html     ->  /tools/<slug>/  or  /master-tools/<slug>/
+  position-share-tool.html                 ->  /tools/chess-position-share/
+  chess-analysis-board.html                ->  /master-tools/analysis-board/   (also switched on in image-to-fen and chess-position-share)
+  old per-page "All tools" nav built in JS  ->  removed (replaced by the shared header)
+
+Re-check any time:   python3 _build/build_site.py check .
+After editing TOOLS: python3 _build/build_site.py refresh .
