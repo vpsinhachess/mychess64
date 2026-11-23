@@ -1,0 +1,4 @@
+document.getElementById('pbl').src=document.getElementById('hl').src
+const CUR="academy-break-even-calculator";const T={"fields": [["fx", "Fixed costs per month (₹)", "number", 25000], ["fee", "Fee per student per month (₹)", "number", 1500], ["vc", "Variable cost per student (₹)", "number", 150], ["cur", "Current students", "number", 14]], "title": "Academy Break-Even Calculator", "slug": "academy-break-even-calculator", "mode": "std"};function calc(v){const cm=n(v.fee)-n(v.vc);if(cm<=0)return '<p class="bad">Fee must be higher than the variable cost per student.</p>';
+const be=Math.ceil(n(v.fx)/cm),cur=n(v.cur),d=cur-be;
+return st('Break-even students',be)+st('Break-even revenue',inr(be*n(v.fee)),'Per month')+st(d>=0?'Above break-even':'Short of break-even',`<span class="${d<0?'bad':''}">${Math.abs(d)} students</span>`,'Monthly result now: '+inr(cur*cm-n(v.fx)))}

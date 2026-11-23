@@ -1,0 +1,5 @@
+document.getElementById('pbl').src=document.getElementById('hl').src
+const CUR="tournament-time-planner";const T={"fields": [["rd", "Rounds", "number", 7], ["b", "Base time (minutes)", "number", 60], ["inc", "Increment (seconds)", "number", 30], ["mv", "Expected moves per game", "number", 50], ["bk", "Break between rounds (minutes)", "number", 20], ["t", "First round starts", "time", "09:00"]], "title": "Tournament Time Planner", "slug": "tournament-time-planner", "mode": "std"};function calc(v){const L=2*(n(v.b)+n(v.inc)*n(v.mv)/60),[h,m]=v.t.split(':').map(Number);let c=h*60+m,rows='';
+const hm=x=>{const d=Math.floor(x/1440),y=x%1440;return String(Math.floor(y/60)).padStart(2,'0')+':'+String(Math.round(y%60)).padStart(2,'0')+(d?' (+'+d+'d)':'')};
+for(let i=1;i<=n(v.rd);i++){rows+=`<tr><td>Round ${i}</td><td>${hm(c)}</td><td>${hm(c+L)}</td></tr>`;c+=L+n(v.bk)}
+return st('Latest finish',hm(c-n(v.bk)),'Total '+((c-n(v.bk)-(h*60+m))/60).toFixed(1)+' hours')+`<table><tr><th>Round</th><th>Start</th><th>Latest end</th></tr>${rows}</table>`}

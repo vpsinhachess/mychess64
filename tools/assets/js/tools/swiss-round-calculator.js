@@ -1,0 +1,3 @@
+const CUR="swiss-rounds-calculator";const T={"fields": [["p", "Number of players", "number", 40], ["r", "Rounds planned (0 = recommend)", "number", 0]], "title": "Swiss Rounds Calculator", "slug": "swiss-rounds-calculator", "mode": "std"};function calc(v){const p=Math.floor(n(v.p));if(p<2)return '<p class="bad">Need at least 2 players.</p>';
+const rec=Math.ceil(Math.log2(p)),r=n(v.r)||rec,bd=Math.floor(p/2);
+return st('Rounds',r,r==rec?'Recommended':'Recommended: '+rec)+st('Boards per round',bd,p%2?'1 player gets a bye each round':'')+st('Total games',bd*r)+st('Maximum before round-robin',p-1+' rounds',r>=p-1?'Consider a round-robin instead':'')}

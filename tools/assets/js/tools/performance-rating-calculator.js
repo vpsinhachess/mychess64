@@ -1,0 +1,3 @@
+const CUR="performance-rating-calculator";const T={"fields": [["o", "Average opponent rating", "number", 1700], ["g", "Games played", "number", 9], ["s", "Your score (points)", "number", 6]], "title": "Performance Rating Calculator", "slug": "performance-rating-calculator", "mode": "std"};function calc(v){const o=n(v.o),g=n(v.g),s=n(v.s);if(s>g||g<=0)return '<p class="bad">Enter a valid score and game count.</p>';
+const p=s/g,q=Math.min(.99,Math.max(.01,p)),dp=Math.max(-800,Math.min(800,400*Math.log10(q/(1-q))));
+return st('Performance rating',Math.round(o+dp))+st('Score',(p*100).toFixed(1)+'%',s+' / '+g)+st('Rating difference',(dp>=0?'+':'')+Math.round(dp))}

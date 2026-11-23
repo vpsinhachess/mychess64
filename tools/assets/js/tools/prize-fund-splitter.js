@@ -1,0 +1,4 @@
+document.getElementById('pbl').src=document.getElementById('hl').src
+const CUR="prize-fund-splitter";const T={"fields": [["f", "Total prize fund (₹)", "number", 50000], ["pl", "Number of prizes", "number", 6], ["rt", "Each prize is this % of the one above", "number", 60], ["rn", "Round to nearest", "select", "100", ["1", "10", "50", "100", "500"]]], "title": "Prize Fund Splitter", "slug": "prize-fund-splitter", "mode": "std"};function calc(v){const N=Math.min(50,Math.floor(n(v.pl))),r=n(v.rt)/100,R=n(v.rn);let w=[];for(let i=0;i<N;i++)w.push(Math.pow(r,i));const s=w.reduce((a,b)=>a+b,0);
+let a=w.map(x=>Math.round(n(v.f)*x/s/R)*R);a[0]+=n(v.f)-a.reduce((x,y)=>x+y,0);
+return st('Total',inr(n(v.f)),'1st prize '+inr(a[0]))+'<table><tr><th>Place</th><th>Prize</th><th>Share</th></tr>'+a.map((x,i)=>`<tr><td>${i+1}</td><td>${inr(x)}</td><td>${(x/n(v.f)*100).toFixed(1)}%</td></tr>`).join('')+'</table>'}

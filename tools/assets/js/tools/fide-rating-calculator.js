@@ -1,0 +1,3 @@
+const CUR="fide-rating-calculator";const T={"fields": [["r", "Your current rating", "number", 1500], ["o", "Average opponent rating", "number", 1600], ["g", "Games played", "number", 9], ["s", "Your score (points)", "number", 5.5], ["k", "K-factor", "select", "20", ["40", "20", "10"]]], "title": "FIDE Rating Calculator", "slug": "fide-rating-calculator", "mode": "std"};function calc(v){const r=n(v.r),o=n(v.o),g=n(v.g),s=n(v.s),k=n(v.k);if(s>g)return '<p class="bad">Score cannot exceed games played.</p>';
+const e=1/(1+Math.pow(10,(o-r)/400)),ex=e*g,ch=k*(s-ex);
+return st('New rating',Math.round(r+ch))+st('Rating change',(ch>=0?'+':'')+ch.toFixed(1))+st('Expected score',ex.toFixed(2)+' / '+g,'Win expectancy per game: '+(e*100).toFixed(1)+'%')}
