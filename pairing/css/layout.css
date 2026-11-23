@@ -1,0 +1,18 @@
+/* css/layout.css - page frame: header, main column, rows, tabs, footer, responsive rules. */
+main{max-width:1040px;margin:0 auto;padding:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tabs button{border-radius:999px;padding:5px 14px;font-weight:600}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bar b{margin-right:4px}.bar select{min-width:120px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--hd);color:#fff;padding:10px 16px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+header h1{margin:0;color:#fff;font-size:18px}
+header button{background:rgba(255,255,255,.16);color:#fff;border-color:transparent}
+header button.on{background:#fff;color:#0d1f36}
+.brand{display:flex;align-items:center;gap:12px}.logo{background:#fff;border-radius:10px;padding:3px 10px;display:inline-flex;line-height:0}.logo img{height:54px;width:auto}
+.bt{color:#fff;font-weight:700;font-size:17px;letter-spacing:.3px}
+@media (max-width:640px){.bt{display:none}.logo img{height:42px}}
+.org{display:none}.os .org{display:inline-block}
+.ft{text-align:center;padding:26px 16px 34px;border-top:1px solid var(--bd);margin-top:28px;color:var(--mu);font-size:13px;line-height:1.7}
+.ft .fl{height:84px;width:auto;background:#fff;border-radius:12px;padding:6px 16px;margin-bottom:8px;border:1px solid var(--bd)}
+.ft .fb{color:var(--fg);font-size:15px;font-weight:700;margin-bottom:2px}.ft a{color:var(--ac);font-weight:600}

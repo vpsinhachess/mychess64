@@ -1,0 +1,10 @@
+/* css/tables.css - tables, pairing table, standing table. */
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+th{color:var(--mu);font-weight:600;background:rgba(127,127,127,.08);font-size:13px}
+tr:nth-child(even) td{background:rgba(127,127,127,.06)}
+#st tr:nth-child(2) td:first-child{color:#c9a227;font-weight:700}#st tr:nth-child(3) td:first-child{color:#9a9a9a;font-weight:700}#st tr:nth-child(4) td:first-child{color:#b0713b;font-weight:700}
+#pairs select{min-width:92px;font-weight:600}
+.pt th:nth-child(3),.pt th:nth-child(4),.pt th:nth-child(5),.pt th:nth-child(7),.pt th:nth-child(8),.pt td:nth-child(3),.pt td:nth-child(4),.pt td:nth-child(5),.pt td:nth-child(7),.pt td:nth-child(8){text-align:center}
+.pt td:nth-child(5){min-width:140px}.pt select{display:block;margin:0 auto;text-align:center;text-align-last:center}
+.stt th:nth-child(n+3),.stt td:nth-child(n+3){text-align:center}

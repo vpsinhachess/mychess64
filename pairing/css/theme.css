@@ -1,0 +1,4 @@
+/* css/theme.css - colours. Light by default; dark follows the device unless the user taps the theme button (html[data-theme]). */
+:root{--bg:#f7f6f2;--fg:#1d1d1b;--card:#fff;--bd:#d9d7cf;--mu:#6b6a63;--ac:#0a66c2;--on:#fff;--hd:#0d1f36;--hl:#fff2a8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171815;--fg:#ecebe5;--card:#22231f;--bd:#3a3b35;--mu:#9a9990;--ac:#5aa9ff;--on:#0a1524;--hd:#0a1524;--hl:#4a4220}}
+:root[data-theme="dark"]{--bg:#171815;--fg:#ecebe5;--card:#22231f;--bd:#3a3b35;--mu:#9a9990;--ac:#5aa9ff;--on:#0a1524;--hd:#0a1524;--hl:#4a4220}
